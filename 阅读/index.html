@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>show-something 阅读目录 · AI 工程五讲</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,PingFang SC,sans-serif; background:#f8fafc; color:#1f2328; line-height:1.7; }
+  .wrap { max-width:860px; margin:0 auto; padding:48px 24px 64px; }
+  header.hero { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:36px 32px; margin-bottom:28px; }
+  header.hero h1 { font-size:26px; margin-bottom:10px; }
+  header.hero p.sub { color:#6b7280; font-size:15px; }
+  header.hero .meta { margin-top:14px; font-size:13px; color:#94a3b8; }
+  .intro { background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:18px 22px; font-size:14px; margin-bottom:28px; }
+  .intro b { color:#1d4ed8; }
+  .card { display:block; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:22px 26px; margin-bottom:16px; text-decoration:none; color:inherit; transition:border-color .15s, box-shadow .15s; }
+  .card:hover { border-color:#93c5fd; box-shadow:0 2px 10px rgba(59,130,246,.08); }
+  .card .no { display:inline-block; font-size:12px; font-weight:600; color:#1d4ed8; background:#dbeafe; border-radius:99px; padding:2px 12px; margin-bottom:8px; }
+  .card h2 { font-size:18px; margin-bottom:6px; }
+  .card p { font-size:14px; color:#475569; }
+  .card .tags { margin-top:8px; font-size:12px; color:#94a3b8; }
+  footer { margin-top:32px; font-size:13px; color:#94a3b8; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>AI 工程五讲 · 阅读版</h1>
+    <p class="sub">五篇关于 AI 时代工程问题的文章，每篇 10 分钟读懂：讲清楚是什么、为什么、怎么做。</p>
+    <p class="meta">每篇都配了图和类比，读完想深挖的，可以从每篇底部进入对应的深入版（Markdown）。</p>
+  </header>
+
+  <div class="intro">
+    <b>建议阅读顺序：</b>01 → 04 讲"为什么会出问题"（Agent 的行为与可靠性）；02 → 03 讲"怎么防"（证据化工程与需求契约）；05 是一篇基于公开证据的 Codex vs Claude Code 协作对比调研。只看每篇开头的「30 秒版」也能抓住核心。
+  </div>
+
+  <a class="card" href="讲解-01-越聊越浅.html">
+    <span class="no">01 · 机制拆解</span>
+    <h2>为什么编码 Agent 越聊越浅</h2>
+    <p>不是模型变笨，是三个机制叠加：上下文腐烂、自我纠错盲区、交接成本。解法不是更好的提示词，而是按变化速度分层管理信息。</p>
+    <div class="tags">上下文腐烂 · 自我纠错 · 信息分层</div>
+  </a>
+
+  <a class="card" href="讲解-02-证据化工程.html">
+    <span class="no">02 · 案例论证</span>
+    <h2>AI 让看起来正确变得廉价：从似真产出到证据化工程</h2>
+    <p>AI 把"看起来正确"的生成成本压到近零，但验证成本没有降——工程重心必须从"产出"转向"证据链与门禁"。</p>
+    <div class="tags">似真产出 · 门禁 · 证据链</div>
+  </a>
+
+  <a class="card" href="讲解-03-PRD契约.html">
+    <span class="no">03 · 方法指南</span>
+    <h2>AI 时代，PRD 有了第二类读者：把需求文档变成可验证契约</h2>
+    <p>当 PRD 同时被人和编码 Agent 读取，歧义会被并行执行放大。需求文档要从"可读说明"升级为"可验证契约"。</p>
+    <div class="tags">PRD · 单一事实源 · 意图回放</div>
+  </a>
+
+  <a class="card" href="讲解-04-提示词与代码边界.html">
+    <span class="no">04 · 机制拆解</span>
+    <h2>Agent 系统可靠性：提示词、模型与代码的边界</h2>
+    <p>事故的根因往往不是"提示词不够狠"，而是分工错了：提示词只能降低失败率，代码才能消除可计算的失败。</p>
+    <div class="tags">提示词边界 · 参数分型 · 纵深防御</div>
+  </a>
+
+  <a class="card" href="讲解-05-协作可靠性调研.html">
+    <span class="no">05 · 证据评审</span>
+    <h2>Claude Code 与 Codex 真实协作可靠性调研</h2>
+    <p>别问谁的分数高，问拉回来的成本是多少——用稳定性、协作成本与失败可恢复性评价编码 Agent，公开证据初步支持 Claude 系更适合协商型协作。</p>
+    <div class="tags">证据标签 · 任务模型 · 协作成本</div>
+  </a>
+
+  <footer>深入版（Markdown）位于仓库「来源」目录 · 本目录与讲解页均为离线可读的本地文件 · 2026-10-16</footer>
+</div>
+</body>
+</html>

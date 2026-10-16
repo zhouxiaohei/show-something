@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讲解 · Agent 系统可靠性：提示词、模型与代码的边界</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+  a { color: #3b82f6; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* Hero */
+  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
+  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
+  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
+  .hero .why { color: #6b7280; font-size: 15px; }
+  .hero .why strong { color: #1f2328; }
+  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
+  /* 30秒版 */
+  .quick {
+    background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 40px;
+  }
+  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
+  .quick ol { padding-left: 22px; }
+  .quick li { margin-bottom: 8px; }
+  .quick li:last-child { margin-bottom: 0; }
+  /* 正文 */
+  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
+  h3 { font-size: 17px; margin: 26px 0 10px; }
+  p { margin-bottom: 12px; }
+  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
+  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
+  /* 类比卡片 */
+  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
+  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
+  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
+  .analogy.green { background: #ecfdf5; border-color: #86efac; }
+  .analogy h3 { margin-top: 0; }
+  .analogy .row { margin-bottom: 8px; }
+  .analogy .row:last-child { margin-bottom: 0; }
+  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
+  .blue .label  { color: #3b82f6; }
+  .yellow .label{ color: #f59e0b; }
+  .green .label { color: #10b981; }
+  .edge { font-size: 14px; color: #6b7280; }
+  .edge strong { color: #1f2328; }
+  /* 引用与金句 */
+  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
+  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
+  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+  ul.plain { padding-left: 22px; margin-bottom: 12px; }
+  ul.plain li { margin-bottom: 6px; }
+  /* 图 */
+  figure { margin: 24px 0; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
+  /* 面试官加分区 */
+  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
+  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
+  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
+  .interview details:last-of-type { margin-bottom: 0; }
+  .interview summary { cursor: pointer; font-weight: 600; }
+  .interview details[open] summary { margin-bottom: 8px; }
+  .interview .ans { font-size: 15px; color: #374151; }
+  /* 出口 */
+  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
+  .exit strong { color: #1f2328; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="toplink"><a href="../来源/Agent 系统可靠性：提示词、模型与代码的边界.md">📄 深入版（含完整证据链）→</a></div>
+
+  <!-- ① Hero -->
+  <header class="hero">
+    <h1>Agent 系统可靠性：提示词、模型与代码的边界</h1>
+    <p class="core">一句话核心观点：可靠性的根因不是提示词不够狠，而是分工边界错了——提示词是"建议书"，只能降低失败率；代码是"法律条款"，能在本地确定性路径上消除可计算的失败。</p>
+    <p class="why"><strong>为什么值得读：</strong>凡是做过 Agent 系统的人都经历过"加狠词→测试通过→上线复发"的循环，以及更可怕的那种错误——不报错、看起来很专业、但数据是错的。这篇给出一套可操作的分工判断框架：参数怎么分型、三类问题怎么分流、三层漏斗怎么拦截。HR 和非对口面试官读完 30 秒版即可转述核心；技术面试官可沿出口进入深入版逐条核对。</p>
+  </header>
+
+  <!-- ② 30 秒版 -->
+  <section class="quick">
+    <h2>⏱ 30 秒版</h2>
+    <ol>
+      <li><strong>根因是分工边界错了。</strong>把本该代码保证的确定性，交给概率模型去"尽量遵守"，再加狠词也只是短期有效。</li>
+      <li><strong>提示词 = 建议书：</strong>它能显著提高模型做某件事的概率，但不能把概率变成 100%；顺着模型本来倾向走的约束（风格、措辞）收益高，逆着省力路径的约束（必须查库、必须用权威 id）迟早漏。</li>
+      <li><strong>参数要分型：</strong>来自语义理解的"生成型"（city=上海）可以给模型；原样搬运的"搬运型"（customer_id=1000020698274）若无语义、长、候选多、错了难自检，绝不能让模型碰——这类错误最可怕的是"成功地错了"：不报错，只是返回了另一个人的数据。</li>
+      <li><strong>三层拦截漏斗：</strong>提示词在生成前加权概率 → 校验在生成后拦截不合法输出 → 约束执行在动作前做最后裁决。软层降概率，硬层消可计算失败，谁也替代不了谁。</li>
+      <li><strong>核心判断一句话：</strong>这件事到底应该被模型理解，还是应该被系统保证？</li>
+    </ol>
+  </section>
+
+  <!-- ③④ 正文 + 配图 -->
+  <main>
+    <div class="sqa">
+      <p><span class="tag">情境 S</span>团队发现 Agent 不听话，于是在提示词里堆满"必须、一定、严禁、务必"。测试样例过了，顺利上线。</p>
+      <p><span class="tag">冲突 C</span>换一种问法、换一个模型版本、上下文长一点，问题又回来。更糟的是另一类错误根本不触发报警：Agent 拿着错人的数据，输出了一段看起来很专业的"该客户近期工单较少，暂无明显异常"。</p>
+      <p><span class="tag">问题 Q</span>到底是模型不够聪明，还是提示词写得不够狠？要不要换更强的模型？</p>
+      <p><span class="tag">答案 A</span>都不是——是分工边界错了。提示词对概率加权，代码改变执行路径。把"理解"交给模型，把"保证"交给代码，中间用校验拦截，多数可靠性问题会大幅减少。</p>
+    </div>
+
+    <h2 class="sec">贯穿全文的类比：建议书 vs 法律条款</h2>
+    <div class="analogy blue">
+      <div class="row"><span class="label">生活类比：</span><strong>提示词是建议书，代码是法律条款。</strong>建议书写得再恳切，对方大概率听、偶尔不听，而且不听的时候你毫无办法；法律条款不一样——违反会被系统强制纠正，"不听"本身不构成威胁。给提示词加"务必""再强调一遍"，等于把建议书抄十遍：还是建议书。</div>
+      <div class="row"><span class="label">工程锚点：</span>提示词能显著提高模型做某件事的概率，但永远有别的路径存在。Agent 场景尤其明显：长系统提示词、多个工具、多轮上下文、中间状态压缩叠在一起，约束越多越容易漏。而代码在"从结构化对象取字段、查白名单、执行状态机"这类本地路径上是确定的——<strong>LLM 在复制一个字符串（会掉位、混淆、幻觉），代码在引用一个值（没有这些问题）</strong>。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>建议书并非没用——它真实地影响概率分布，"顺水"的约束（简洁、先结论）靠它就够了；法律条款也有覆盖不到的地方——只有"可计算"的失败（权限、格式、主键）能立法，"这段话是否有误导性"这种判断题立不了法，只能叠多层概率手段降低漏率。</div>
+    </div>
+
+    <h2 class="sec">先分型：哪些参数绝不能让模型碰</h2>
+    <p>LLM 每天都在给工具传参数，很多时候表现很好——关键要分两类。<strong>生成型</strong>参数来自语义理解，比如用户说"查上海的高优先级客户"，模型抽出 <code>city=上海</code>，这是它擅长的。<strong>搬运型</strong>参数不是理解，而是把上下文里已有的值原样搬到另一个地方，比如 <code>customer_id=1000020698274</code>。搬运型危不危险，看五个维度：有没有语义、长不长、候选唯不唯一、离上下文远不远、错了能不能自检。五项全差时就不该交给模型——<strong>不是因为模型一定会错，而是一旦错了，系统没有信号能发现。</strong></p>
+    <p>一个订单号 <code>ORDER-SH-2026-001</code> 搬错了，至少看起来不对劲；一个 13 位纯数字 id 错一位，接口照样返回 <code>success: true</code>，只是返回了另一个人的数据。这就是"成功地错了"。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 380" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="张伟案例错误发生时序图">
+        <defs>
+          <marker id="arw-gray-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 拦截机会标注 -->
+        <rect x="180" y="18" width="280" height="34" rx="17" fill="#ecfdf5" stroke="#86efac" stroke-dasharray="5 3"/>
+        <text x="320" y="40" font-size="12" fill="#10b981" text-anchor="middle">拦截机会：本可暴露 multiple_candidates</text>
+        <line x1="320" y1="52" x2="320" y2="86" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- 时序六步 -->
+        <rect x="40" y="90" width="120" height="96" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+        <text x="100" y="122" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">① 用户提问</text>
+        <text x="100" y="148" font-size="12" fill="#6b7280" text-anchor="middle">查张伟的</text>
+        <text x="100" y="166" font-size="12" fill="#6b7280" text-anchor="middle">最近工单</text>
+        <rect x="180" y="90" width="120" height="96" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="240" y="122" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">② 按名字搜</text>
+        <text x="240" y="148" font-size="12" fill="#6b7280" text-anchor="middle">撞上 3 个</text>
+        <text x="240" y="166" font-size="12" fill="#6b7280" text-anchor="middle">同名客户</text>
+        <rect x="320" y="90" width="120" height="96" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="380" y="122" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">③ 模型挑人</text>
+        <text x="380" y="148" font-size="12" fill="#6b7280" text-anchor="middle">自行选了</text>
+        <text x="380" y="166" font-size="12" fill="#6b7280" text-anchor="middle">错的张伟</text>
+        <rect x="460" y="90" width="120" height="96" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+        <text x="520" y="122" font-size="13" font-weight="700" fill="#ef4444" text-anchor="middle">④ 错 id 查询</text>
+        <text x="520" y="148" font-size="12" fill="#6b7280" text-anchor="middle">接口返回</text>
+        <text x="520" y="166" font-size="12" fill="#6b7280" text-anchor="middle">success: true</text>
+        <rect x="600" y="90" width="120" height="96" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+        <text x="660" y="122" font-size="13" font-weight="700" fill="#ef4444" text-anchor="middle">⑤ 似真总结</text>
+        <text x="660" y="146" font-size="11" fill="#6b7280" text-anchor="middle">"工单较少，</text>
+        <text x="660" y="163" font-size="11" fill="#6b7280" text-anchor="middle">暂无明显异常"</text>
+        <text x="660" y="182" font-size="11" fill="#6b7280" text-anchor="middle">（空工单编的）</text>
+        <rect x="740" y="90" width="120" height="96" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="800" y="122" font-size="13" font-weight="700" fill="#ef4444" text-anchor="middle">⑥ 用户被误导</text>
+        <text x="800" y="148" font-size="12" fill="#6b7280" text-anchor="middle">基于错数据</text>
+        <text x="800" y="166" font-size="12" fill="#6b7280" text-anchor="middle">做出判断</text>
+        <!-- 箭头 -->
+        <line x1="160" y1="138" x2="176" y2="138" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-a)"/>
+        <line x1="300" y1="138" x2="316" y2="138" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-a)"/>
+        <line x1="440" y1="138" x2="456" y2="138" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-a)"/>
+        <line x1="580" y1="138" x2="596" y2="138" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-a)"/>
+        <line x1="720" y1="138" x2="736" y2="138" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-a)"/>
+        <!-- 错误发生标注 -->
+        <line x1="380" y1="186" x2="380" y2="228" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="380" y="248" font-size="12" fill="#ef4444" text-anchor="middle">错误在这里发生（步骤③）</text>
+        <rect x="460" y="270" width="400" height="52" rx="8" fill="#fef2f2" stroke="#ef4444"/>
+        <text x="660" y="292" font-size="13" font-weight="700" fill="#ef4444" text-anchor="middle">"成功地错了"：从步骤④起，错误不再产生任何信号</text>
+        <text x="660" y="312" font-size="12" fill="#6b7280" text-anchor="middle">后续链路全部把它当成功处理——复盘时只看到"模型没听提示词"</text>
+        <line x1="660" y1="266" x2="660" y2="262" stroke="#ef4444" stroke-width="1.5"/>
+        <line x1="520" y1="186" x2="520" y2="264" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- 底注 -->
+        <text x="450" y="358" font-size="13" fill="#6b7280" text-anchor="middle">案例为构造的原型案例，用于展示错误结构；归因成"模型不聪明"会错过真问题：步骤②③本不该由模型做</text>
+      </svg>
+      <figcaption>图 1 · 张伟案例错误时序：错误在步骤③发生，但从步骤④起就"成功地错了"——没有任何信号，唯一的拦截机会在步骤②（暴露多候选状态让用户确认），这正是一个本该归代码/交互的动作</figcaption>
+    </figure>
+
+    <h2 class="sec">三类问题，三种去处</h2>
+    <p>把 Agent 链路上的每个动作拿出来问一句：<strong>它的正确答案是由理解产生、由格式约束，还是由唯一事实来源决定？</strong>三种答案对应三种去处：</p>
+
+    <figure>
+      <svg viewBox="0 0 900 340" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="三类问题分流图">
+        <defs>
+          <marker id="arw-blue-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3b82f6"/>
+          </marker>
+          <marker id="arw-amber-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/>
+          </marker>
+          <marker id="arw-green-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
+          </marker>
+        </defs>
+        <!-- 输入 -->
+        <rect x="40" y="130" width="170" height="80" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+        <text x="125" y="164" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">链路上的</text>
+        <text x="125" y="186" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">每一个动作</text>
+        <!-- 三分支 -->
+        <path d="M 210 160 C 280 160, 280 62, 350 62" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#arw-blue-b)"/>
+        <path d="M 210 170 L 350 170" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arw-amber-b)"/>
+        <path d="M 210 180 C 280 180, 280 278, 350 278" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green-b)"/>
+        <!-- 语义型 -->
+        <rect x="354" y="26" width="490" height="76" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="376" y="54" font-size="14" font-weight="700" fill="#3b82f6">语义型 —— 答案由理解产生 → 交给 LLM</text>
+        <text x="376" y="80" font-size="12" fill="#6b7280">例：用户想查什么 · 工具返回怎么解释 · 方案怎么对比</text>
+        <!-- 结构型 -->
+        <rect x="354" y="132" width="490" height="76" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="376" y="160" font-size="14" font-weight="700" fill="#f59e0b">结构型 —— 答案由格式约束 → 提示词 + 校验 + 约束解码</text>
+        <text x="376" y="186" font-size="12" fill="#6b7280">例：合法 JSON · 字段固定 · schema —— 生成前请求 / 生成后拦截 / 生成中限制</text>
+        <!-- 权威型 -->
+        <rect x="354" y="238" width="490" height="76" rx="10" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="376" y="266" font-size="14" font-weight="700" fill="#10b981">权威型 —— 答案由唯一事实来源决定 → 归代码硬闸</text>
+        <text x="376" y="292" font-size="12" fill="#6b7280">例：id 来源 · 权限 · 金额 · 坐标 · 副作用 —— LLM 提意图，代码做授权与执行</text>
+        <!-- 底注 -->
+        <text x="450" y="334" font-size="13" fill="#6b7280" text-anchor="middle">权威型问题不要让 LLM"判断一下"——写"不要越权"不等于做了权限系统</text>
+      </svg>
+      <figcaption>图 2 · 三类问题分流：判据是"正确答案由什么决定"——理解产生、格式约束、还是唯一事实来源；张伟案例错在把权威型动作（选人、取 id）当成了语义型</figcaption>
+    </figure>
+
+    <h2 class="sec">核心图：三层拦截漏斗</h2>
+    <p>模型的输出出生在概率空间里，失败与成功混在一起。可靠系统不是祈祷它全对，而是在下游布三层拦截——每过一层，能漏下去的可计算失败就少一批：</p>
+
+    <figure>
+      <svg viewBox="0 0 900 440" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="三层拦截漏斗图">
+        <defs>
+          <marker id="arw-gray-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 顶部：概率空间 -->
+        <rect x="230" y="24" width="440" height="56" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+        <text x="450" y="48" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">模型的全部候选输出（概率空间）</text>
+        <text x="450" y="68" font-size="12" fill="#6b7280" text-anchor="middle">失败与成功混在一起，模型自己分不出来</text>
+        <line x1="450" y1="80" x2="450" y2="108" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-c)"/>
+        <!-- 第一层 -->
+        <rect x="250" y="112" width="400" height="70" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="450" y="140" font-size="14" font-weight="700" fill="#3b82f6" text-anchor="middle">第一层 · 提示词（生成前）</text>
+        <text x="450" y="164" font-size="12" fill="#1f2328" text-anchor="middle">对概率分布重新加权：降低失败率，不能归零</text>
+        <line x1="450" y1="182" x2="450" y2="210" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-c)"/>
+        <!-- 第二层 -->
+        <rect x="310" y="214" width="280" height="70" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="450" y="242" font-size="14" font-weight="700" fill="#f59e0b" text-anchor="middle">第二层 · 校验（生成后）</text>
+        <text x="450" y="266" font-size="12" fill="#1f2328" text-anchor="middle">schema / parser / 来源检查：不合法就拦截、可重试</text>
+        <line x1="450" y1="284" x2="450" y2="312" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-c)"/>
+        <!-- 第三层 -->
+        <rect x="370" y="316" width="160" height="70" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+        <text x="450" y="344" font-size="14" font-weight="700" fill="#10b981" text-anchor="middle">第三层 · 约束执行</text>
+        <text x="450" y="366" font-size="12" fill="#1f2328" text-anchor="middle">权限 / 白名单 / 状态机</text>
+        <!-- 侧注 -->
+        <text x="700" y="145" font-size="12" fill="#6b7280">顺水约束收益高</text>
+        <text x="700" y="163" font-size="12" fill="#6b7280">逆水约束靠不住</text>
+        <text x="640" y="247" font-size="12" fill="#6b7280">下游程序要消费，就必须有这层</text>
+        <text x="580" y="349" font-size="12" fill="#6b7280">可计算失败在此消除</text>
+        <!-- 底部输出 -->
+        <line x1="450" y1="386" x2="450" y2="402" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray-c)"/>
+        <rect x="330" y="406" width="240" height="26" rx="13" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="450" y="424" font-size="13" font-weight="700" fill="#10b981" text-anchor="middle">进入系统与用户</text>
+      </svg>
+      <figcaption>图 3 · 三层拦截漏斗（核心图）：提示词在生成前加权、校验在生成后拦截、约束执行在动作前裁决——软层降概率，硬层消可计算失败；判断题类的失败主要靠前两层叠概率手段，可计算类的失败必须在第三层归零</figcaption>
+    </figure>
+
+    <p>漏斗不回答"每层该多厚"，也不暗示三层都要有——纯内部草稿场景可能只需要第一层。但它回答了最常见的路线之争：<strong>叠软层还是上硬闸？</strong>判据是问题能否还原成确定性计算。"这段话是否有诱导性"是判断题，只能叠软层（规则、分类器、人工审核）降低漏率；"这个 id 是否来自当前记录"是计算题，直接上硬闸——查白名单，不在就拒绝。硬闸不是"更强的提示词"，而是把问题从概率空间移回程序空间。</p>
+    <p>落到需求上，这门手艺叫"把模糊需求改写成可兜底需求"："不要乱编客户信息"兜不住，改写成"回答中的客户字段必须来自查询结果"；"不要查错人"改写成"详情查询必须使用会话锁定的 <code>customer_id</code>"——再配一个状态机：搜出 3 个候选就请用户选择，选定后写入会话状态，后续查询只用这个 id，模型看不到也搬运不了它。对照图 1 的时序：错误在步骤③就被拦住了，根本走不到"成功地错了"。</p>
+
+    <div class="quote">模型可以升级，硬边界不能跟着漂——提示词的效果是"模型当前行为分布"的函数，换一次模型就是一次重新洗牌；只有代码边界是版本无关的。</div>
+    <p style="margin-top:6px;">这也是为什么生产环境要钉模型版本、建覆盖失败路径（同名、空结果、权限不足、工具失败）的回归 eval、并在换模型时比较工具调用率与格式失败率——而不是只在 happy path 上跑一遍。</p>
+  </main>
+
+  <!-- ⑤ 面试官加分区 -->
+  <section class="interview">
+    <h2>面试官可能会追问</h2>
+    <details>
+      <summary>Q1：按你这套说法，提示词到底还有没有用？</summary>
+      <div class="ans">有，而且是第一层——但要说清它是什么：提示词影响的是概率分布，不是执行结果。它对"顺水"约束收益很高（回答简洁、先结论、风格偏好，模型本来就容易这么做）；对"逆水 + 不容忍漏"的约束（必须先查库、必须用权威 id、必须拒绝越权）靠不住，因为模型走省力路径更自然，加多少狠词都是在逆着训练分布做功。所以正确用法不是二选一，而是分层：能用提示词的用提示词（成本最低），漏不起的加校验和硬闸。把"提示词无用论"和"提示词万能论"都否掉，才是面试里想听到的判断。</div>
+    </details>
+    <details>
+      <summary>Q2：代码也不是 100% 可靠吧？凭什么说代码能做到 P=1？</summary>
+      <div class="ans">这是个限定结论，不是无限承诺：代码消除的是<strong>本地确定性路径</strong>上的不确定性——从结构化对象取字段、做比较、查白名单、执行状态机，这类路径上它等价于 P=1。系统整体当然还受下游接口、网络、并发影响，但那是另一类可靠性问题，有成熟的工程手段（重试、超时、降级、幂等）。关键是要防一个滑坡论证："代码也不可靠，所以让模型试试也无妨"——两类不确定性性质不同：下游故障会产生错误信号（超时、报错），模型抄错 id 却可能"成功地错了"，无信号、难发现。把它们分开讨论，才能各自对症。</div>
+    </details>
+    <details>
+      <summary>Q3：这不就是传统软件工程"确定性的事交给程序"吗，新意在哪？</summary>
+      <div class="ans">原则是老的，边界是新的。LLM 引入了一类传统校验没见过的不确定性：错误看起来和正确结果一样（似真产出）、没有失败信号（成功地错了）、且行为分布随模型版本漂移（这次测试过了，下次更新又漏）。所以新东西有三点：一是参数分型——生成型与搬运型的区分在传统接口设计里不存在；二是"改写手艺"——把"不要乱编"这类模糊需求翻译成系统能观察、能阻止、能恢复的状态约束；三是漏斗分层——软层降概率、硬层消可计算失败，各管一段。面试时可以说：这是老原则在新材料上的重新勘界。</div>
+    </details>
+    <details>
+      <summary>Q4：怎么评审一个 Agent 功能的可靠性？</summary>
+      <div class="ans">按七问走：①这一步是语义理解还是权威搬运？②这个值错了系统能不能自检？③是否存在多个相似候选？④这条约束容不容忍偶尔漏？⑤它是顺水还是逆水？⑥能不能还原成确定性计算？⑦失败是否可观察、可恢复——不静默失败、不把未验证包装成确定、记录拦截原因。前三问定"动作归谁"，中间三问定"约束放哪"，最后一问定"错了之后怎样"。有分歧的通常是④⑤，因为它们依赖业务代价判断——分歧值得拿出来讨论，而不是各自默认。</div>
+    </details>
+    <details>
+      <summary>Q5：工具是不是注册得越多越好？</summary>
+      <div class="ans">不是。工具越多，模型选择空间越大，注意力越稀释，越容易走捷径或选错。主 Agent 只应看到当前任务必要的能力，复杂工具组用 skill、子 Agent 或延迟加载隔离。同理，约束越多越容易漏、上下文越长指令越稀释——这与"提示词是建议书"是同一个机制：建议书抄一百遍也还是建议书，还把重点淹没了。</div>
+    </details>
+  </section>
+
+  <!-- ⑥ 出口 -->
+  <footer class="exit">
+    <p><strong>想核对证据与完整论证？</strong>深入版在这里：<a href="../来源/Agent 系统可靠性：提示词、模型与代码的边界.md">Agent 系统可靠性：提示词、模型与代码的边界.md</a>（含参数五维度表、两问判断矩阵、模糊需求改写表、落地检查清单与证据边界声明）。</p>
+    <p style="margin-top:8px;">版本标注：对应深入版 v2（status: revised，2026-10-16）。本页为讲解版，结论与深入版一致；类比均已标注边界。</p>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讲解 · 为什么编码 Agent 越聊越浅</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+  a { color: #3b82f6; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* Hero */
+  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
+  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
+  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
+  .hero .why { color: #6b7280; font-size: 15px; }
+  .hero .why strong { color: #1f2328; }
+  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
+  /* 30秒版 */
+  .quick {
+    background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 40px;
+  }
+  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
+  .quick ol { padding-left: 22px; }
+  .quick li { margin-bottom: 8px; }
+  .quick li:last-child { margin-bottom: 0; }
+  /* 正文 */
+  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
+  h3 { font-size: 17px; margin: 26px 0 10px; }
+  p { margin-bottom: 12px; }
+  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
+  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
+  /* 类比卡片 */
+  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
+  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
+  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
+  .analogy.green { background: #ecfdf5; border-color: #86efac; }
+  .analogy h3 { margin-top: 0; }
+  .analogy .row { margin-bottom: 8px; }
+  .analogy .row:last-child { margin-bottom: 0; }
+  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
+  .blue .label  { color: #3b82f6; }
+  .yellow .label{ color: #f59e0b; }
+  .green .label { color: #10b981; }
+  .edge { font-size: 14px; color: #6b7280; }
+  .edge strong { color: #1f2328; }
+  /* 引用与金句 */
+  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
+  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
+  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+  ul.plain { padding-left: 22px; margin-bottom: 12px; }
+  ul.plain li { margin-bottom: 6px; }
+  /* 图 */
+  figure { margin: 24px 0; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
+  /* 面试官加分区 */
+  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
+  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
+  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
+  .interview details:last-of-type { margin-bottom: 0; }
+  .interview summary { cursor: pointer; font-weight: 600; }
+  .interview details[open] summary { margin-bottom: 8px; }
+  .interview .ans { font-size: 15px; color: #374151; }
+  /* 出口 */
+  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
+  .exit strong { color: #1f2328; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="toplink"><a href="../来源/为什么编码 Agent 越聊越浅：上下文腐烂、自我纠错盲区与交接成本.md">📄 深入版（含完整证据链）→</a></div>
+
+  <!-- ① Hero -->
+  <header class="hero">
+    <h1>为什么编码 Agent 越聊越浅？</h1>
+    <p class="core">一句话核心观点：不是模型突然变笨了，而是"上下文腐烂、自我纠错盲区、交接成本"三个独立机制叠加——解法是管理信息，不是把提示词喊得更凶。</p>
+    <p class="why"><strong>为什么值得读：</strong>如果你用过编码 Agent 做长任务，大概率经历过"人替 Agent 当记忆外设"的疲惫。这篇把这种模糊的挫败感拆成三个可诊断、可处理的机制，给出一套能直接照做的恢复流程。HR 和非对口面试官读完 30 秒版即可转述核心；技术面试官可沿出口进入深入版核对每条证据。</p>
+  </header>
+
+  <!-- ② 30 秒版 -->
+  <section class="quick">
+    <h2>⏱ 30 秒版</h2>
+    <ol>
+      <li><strong>越聊越浅 ≠ 模型变笨。</strong>三个独立机制会造成同样的症状，混在一起诊断只会得到"换更强模型"这类无效建议。</li>
+      <li><strong>机制一 · 上下文腐烂：</strong>会话越久，历史噪声越多，有效信息被包围——像传话游戏，也像开了一整天的会，下午没人记得上午的决议。</li>
+      <li><strong>机制二 · 自我纠错盲区：</strong>模型很难证伪自己刚说的话——像自己批改自己的作文，错别字永远看不见。让它"深入复盘"只会得到更自洽的解释。</li>
+      <li><strong>机制三 · 交接成本：</strong>新窗口更干净，但代码任务知识高度纠缠，"搬家"太贵，于是大家留在已经腐烂的旧会话里继续忍受。</li>
+      <li><strong>解法：</strong>信息按变化速度分三层管理（长期规范 / 关键决定 / 现场证据）；复盘时让干净上下文直接读原始证据（diff、测试），而不是让旧窗口自证清白。</li>
+    </ol>
+  </section>
+
+  <!-- ③ 正文 -->
+  <main>
+    <div class="sqa">
+      <p><span class="tag">情境 S</span>编码 Agent 刚上手时确实惊艳：前几轮它能正确找到入口、约束和测试范围，分析得又快又深。</p>
+      <p><span class="tag">冲突 C</span>但长任务做到一半，画风突变：它重复读看过的文件、复活被否决的方案、删掉不该删的后端逻辑；你要求复盘，它交来的却是一份"每一步都合理"的自我辩护。最后你发现自己成了它的记忆外设——反复提醒约束、逐项核对"完成"。省下的编码时间，全被纠偏吃回去了。</p>
+      <p><span class="tag">问题 Q</span>到底哪里出了问题？是模型能力不行？是提示词不够凶？还是该换产品？</p>
+      <p><span class="tag">答案 A</span>先排除一个"零号变量"（推理预算/模型配置），然后拆开三个机制逐个看：上下文腐烂、自我纠错盲区、交接成本。每个机制都能对上你观察到的部分症状，也各自对应一种解法。</p>
+    </div>
+
+    <h2 class="sec">机制一：上下文腐烂——传话游戏 + 开了一整天的会</h2>
+    <div class="analogy blue">
+      <div class="row"><span class="label">生活类比：</span>两个画面叠在一起。一个是<strong>传话游戏</strong>：一句话经过十几个人转述，早已面目全非。另一个是<strong>开了一整天的会</strong>：到了下午，没人记得上午定了什么，有人还在重提上午已经被否掉的方案。</div>
+      <div class="row"><span class="label">工程锚点：</span>Agent 每次搜索、读文件、跑工具，结果都会堆进会话。窗口里渐渐同时存在：失效的旧方案、重复的文件片段、语义相似的搜索结果、被覆盖的早期要求、报错重试记录、它自己的过程总结。有效信息没有消失，但被噪声包围了。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>传话游戏是"逐句失真"，但上下文腐烂<strong>不是信息被改写</strong>——原始信息大多还在窗口里，失稳的是"哪一份才是当前权威版本"这个判断。所以解法不是"多强调几遍"，而是降低噪声、明确权威来源。</div>
+    </div>
+    <p>结果就是你看到的症状：重复读取没变化的文件、忘记已否决方案、只回应你最新一句而遗漏累计约束。还有更隐蔽的一种——<strong>方差变大</strong>：同一个问题时而很深、时而突然丢掉关键约束，而不是稳定变笨。</p>
+    <div class="evidence">证据一笔带过（完整版见深入版）：Chroma 的 Context Rot 研究发现，输入变长、干扰变多会降低表现，且即使正确答案已在上下文中也照样受影响；另一项多轮对话研究发现，同样的信息分散在多轮中，表现显著差于一次性给出。</div>
+
+    <figure>
+      <svg viewBox="0 0 900 340" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="长会话上下文失真过程图">
+        <defs>
+          <marker id="arw-gray1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 图例 -->
+        <rect x="40" y="14" width="14" height="14" rx="3" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="60" y="26" font-size="13" fill="#1f2328">仍然有效的事实</text>
+        <rect x="200" y="14" width="14" height="14" rx="3" fill="#fef3c7" stroke="#fcd34d"/>
+        <text x="220" y="26" font-size="13" fill="#1f2328">旧方案 / 重复片段 / 被覆盖的要求</text>
+        <rect x="480" y="14" width="14" height="14" rx="3" fill="#fee2e2" stroke="#fca5a5"/>
+        <text x="500" y="26" font-size="13" fill="#1f2328">报错重试 / 过程自述</text>
+        <!-- 阶段1 -->
+        <rect x="40" y="50" width="160" height="250" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+        <text x="120" y="76" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">第 1 轮</text>
+        <rect x="60" y="90" width="120" height="170" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="120" y="180" font-size="13" fill="#1f2328" text-anchor="middle">有效信息</text>
+        <rect x="60" y="264" width="120" height="16" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+        <!-- 阶段2 -->
+        <rect x="270" y="50" width="160" height="250" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+        <text x="350" y="76" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">中段</text>
+        <rect x="290" y="90" width="120" height="110" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+        <rect x="290" y="204" width="120" height="40" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+        <rect x="290" y="248" width="120" height="32" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
+        <!-- 阶段3 -->
+        <rect x="500" y="50" width="160" height="250" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+        <text x="580" y="76" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">后段</text>
+        <rect x="520" y="90" width="120" height="80" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="580" y="135" font-size="13" fill="#1f2328" text-anchor="middle">有效信息</text>
+        <rect x="520" y="174" width="120" height="52" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+        <text x="580" y="205" font-size="12" fill="#6b7280" text-anchor="middle">旧方案/重复</text>
+        <rect x="520" y="230" width="120" height="50" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
+        <text x="580" y="260" font-size="12" fill="#6b7280" text-anchor="middle">报错/自述</text>
+        <!-- 阶段4：结果 -->
+        <rect x="730" y="50" width="130" height="250" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="795" y="120" font-size="15" font-weight="700" fill="#ef4444" text-anchor="middle">症状</text>
+        <text x="795" y="160" font-size="13" fill="#1f2328" text-anchor="middle">表现方差变大</text>
+        <text x="795" y="188" font-size="13" fill="#1f2328" text-anchor="middle">时深时浅</text>
+        <text x="795" y="216" font-size="13" fill="#1f2328" text-anchor="middle">丢约束</text>
+        <text x="795" y="244" font-size="13" fill="#1f2328" text-anchor="middle">复活旧方案</text>
+        <!-- 箭头 -->
+        <line x1="205" y1="175" x2="262" y2="175" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray1)"/>
+        <line x1="435" y1="175" x2="492" y2="175" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray1)"/>
+        <line x1="665" y1="175" x2="722" y2="175" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray1)"/>
+        <!-- 底注 -->
+        <text x="450" y="328" font-size="13" fill="#6b7280" text-anchor="middle">窗口没变小，但有效信息的"邻居"越来越多——"哪份是权威版本"的判断变得不稳定</text>
+      </svg>
+      <figcaption>图 1 · 长会话上下文失真过程：有效信息（蓝）没有消失，而是被噪声（黄/红）包围——"哪份是权威版本"的判断变得不稳定，表现更多是"方差变大"而非"稳定变差"</figcaption>
+    </figure>
+
+    <h2 class="sec">机制二：自我纠错盲区——自己批改自己的作文</h2>
+    <div class="analogy yellow">
+      <div class="row"><span class="label">生活类比：</span><strong>自己批改自己的作文</strong>。错别字在那里，你读三遍也看不见——因为你是顺着自己当时的思路在读，而不是逐字审查。</div>
+      <div class="row"><span class="label">工程锚点：</span>模型逐词生成，已经写下的内容会成为后续生成的"既定前提"。同一份错误，以"这是你刚才的结论"出现和以"这是另一份待审查材料"出现，模型的审查表现可能完全不同。所以"请深入复盘你刚才的修改"这类提示经常无效——它仍在原来的解释框架里，只会产出更长、更自洽的解释。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>结构盲区相同，但模型并非全无自纠能力——当测试、编译器这类<strong>外部反馈</strong>存在时，它纠错表现会明显更好。类比否定的是"无外部反馈的自我证伪"，不是"自我纠错"本身。</div>
+    </div>
+    <p>所以正确的动作不是"再强调一次"，而是<strong>改变产物的身份</strong>：新开上下文，给它 git diff、测试输出和原始需求，称它为"这份修改"而不是"你刚才写的"，要求逐条找反例而不是解释设计意图。风险高时换一个模型来审——价值在于审查者不继承原作者的隐含前提。</p>
+    <div class="evidence">证据一笔带过：Self-Correction Bench 用受控错误注入证实了自我纠错盲区，且任务越复杂盲区越严重；更早的研究表明，缺少外部反馈时"再想想"式提示不能稳定提升正确率，有时反而把对的改错。</div>
+
+    <h2 class="sec">机制三：交接成本——新员工接手没有文档的老系统</h2>
+    <div class="analogy green">
+      <div class="row"><span class="label">生活类比：</span><strong>新员工接手没有文档的老系统</strong>。知识都在老员工脑子里，而老员工下周离职。你只有两个选择：花三个月让老员工写文档（太贵），或者让新人自己在烂摊子里挖（更贵）。</div>
+      <div class="row"><span class="label">工程锚点：</span>代码任务高度紧耦合：一个修改同时依赖项目规范、多轮追加的约束、试过的失败路径、当前 diff、测试环境、只能从讨论里领会的意图。每换一次窗口都要人工重写这些背景，成本高到让人放弃——于是留在腐烂的旧会话里。这就是前两个机制"知道该换却换不动"的原因。多开几个 Agent 也不解决：并行提高的是吞吐，不是单点深度。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>好的交接物<strong>不等于</strong>把聊天记录全转给下一个人——那等于把噪声也搬过去。交接的价值在"哪些决定仍然约束未来"，不在"我做了什么"的流水账。</div>
+    </div>
+
+    <h2 class="sec">三个机制如何咬合成一条因果链</h2>
+    <figure>
+      <svg viewBox="0 0 900 430" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="三机制因果链图">
+        <defs>
+          <marker id="arw-gray2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 行1：上下文腐烂 -->
+        <text x="40" y="46" font-size="15" font-weight="700" fill="#3b82f6">① 上下文腐烂</text>
+        <rect x="180" y="26" width="180" height="40" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="270" y="51" font-size="13" fill="#1f2328" text-anchor="middle">历史噪声不断累积</text>
+        <line x1="362" y1="46" x2="392" y2="46" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <rect x="396" y="26" width="180" height="40" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="486" y="51" font-size="13" fill="#1f2328" text-anchor="middle">有效信息被包围</text>
+        <line x1="578" y1="46" x2="608" y2="46" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <rect x="612" y="26" width="220" height="40" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="722" y="51" font-size="13" fill="#1f2328" text-anchor="middle">"哪份是权威版本"判断失稳</text>
+        <!-- 行2：自我纠错盲区 -->
+        <text x="40" y="146" font-size="15" font-weight="700" fill="#f59e0b">② 自我纠错盲区</text>
+        <rect x="180" y="126" width="180" height="40" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="270" y="151" font-size="13" fill="#1f2328" text-anchor="middle">自产内容成为既定前提</text>
+        <line x1="362" y1="146" x2="392" y2="146" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <rect x="396" y="126" width="180" height="40" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="486" y="151" font-size="13" fill="#1f2328" text-anchor="middle">无外部反馈则证伪失效</text>
+        <line x1="578" y1="146" x2="608" y2="146" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <rect x="612" y="126" width="220" height="40" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="722" y="151" font-size="13" fill="#1f2328" text-anchor="middle">复盘 = 更长更自洽的解释</text>
+        <!-- 行3：交接成本 -->
+        <text x="40" y="246" font-size="15" font-weight="700" fill="#ef4444">③ 交接成本</text>
+        <rect x="180" y="226" width="180" height="40" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="270" y="251" font-size="13" fill="#1f2328" text-anchor="middle">代码任务高度紧耦合</text>
+        <line x1="362" y1="246" x2="392" y2="246" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <rect x="396" y="226" width="180" height="40" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="486" y="251" font-size="13" fill="#1f2328" text-anchor="middle">知识"搬家"代价高</text>
+        <line x1="578" y1="246" x2="608" y2="246" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <rect x="612" y="226" width="220" height="40" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="722" y="251" font-size="13" fill="#1f2328" text-anchor="middle">留在腐烂上下文里忍受</text>
+        <!-- 汇聚箭头 -->
+        <path d="M 832 46 H 852 V 400 H 742" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <path d="M 832 146 H 852 V 400 H 742" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <path d="M 832 246 H 852 V 400 H 742" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray2)"/>
+        <!-- 底部节点 -->
+        <rect x="180" y="372" width="560" height="48" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="460" y="394" font-size="15" font-weight="700" fill="#ef4444" text-anchor="middle">共同症状："越聊越浅"</text>
+        <text x="460" y="412" font-size="12" fill="#6b7280" text-anchor="middle">人开始替 Agent 维护任务记忆：提醒约束、拦旧方案、核对"完成"</text>
+      </svg>
+      <figcaption>图 2 · 三机制因果链：三个独立机制各自成立，却在底部汇成同一组症状——这正是"统一叫'模型变笨'"无法对症的原因</figcaption>
+    </figure>
+
+    <h2 class="sec">解法：信息按变化速度分三层——像会议纪要只记"决议"</h2>
+    <p>贯穿全文的类比是<strong>传话游戏 + 会议纪要</strong>：会开久了靠口口相传必然走样（传话游戏），但靠谱的团队不靠"大家还记得吧"，而是把<strong>决议</strong>写进会议纪要（纪要只记"定了什么、为什么、什么被否了"），至于现场争论的细节，散会即弃。</p>
+    <p>对应到 Agent 协作，信息按<strong>变化速度</strong>分三层：</p>
+    <ul class="plain">
+      <li><strong>地基层</strong>（几乎不变）：技术栈、代码规范、绝对禁区 → 写进 <code>AGENTS.md</code>，自动加载；</li>
+      <li><strong>决策层</strong>（少量增长）：已定方案、<strong>试过但失败的路径及原因</strong>、设计意图 → 写进 <code>NOTES.md</code>/ADR，经人确认后增量更新；</li>
+      <li><strong>现场层</strong>（时刻在变）：当前 diff、测试结果、日志 → <strong>完全不搬运</strong>，让新上下文直接读工作区、重新跑测试。</li>
+    </ul>
+    <p>判断某条信息去留的一句话判据：<strong>只保留仍然会约束未来推理的信息。</strong>"我读了 20 个文件"不留；"方案 A 因事务边界不成立被否决"必须留。决策层的更新要"经人确认"——防止模型对过程的有损总结，在没人审阅的情况下写进纪要，变成下一轮的"权威事实"。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="信息分层策略图">
+        <defs>
+          <marker id="arw-blue3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3b82f6"/>
+          </marker>
+          <marker id="arw-green3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
+          </marker>
+          <marker id="arw-amber3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/>
+          </marker>
+          <marker id="arw-gray3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 旧会话 -->
+        <rect x="40" y="140" width="160" height="130" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="120" y="190" font-size="15" font-weight="700" fill="#ef4444" text-anchor="middle">旧会话</text>
+        <text x="120" y="216" font-size="12" fill="#6b7280" text-anchor="middle">腐烂的上下文</text>
+        <text x="120" y="236" font-size="12" fill="#6b7280" text-anchor="middle">（它不负责转述）</text>
+        <!-- 地基层 -->
+        <rect x="310" y="36" width="260" height="76" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="330" y="64" font-size="14" font-weight="700" fill="#3b82f6">地基层（几乎不变）</text>
+        <text x="330" y="88" font-size="12" fill="#1f2328">AGENTS.md · 代码规范 · 绝对禁区</text>
+        <!-- 决策层 -->
+        <rect x="310" y="150" width="260" height="90" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="330" y="178" font-size="14" font-weight="700" fill="#f59e0b">决策层（少量增长）</text>
+        <text x="330" y="200" font-size="12" fill="#1f2328">已定方案 · 已否决路径 + 理由 · 意图</text>
+        <text x="330" y="222" font-size="12" fill="#6b7280">NOTES.md / ADR · 经人确认后更新</text>
+        <!-- 现场层 -->
+        <rect x="310" y="280" width="260" height="76" rx="10" fill="#ecfdf5" stroke="#86efac" stroke-dasharray="6 4"/>
+        <text x="330" y="308" font-size="14" font-weight="700" fill="#10b981">现场层（时刻在变）</text>
+        <text x="330" y="332" font-size="12" fill="#1f2328">Git diff · 测试结果 · 日志</text>
+        <!-- 旧会话 → 地基/决策 -->
+        <path d="M 200 170 H 250 V 74 H 302" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#arw-blue3)"/>
+        <text x="252" y="110" font-size="12" fill="#3b82f6" text-anchor="middle">提炼写入</text>
+        <path d="M 200 205 H 302" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arw-amber3)"/>
+        <text x="251" y="198" font-size="12" fill="#f59e0b" text-anchor="middle">提炼写入</text>
+        <!-- 现场层来源：不搬运 -->
+        <path d="M 120 318 H 302" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green3)"/>
+        <text x="208" y="352" font-size="12" fill="#10b981" text-anchor="middle">不经旧会话转述</text>
+        <!-- 三层 → 新上下文 -->
+        <path d="M 570 74 H 622 V 158 H 646" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#arw-blue3)"/>
+        <path d="M 570 195 H 646" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arw-amber3)"/>
+        <path d="M 570 318 H 622 V 224 H 646" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green3)"/>
+        <!-- 新上下文 -->
+        <rect x="650" y="140" width="210" height="120" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+        <text x="755" y="184" font-size="15" font-weight="700" fill="#10b981" text-anchor="middle">新上下文</text>
+        <text x="755" y="210" font-size="12" fill="#1f2328" text-anchor="middle">自动加载地基</text>
+        <text x="755" y="230" font-size="12" fill="#1f2328" text-anchor="middle">读取决策 · 直读现场证据</text>
+        <!-- 新上下文 → 审查 -->
+        <rect x="650" y="300" width="210" height="60" rx="10" fill="#ffffff" stroke="#93c5fd"/>
+        <text x="755" y="326" font-size="13" font-weight="700" fill="#3b82f6" text-anchor="middle">独立审查任务</text>
+        <text x="755" y="346" font-size="12" fill="#6b7280" text-anchor="middle">读 diff · 跑测试 · 逐条找反例</text>
+        <line x1="755" y1="264" x2="755" y2="292" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray3)"/>
+        <!-- 底注 -->
+        <text x="450" y="390" font-size="13" fill="#6b7280" text-anchor="middle">手工维护的只有决策层——尤其是"试过但失败的方案"，它无法从当前代码自动恢复，却持续约束未来选择</text>
+      </svg>
+      <figcaption>图 3 · 信息分层策略：按变化速度切三层，现场层不搬运、由新上下文直读原始证据——绕开"新窗口需要知道哪些内容"这个几乎答不对的问题</figcaption>
+    </figure>
+
+    <div class="quote">工作原则一句话：别让旧上下文汇报自己做得怎么样；让它交出记录，再让一个干净的上下文读取证据。</div>
+    <p style="margin-top:6px;">对照一下就用得上：复盘输入只需要五块——原始目标、仍然有效的约束（注明来源）、已否决方案（方案+理由+证据）、当前事实（让新上下文自己读 diff 和测试）、审查任务（找被绕过的要求、被掩盖的失败、未验证的假设）。每个"已完成"都必须对应外部证据。判断要不要换窗口时不看 token 数，抽查三个问题：当前目标是什么、哪条路已被否决、完成需要什么证据——答错任何一个，就该停手交接了。</p>
+  </main>
+
+  <!-- ⑤ 面试官加分区 -->
+  <section class="interview">
+    <h2>面试官可能会追问</h2>
+    <details>
+      <summary>Q1：你说"上下文腐烂"，证据是什么？会不会只是模型能力不行？</summary>
+      <div class="ans">能力不行对应"从第一轮就浅"，这要先排除（检查推理档位、模型版本——零号变量）。而"前几轮好、后来变浅"有实验证据支撑：Chroma 的 Context Rot 在多个前沿模型上观察到，输入变长、干扰变多会降低表现，即使正确答案已在上下文中；多轮对话研究（arXiv 2505.06120）也发现同样信息分散在多轮中表现显著更差。要诚实说明边界：这些是受控问答实验，不能直接推出某款编码 Agent 在真实仓库中的具体失败率；"注意力互相挤占"是对现象的候选解释而非已证机制。</div>
+    </details>
+    <details>
+      <summary>Q2：让模型自己复盘不是常规操作吗？为什么你说它不行？</summary>
+      <div class="ans">不是全盘否定，而是区分条件。Self-Correction Bench 等研究显示：缺少外部反馈时，模型的自我纠错存在系统性盲区，任务越复杂越明显；"再想想"式提示有时还会把对的改错。但当外部信号（测试、编译器、验证器）存在时，纠错效果会明显改善。所以操作上不是"不复盘"，而是改变复盘的身份：新开上下文、给原始产物（diff/测试）、要求找反例而不是解释意图——把"你的结论"变成"一份待审查的外部材料"。</div>
+    </details>
+    <details>
+      <summary>Q3：多开几个 Agent 并行，不就更快更深了吗？</summary>
+      <div class="ans">并行提高的是吞吐，不是单点深度。Anthropic 多 Agent 研究系统的经验明确区分：并行架构适合能拆成独立分支的研究型任务；对需要共享状态、持续协调的紧耦合编码任务，效果更差且成本显著增加。症状"多 Agent 很忙但结果不深"优先怀疑任务紧耦合；但若任务其实可拆分，问题可能出在子任务边界模糊或缺少共享状态约定——这也是为什么深入版的速查表每行都带"误判时怎么办"。</div>
+    </details>
+    <details>
+      <summary>Q4：按你这套说法，是不是应该经常清空会话？</summary>
+      <div class="ans">不是。"定时清空"是对本文的误读——上下文腐烂不能简化成日程表问题。四种情况继续当前上下文更划算：修改很小、约束没变、测试反馈清晰；Agent 仍能准确回放目标与非目标；问题依赖尚未落盘的局部推理；交接成本高于剩余工作。切换信号不是 token 数，而是"任务模型是否稳定"：抽查当前目标、已否决路径、完成判据三问，答错才换。</div>
+    </details>
+    <details>
+      <summary>Q5：这套方法你自己怎么落地？会不会维护成本很高？</summary>
+      <div class="ans">落地成本被三层结构刻意压低了：地基层基本一次写好；现场层零维护（Git 和工具输出自己会"说话"）；真正手工维护的只有决策层，核心是"已否决方案 + 理由"这种无法从代码自动恢复的信息。判据一句话："只保留仍然约束未来推理的信息。"过期笔记反而有害——它们会在每次会话中重复污染上下文，所以要定期删失效状态、合并重复规则。整套方法的目标不是让 Agent 记得更多，而是缩短人的纠偏路径。</div>
+    </details>
+  </section>
+
+  <!-- ⑥ 出口 -->
+  <footer class="exit">
+    <p><strong>想核对证据与完整论证？</strong>深入版在这里：<a href="../来源/为什么编码 Agent 越聊越浅：上下文腐烂、自我纠错盲区与交接成本.md">为什么编码 Agent 越聊越浅：上下文腐烂、自我纠错盲区与交接成本.md</a>（含 7 篇参考文献、每条断言的证据标签与边界声明）。</p>
+    <p style="margin-top:8px;">版本标注：对应深入版 v2（status: revised，2026-10-16）。本页为讲解版，结论与深入版一致；类比均已标注边界。</p>
+  </footer>
+
+</div>
+</body>
+</html>

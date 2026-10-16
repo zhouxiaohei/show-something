@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讲解 · AI 让看起来正确变得廉价：从似真产出到证据化工程</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+  a { color: #3b82f6; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* Hero */
+  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
+  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
+  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
+  .hero .why { color: #6b7280; font-size: 15px; }
+  .hero .why strong { color: #1f2328; }
+  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
+  /* 30秒版 */
+  .quick {
+    background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 40px;
+  }
+  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
+  .quick ol { padding-left: 22px; }
+  .quick li { margin-bottom: 8px; }
+  .quick li:last-child { margin-bottom: 0; }
+  /* 正文 */
+  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
+  h3 { font-size: 17px; margin: 26px 0 10px; }
+  p { margin-bottom: 12px; }
+  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
+  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
+  /* 类比卡片 */
+  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
+  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
+  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
+  .analogy.green { background: #ecfdf5; border-color: #86efac; }
+  .analogy h3 { margin-top: 0; }
+  .analogy .row { margin-bottom: 8px; }
+  .analogy .row:last-child { margin-bottom: 0; }
+  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
+  .blue .label  { color: #3b82f6; }
+  .yellow .label{ color: #f59e0b; }
+  .green .label { color: #10b981; }
+  .edge { font-size: 14px; color: #6b7280; }
+  .edge strong { color: #1f2328; }
+  /* 引用与金句 */
+  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
+  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
+  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+  ul.plain { padding-left: 22px; margin-bottom: 12px; }
+  ul.plain li { margin-bottom: 6px; }
+  /* 图 */
+  figure { margin: 24px 0; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
+  /* 面试官加分区 */
+  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
+  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
+  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
+  .interview details:last-of-type { margin-bottom: 0; }
+  .interview summary { cursor: pointer; font-weight: 600; }
+  .interview details[open] summary { margin-bottom: 8px; }
+  .interview .ans { font-size: 15px; color: #374151; }
+  /* 出口 */
+  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
+  .exit strong { color: #1f2328; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="toplink"><a href="../来源/AI 让看起来正确变得廉价：从似真产出到证据化工程.md">📄 深入版（含完整证据链）→</a></div>
+
+  <!-- ① Hero -->
+  <header class="hero">
+    <h1>AI 让“看起来正确”变得廉价，然后呢？</h1>
+    <p class="core">一句话核心观点：看起来正确从来都廉价，AI 改变的是比例——产出成本趋零、验证成本不降，剪刀差张开；工程重心从“生产结果”转向“建立证据链”，让错误结果无法只凭外观过关。</p>
+    <p class="why"><strong>为什么值得读：</strong>AI 能几秒钟生成格式漂亮、语气自信、状态成功的结果——其中混着错的，而且错的看起来和对的一样好。这篇用一次真实项目的两次返工，把“怎么分辨真假”从个人警觉变成一套机制：探针、门禁、可验收的完成条件、独立验证。HR 和非对口面试官读完 30 秒版即可转述核心；技术面试官可沿出口进入深入版核对每条论据。</p>
+  </header>
+
+  <!-- ② 30 秒版 -->
+  <section class="quick">
+    <h2>⏱ 30 秒版</h2>
+    <ol>
+      <li><strong>最危险的失败不是报错，是“成功地输出错误结果”：</strong>schema 通过、接口返回 <code>success: true</code>、页面正常——但结论建立在错误前提上。</li>
+      <li><strong>剪刀差是核心：</strong>似真产出不是 AI 发明的，但 AI 把“做出来”的成本压到近零，“证明它对”的成本没降——“做出来了”从此不再携带“大概率做对了”的信息量。</li>
+      <li><strong>四种“正确替身”：</strong>状态字段冒充成功、原始数量冒充质量、名称先验冒充能力、“做完了”冒充可验证完成——就像样板间冒充房子。</li>
+      <li><strong>四种证真机制：</strong>集成点先放探针再设计；产出边界设分层门禁；完成条件写成第三方能判“过/不过”的清单；验证者从外部证据独立重建判断。</li>
+      <li><strong>一条证据链：</strong>需求 → 设计 → 实现 → 交付 → 生产，五阶段四道验证闸，任何一层只说“应该没问题”，链就在那里断了。</li>
+    </ol>
+  </section>
+
+  <!-- ③ 正文 -->
+  <main>
+    <div class="sqa">
+      <p><span class="tag">情境 S</span>过去做软件，产出本身是稀缺能力：一个能跑的功能、一份像样的方案，都要人投入数天。“做出来了”和“基本做对了”虽然不是一回事，通常也不会离得太远。</p>
+      <p><span class="tag">冲突 C</span>AI 把“做出来”变成几秒钟的事。一个真实项目里，一个自动总结卡功能连续翻盘两次：第一版的生成逻辑挂在一个拿不到完整结果的 hook 上，整体作废；第二版批量产出 14 张卡，人工筛选后只有 5 张能用——其余的把旧数据写成近期变化、把明细说成趋势、查询失败还生成“暂无异常”。系统没有报错，它在成功地生产错误结果。</p>
+      <p><span class="tag">问题 Q</span>团队不够仔细吗？可“以后多检查”为什么从来没管用过？</p>
+      <p><span class="tag">答案 A</span>因为验证责任还停留在“人的警觉”上，而自动化恰恰放大了警觉的稀缺。解法是把“信不信”从生成者手里移交出去——交给探针、门禁、清单和独立证据。</p>
+    </div>
+
+    <h2 class="sec">贯穿类比：样板间 vs 交房验收</h2>
+    <div class="analogy blue">
+      <div class="row"><span class="label">生活类比：</span>看房时你先逛<strong>样板间</strong>：灯光、家具、动线都调到最好，看起来“已经是可以住的房子”。但真正的交付要过<strong>交房验收</strong>：面积实测、水电打压、墙面空鼓，一项项查。样板间生产的是“看起来能住”，验收证明的是“真的能住”。</div>
+      <div class="row"><span class="label">工程锚点：</span>AI 产物天然是样板间——结构完整、语气自信、状态成功。四个典型冒充点：外层 <code>status: success</code> 里层是 <code>upstream timeout</code>；生成 14 个结果只有 5 个可用；hook 名字叫 <code>post_tool_use</code> 就以为它能拿到整轮上下文；一句“修改完成”没有可验证的下落。证真机制就是验收工程：探针是量房，门禁是水电打压，完成条件清单是验收单，独立验证是请第三方验房师。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>房子验收一次基本管住实物，而 AI 产物是<strong>流水的、每次生成都不一样</strong>——所以验收不能一次做完，必须做成持续运转的证据链（见后文）。另外，验收清单本身也可能漏检：门禁会误杀也会误放，需要度量，不是装上就一劳永逸。</div>
+    </div>
+
+    <h2 class="sec">核心图：一条张开剪刀差的成本曲线</h2>
+    <p>立论要先摆正：似真产出不是 AI 时代的发明——装饰性汇报、空洞但专业的方案，一直存在，测试、评审、验收这些工程纪律也早已存在。AI 改变的是<strong>比例</strong>：产出成本一条线掉到近零，验证成本一条线基本不动。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 380" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="成本剪刀差图">
+        <defs>
+          <marker id="arw-gray1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 坐标轴 -->
+        <line x1="90" y1="40" x2="90" y2="310" stroke="#9ca3af" stroke-width="2" marker-end="url(#arw-gray1)"/>
+        <line x1="90" y1="310" x2="840" y2="310" stroke="#9ca3af" stroke-width="2" marker-end="url(#arw-gray1)"/>
+        <text x="60" y="46" font-size="13" fill="#6b7280">单位成本</text>
+        <text x="820" y="336" font-size="13" fill="#6b7280">时间（示意）</text>
+        <!-- AI 时代分界线 -->
+        <line x1="430" y1="40" x2="430" y2="310" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="430" y="28" font-size="13" fill="#6b7280" text-anchor="middle">AI 大规模进入生产</text>
+        <text x="250" y="336" font-size="12" fill="#6b7280" text-anchor="middle">前 AI 时代</text>
+        <text x="650" y="336" font-size="12" fill="#6b7280" text-anchor="middle">AI 时代</text>
+        <!-- 剪刀差区域 -->
+        <path d="M 430 128 C 560 190 680 240 810 272 L 810 214 C 680 212 560 210 430 208 Z" fill="#fee2e2" opacity="0.55"/>
+        <!-- 产出成本曲线（下降，蓝） -->
+        <path d="M 110 92 C 250 130 340 170 430 208 C 560 240 680 258 810 272" fill="none" stroke="#3b82f6" stroke-width="3"/>
+        <!-- 验证成本曲线（平，红） -->
+        <path d="M 110 200 C 250 206 340 206 430 208 C 560 212 680 212 810 214" fill="none" stroke="#ef4444" stroke-width="3"/>
+        <!-- 标注 -->
+        <text x="130" y="80" font-size="14" font-weight="700" fill="#3b82f6">产出一件的成本</text>
+        <text x="560" y="262" font-size="12" fill="#3b82f6">趋近于零</text>
+        <text x="620" y="196" font-size="14" font-weight="700" fill="#ef4444">验证一件的成本</text>
+        <text x="700" y="240" font-size="12" fill="#ef4444">基本不变</text>
+        <!-- 剪刀差标注 -->
+        <text x="620" y="110" font-size="15" font-weight="700" fill="#dc2626">剪刀差</text>
+        <text x="620" y="132" font-size="12" fill="#6b7280">“做出来了”不再携带</text>
+        <text x="620" y="150" font-size="12" fill="#6b7280">“大概率做对了”的信息量</text>
+        <line x1="655" y1="158" x2="672" y2="228" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- 左侧注释 -->
+        <text x="110" y="130" font-size="12" fill="#6b7280">过去：产出贵</text>
+        <text x="110" y="148" font-size="12" fill="#6b7280">→ 做出来≈有人认真投入过</text>
+        <text x="110" y="166" font-size="12" fill="#6b7280">→ 两条线几乎贴着走</text>
+        <!-- 底注 -->
+        <text x="465" y="368" font-size="13" fill="#6b7280" text-anchor="middle">两条线本来贴得很近；AI 只压低了上面那条——工程重心因此从“生产结果”移到两条线之间的缝隙里</text>
+      </svg>
+      <figcaption>图 1 · 成本剪刀差：产出成本趋零、验证成本不降，两者之间张开的缝隙就是似真产出的生存空间——也是工程价值的新位置（示意图，非定量数据）</figcaption>
+    </figure>
+
+    <h2 class="sec">四种“正确替身”：AI 产物里的样板间</h2>
+    <ul class="plain">
+      <li><strong>状态字段替代真实成功</strong>——外层说流程走完，内层说业务失败；异常被捕获、HTTP 200，都不等于用户要的结果成立。案例里查询失败还出的那张“暂无异常”卡，就是状态字段盖出的假章。</li>
+      <li><strong>原始产出替代有效产出</strong>——“生成了 14 个”是吞吐量，“其中 5 个可用”才是质量。指标要分四级：<code>raw → valid → grounded → useful</code>，只统计第一级，系统就会被激励去生产形式完整的垃圾。</li>
+      <li><strong>名称和先验替代真实能力</strong>——<code>post_tool_use</code> 听起来“应该”能拿到完整上下文，但集成点能力是经验问题，答案只来自派发代码、真实载荷、最小探针和运行轨迹。第一版 hook 赌的就是这个“应该”。</li>
+      <li><strong>“做完了”替代可验证完成</strong>——“生成一张高质量总结卡”人人看得懂，却没法验收：什么数据足以支撑趋势？失败时沉默还是降级？没有可观察下落的“完成”，只是漂亮的状态描述。</li>
+    </ul>
+
+    <p>四个替身各自对应一种证真机制——就像四种样板间花招各有对应的验收工程：</p>
+
+    <figure>
+      <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="四替身与四机制对应图">
+        <defs>
+          <marker id="arw-green2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
+          </marker>
+        </defs>
+        <text x="190" y="30" font-size="14" font-weight="700" fill="#dc2626" text-anchor="middle">正确替身（样板间）</text>
+        <text x="710" y="30" font-size="14" font-weight="700" fill="#059669" text-anchor="middle">证真机制（验收工程）</text>
+        <!-- 行1 -->
+        <rect x="40" y="50" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="56" y="76" font-size="13" font-weight="700" fill="#ef4444">① 状态字段替代真实成功</text>
+        <text x="56" y="98" font-size="12" fill="#6b7280">查询失败仍出“暂无异常”卡</text>
+        <rect x="560" y="50" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="576" y="76" font-size="13" font-weight="700" fill="#059669">质量门禁（结构/证据层）</text>
+        <text x="576" y="98" font-size="12" fill="#6b7280">代码查来源与关键数据，逐层拦</text>
+        <!-- 行2 -->
+        <rect x="40" y="126" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="56" y="152" font-size="13" font-weight="700" fill="#ef4444">② 原始产出替代有效产出</text>
+        <text x="56" y="174" font-size="12" fill="#6b7280">14 张卡里只有 5 张可用</text>
+        <rect x="560" y="126" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="576" y="152" font-size="13" font-weight="700" fill="#059669">产出分级指标 + 门禁</text>
+        <text x="576" y="174" font-size="12" fill="#6b7280">raw / valid / grounded / useful 漏斗</text>
+        <!-- 行3 -->
+        <rect x="40" y="202" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="56" y="228" font-size="13" font-weight="700" fill="#ef4444">③ 名称先验替代真实能力</text>
+        <text x="56" y="250" font-size="12" fill="#6b7280">hook 拿不到整轮结果</text>
+        <rect x="560" y="202" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="576" y="228" font-size="13" font-weight="700" fill="#059669">探针先行</text>
+        <text x="576" y="250" font-size="12" fill="#6b7280">先记录真实载荷，再决定设计</text>
+        <!-- 行4 -->
+        <rect x="40" y="278" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="56" y="304" font-size="13" font-weight="700" fill="#ef4444">④ “做完了”替代可验证完成</text>
+        <text x="56" y="326" font-size="12" fill="#6b7280">“生成高质量总结卡”无法验收</text>
+        <rect x="560" y="278" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="576" y="304" font-size="13" font-weight="700" fill="#059669">可检验完成条件 + 独立验证</text>
+        <text x="576" y="326" font-size="12" fill="#6b7280">第三方能判“过/不过”+ 外部证据</text>
+        <!-- 箭头 -->
+        <line x1="348" y1="82" x2="552" y2="82" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
+        <line x1="348" y1="158" x2="552" y2="158" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
+        <line x1="348" y1="234" x2="552" y2="234" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
+        <line x1="348" y1="310" x2="552" y2="310" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
+        <!-- 底注 -->
+        <text x="450" y="380" font-size="13" fill="#6b7280" text-anchor="middle">对应是“最对症的起点”而非一一映射：一个替身常需要多个机制叠加，一个机制也常同时防住多个替身</text>
+      </svg>
+      <figcaption>图 2 · 四替身与四机制对应：每类冒充各有对症的验收工程——案例中两次翻盘分别对应 ③（第一版）与 ①②④（第二版）</figcaption>
+    </figure>
+
+    <h2 class="sec">为什么“以后仔细一点”从来不管用</h2>
+    <div class="analogy yellow">
+      <div class="row"><span class="label">生活类比：</span>靠“下次看房时多留个心眼”来防样板间套路，防不住——看了十套都没问题之后，第十一套你<strong>一定会松懈</strong>。工具越可靠，人越少核对，这个循环有个名字：自动化偏见。</div>
+      <div class="row"><span class="label">工程锚点：</span>模型不会因为上一次被纠正就永久改变行为——没进系统提示、测试或门禁的纠正，换个会话就复发；人也会被“大多数时候都对”驯化。产出端已经自动化，验证端还停留在手工警觉，两端速度失配只会越来越大。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>这个类比否定的是“靠警觉”，不是“靠人”——人没有退出验证，而是换了个位置：从每次盯着看，变成设计验收工程、抽检校准门禁。</div>
+    </div>
+    <div class="quote">工程的价值不只在于降低错误概率，还在于让某些错误没有机会静默通过：靠记得检查 → 每次自动检查 → 检查不通过就无法继续。</div>
+
+    <h2 class="sec">证据链：五阶段、四道验证闸</h2>
+    <p>四种机制不是散装的补丁，它们串成一条从需求到生产的证据链。每一层要证明的东西不同，断掉时的症状也不同——就像验收单上每一项各查一件事，漏查哪项、出事时就能对上号。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 470" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="证据链分层图">
+        <defs>
+          <marker id="arw-blue3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3b82f6"/>
+          </marker>
+          <marker id="arw-gray3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 阶段行 -->
+        <rect x="36" y="40" width="140" height="56" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="106" y="64" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">需求</text>
+        <text x="106" y="84" font-size="11" fill="#6b7280" text-anchor="middle">“正确”的同一定义</text>
+        <rect x="216" y="40" width="140" height="56" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="286" y="64" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">设计</text>
+        <text x="286" y="84" font-size="11" fill="#6b7280" text-anchor="middle">依赖的能力真存在</text>
+        <rect x="396" y="40" width="140" height="56" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="466" y="64" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">实现</text>
+        <text x="466" y="84" font-size="11" fill="#6b7280" text-anchor="middle">确定性约束满足</text>
+        <rect x="576" y="40" width="140" height="56" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="646" y="64" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">交付</text>
+        <text x="646" y="84" font-size="11" fill="#6b7280" text-anchor="middle">符合需求而非只改码</text>
+        <rect x="756" y="40" width="120" height="56" rx="8" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="816" y="64" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">生产</text>
+        <text x="816" y="84" font-size="11" fill="#6b7280" text-anchor="middle">真实分布下可靠</text>
+        <!-- 四道闸箭头 -->
+        <line x1="178" y1="68" x2="210" y2="68" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arw-blue3)"/>
+        <line x1="358" y1="68" x2="390" y2="68" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arw-blue3)"/>
+        <line x1="538" y1="68" x2="570" y2="68" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arw-blue3)"/>
+        <line x1="718" y1="68" x2="750" y2="68" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arw-blue3)"/>
+        <text x="194" y="26" font-size="11" fill="#3b82f6" text-anchor="middle">闸1 验收条件</text>
+        <text x="374" y="26" font-size="11" fill="#3b82f6" text-anchor="middle">闸2 探针</text>
+        <text x="554" y="26" font-size="11" fill="#3b82f6" text-anchor="middle">闸3 门禁</text>
+        <text x="734" y="26" font-size="11" fill="#3b82f6" text-anchor="middle">闸4 独立验证</text>
+        <!-- 回流虚线 -->
+        <path d="M 816 100 V 128 H 106 V 104" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arw-gray3)"/>
+        <text x="460" y="122" font-size="12" fill="#6b7280" text-anchor="middle">失败样本回流：trace · 抽样评估 → 变成下一轮需求</text>
+        <!-- 断裂症状行 -->
+        <text x="36" y="176" font-size="13" font-weight="700" fill="#ef4444">这一层断掉时的典型症状 ↓</text>
+        <rect x="36" y="192" width="160" height="150" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="52" y="216" font-size="12" fill="#1f2328">验收靠“人人都懂”的</text>
+        <text x="52" y="236" font-size="12" fill="#1f2328">形容词，两个实现</text>
+        <text x="52" y="256" font-size="12" fill="#1f2328">各按自己理解做</text>
+        <rect x="216" y="192" width="160" height="150" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="232" y="216" font-size="12" fill="#1f2328">集成点“应该能拿到”，</text>
+        <text x="232" y="236" font-size="12" fill="#1f2328">第一次真实触发</text>
+        <text x="232" y="256" font-size="12" fill="#1f2328">才发现字段缺失</text>
+        <rect x="396" y="192" width="160" height="150" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="412" y="216" font-size="12" fill="#1f2328">只测 happy path，</text>
+        <text x="412" y="236" font-size="12" fill="#1f2328">schema 通过被当成</text>
+        <text x="412" y="256" font-size="12" fill="#1f2328">事实正确</text>
+        <rect x="576" y="192" width="160" height="150" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="592" y="216" font-size="12" fill="#1f2328">作者自证清白，</text>
+        <text x="592" y="236" font-size="12" fill="#1f2328">复查沿用同一套</text>
+        <text x="592" y="256" font-size="12" fill="#1f2328">前提</text>
+        <rect x="756" y="192" width="120" height="150" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="772" y="216" font-size="12" fill="#1f2328">没有 trace 与</text>
+        <text x="772" y="236" font-size="12" fill="#1f2328">回流，问题靠</text>
+        <text x="772" y="256" font-size="12" fill="#1f2328">用户投诉发现</text>
+        <!-- 底部对照 -->
+        <rect x="36" y="376" width="840" height="56" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="456" y="400" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">案例对照：第一版翻盘 = 闸2 没建（探针缺失）；第二版翻盘 = 闸1 + 闸3 没建（不可验收 + 无门禁）</text>
+        <text x="456" y="420" font-size="12" fill="#6b7280" text-anchor="middle">实际路线：两次整体返工 + 一轮人工筛卡　vs　证据链路线：一个探针 + 一张分级表 + 一组验收条件</text>
+        <!-- 底注 -->
+        <text x="456" y="460" font-size="13" fill="#6b7280" text-anchor="middle">任何一层只能提供一句“应该没问题”，证据链就在那里断了</text>
+      </svg>
+      <figcaption>图 3 · 证据链分层：五阶段、四道验证闸、一条回流线——每层“要证明什么”与“断掉时的症状”一一对应；证据链回答的不是“这次对不对”，而是“我凭什么能持续知道对不对”</figcaption>
+    </figure>
+
+    <p>关于门禁的两个补充判断（深入版有完整论证）：门禁<strong>会误杀</strong>，所以要用两个口径一起度量——抽检复核率（被拦的样本里其实该放行的比例）和线上缺陷回流率（放行的样本里下游出问题的比例）；只盯一头，门禁要么拦光一切、要么形同虚设。而门禁里用<strong>模型判别模型产出</strong>不算循环论证的方法是分层限权：模型只做低风险语义初筛并定期接受人工校准，高风险判断（数据真实性、放行与否）留给确定性规则和固定比例人工抽检兜底。</p>
+
+    <div class="quote">一句话总结：AI 让产出变得便宜，所以工程价值越来越集中在判真假；而判真假不能靠每次自觉，必须靠证据和机制。</div>
+    <p style="margin-top:6px;">回到开头的两次翻盘：它们不是“团队不够仔细”，而是两道没建的闸。成本要么花在事后返工，要么花在事前闸门——区别在于后者买回的是可持续的判断能力，前者每次都要重新付一遍。工程师的价值没有消失，只是换了位置：找到似真与真最容易分家的位置，把模糊的“好”改造成可执行标准，为概率组件设计确定性边界，让一次事故变成以后每次都会执行的门禁。</p>
+  </main>
+
+  <!-- ⑤ 面试官加分区 -->
+  <section class="interview">
+    <h2>面试官可能会追问</h2>
+    <details>
+      <summary>Q1：你用 AI 写的东西，怎么保证可信？（正面回答）</summary>
+      <div class="ans">我不假设“AI 写完 = 做对了”，而是让每个“完成”都对应外部证据，分四步：①集成点先放探针，用真实载荷确认能力，不接受“应该能拿到”；②产出边界设分层门禁——结构/范围用代码，证据层代码优先，语义层模型判别加人工校准；③完成条件写成第三方无需理解我的意图也能判“过/不过”的清单，产出按 raw/valid/grounded/useful 分级，不用数量冒充质量；④高风险结果交给不继承作者前提的独立视角——新会话直接读 git diff 和测试输出，或固定比例人工抽检。同时用两个口径监控门禁本身：抽检复核率度量误杀、线上缺陷回流率度量误放。一句话：我信任的不是 AI 的输出，而是这条证据链。</div>
+    </details>
+    <details>
+      <summary>Q2：门禁拦错好结果怎么办？系统会不会变成什么都发不出来的沉默机器？</summary>
+      <div class="ans">会误杀，所以门禁不是越严越好，误杀要有度量而不是靠感觉：一是抽检复核率——定期抽样被拦的结果交人工复核，统计“其实该放行”的比例；二是线上缺陷回流率——放过门禁的样本在下游出问题的比例。两个口径必须一起看：只盯误放会越收越紧直到拦光，只盯误杀则形同虚设。健康的门禁是两个率都有数值、都被业务接受，并随失败样本回流持续校准阈值。</div>
+    </details>
+    <details>
+      <summary>Q3：用模型判别模型产出，不是自己骗自己吗？</summary>
+      <div class="ans">这是真实风险，解法是分层限权，而不是回避使用。模型判别只放在低风险层（是否误导、是否过度断言这类语义检查），且判别器本身定期用人工标注样本校准；高风险判断——数据真实性、业务价值、最终放行——由确定性代码规则和固定比例人工抽检兜底。模型的角色是缩小人工复核范围、提高抽检命中率，不是最终裁决。这样它就不是“模型自证”，而是“模型初筛、证据和人工终审”。</div>
+    </details>
+    <details>
+      <summary>Q4：这不就是传统的测试和 code review 吗？AI 时代新在哪里？</summary>
+      <div class="ans">纪律本身是延续的——测试、评审、验收标准一直都在，因为似真产出（漂亮但空的汇报和方案）人类时代就有。新的是比例：过去产出贵，“做出来”默认携带“有人认真投入过”的信号；AI 把产出成本压到近零，同样规模的验证纪律覆盖的单位产出暴增，且 AI 产物是流水的、每次生成都不一样，验收不能一次做完，必须做成持续运转的证据链和自动化门禁。所以不是发明新纪律，而是把老纪律的覆盖方式从“人工周期性”升级为“机制持续性”。</div>
+    </details>
+    <details>
+      <summary>Q5：小团队或个人开发者用得起这套方法吗？</summary>
+      <div class="ans">这套方法的固定成本低：探针是不承担业务逻辑的一次性小代码；门禁先从结构/范围两层做起，纯代码、不用模型；完成条件清单是写需求时的措辞习惯改变；独立验证可以是“新开会话直接读 diff 和测试”。真正贵的是事后返工——案例里两次整体翻外加人工筛卡，远超一个探针加一张分级表的成本。建议从小切口起步：挑一个会直接展示给用户的产出，设第一道门禁，把误杀/误放两个率跑起来，再逐步分层。</div>
+    </details>
+  </section>
+
+  <!-- ⑥ 出口 -->
+  <footer class="exit">
+    <p><strong>想核对论据与完整论证？</strong>深入版在这里：<a href="../来源/AI 让看起来正确变得廉价：从似真产出到证据化工程.md">AI 让看起来正确变得廉价：从似真产出到证据化工程.md</a>（含 4 篇参考文献、案例证据边界声明、门禁误杀度量与自指处理的完整论证）。</p>
+    <p style="margin-top:8px;">版本标注：对应深入版 v2（status: revised，2026-10-16）。本页为讲解版，结论与深入版一致；类比均已标注边界。案例来自作者真实项目复盘（匿名化），证明失败模式存在，不代表行业发生率。</p>
+  </footer>
+
+</div>
+</body>
+</html>

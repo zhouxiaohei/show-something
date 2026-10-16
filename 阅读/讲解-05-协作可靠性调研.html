@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讲解 · Claude Code 与 Codex 真实协作可靠性调研</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+  a { color: #3b82f6; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* Hero */
+  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
+  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
+  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
+  .hero .why { color: #6b7280; font-size: 15px; }
+  .hero .why strong { color: #1f2328; }
+  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
+  /* 30秒版 */
+  .quick {
+    background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 40px;
+  }
+  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
+  .quick ol { padding-left: 22px; }
+  .quick li { margin-bottom: 8px; }
+  .quick li:last-child { margin-bottom: 0; }
+  /* 正文 */
+  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
+  h3 { font-size: 17px; margin: 26px 0 10px; }
+  p { margin-bottom: 12px; }
+  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
+  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
+  /* 类比卡片 */
+  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
+  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
+  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
+  .analogy.green { background: #ecfdf5; border-color: #86efac; }
+  .analogy h3 { margin-top: 0; }
+  .analogy .row { margin-bottom: 8px; }
+  .analogy .row:last-child { margin-bottom: 0; }
+  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
+  .blue .label  { color: #3b82f6; }
+  .yellow .label{ color: #f59e0b; }
+  .green .label { color: #10b981; }
+  .edge { font-size: 14px; color: #6b7280; }
+  .edge strong { color: #1f2328; }
+  /* 引用与金句 */
+  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
+  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
+  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+  ul.plain { padding-left: 22px; margin-bottom: 12px; }
+  ul.plain li { margin-bottom: 6px; }
+  /* 图 */
+  figure { margin: 24px 0; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
+  /* 面试官加分区 */
+  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
+  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
+  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
+  .interview details:last-of-type { margin-bottom: 0; }
+  .interview summary { cursor: pointer; font-weight: 600; }
+  .interview details[open] summary { margin-bottom: 8px; }
+  .interview .ans { font-size: 15px; color: #374151; }
+  /* 出口 */
+  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
+  .exit strong { color: #1f2328; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="toplink"><a href="../来源/Claude Code 与 Codex 真实协作可靠性调研.md">📄 深入版（含完整证据链）→</a></div>
+
+  <!-- ① Hero -->
+  <header class="hero">
+    <h1>Claude Code 与 Codex，到底选哪个？</h1>
+    <p class="core">一句话核心观点：单次通过率衡量的是终点，协作可靠性衡量的是到达终点的路上你要付出什么——两者解决率几乎打平（78.4% vs 77.4%），但失败动作差 2.4 倍，公开证据初步支持 Claude 系更适合"边聊边改"的真实协作。</p>
+    <p class="why"><strong>为什么值得读：</strong>这是一篇证据评审型调研——不靠个人安利，而是把两篇公开论文、2500 条轨迹数据和 7 个可点击核实的 GitHub issue 摆在桌面上，逐条说明每类证据能证明什么、不能证明什么。所有关键数据都在 2026-10 逐一核实过，复核路径写在文末。</p>
+  </header>
+
+  <!-- ② 30 秒版 -->
+  <section class="quick">
+    <h2>⏱ 30 秒版</h2>
+    <ol>
+      <li><strong>表面矛盾：</strong>Codex 在 SWE-bench 类基准上解决率还略高（78.4% vs 77.4%）。那为什么还判 Claude 更好？——因为通过率相同，路径可以完全不同。</li>
+      <li><strong>过程证据：</strong>TraceProbe 分析 2500 条轨迹发现，Codex 的失败动作占比 8.0% vs Claude 的 3.3%（约 2.4 倍），有害动作 0.10 vs 0.07——它用更多试错换到同等结果。</li>
+      <li><strong>协作证据：</strong>SWE-Together 首次统计"用户要纠正几次"，发现模型越强用户纠正越少（相关性 −0.92）；Claude Opus 4.8 以 63% 通过率 + 最少纠正（1.38 次）双料第一。</li>
+      <li><strong>失败模式：</strong>7 个已核实的 Codex issue 表明，长会话压缩后"累计约束碎裂"真实存在——它能复述任务大概，却悄悄丢掉你几轮前定下的规则。</li>
+      <li><strong>诚实的边界：</strong>这些是预印本和案例证据，不是定论；本文的判断是"初步支持"，复核数据和路径全部公开。</li>
+    </ol>
+  </section>
+
+  <!-- ③ 正文 -->
+  <main>
+    <div class="sqa">
+      <p><span class="tag">情境 S</span>选编码 Agent 的人都在看同一类数字：SWE-bench 解决率。Codex 在这些榜上很强，Claude Code 也强，分数咬得很紧。</p>
+      <p><span class="tag">冲突 C</span>但真实用过的人体验差别很大：一个像靠谱的搭档，你说一半它懂一半；另一个单兵作战凶悍，长任务里却越干越偏——你让它改个按钮，它把后端也"顺手"重构了。分数一样，体验为什么两样？</p>
+      <p><span class="tag">问题 Q</span>排行榜到底漏掉了什么？"体验好"是玄学，还是有证据？</p>
+      <p><span class="tag">答案 A</span>排行榜测的是"终点对不对"，漏掉了"路径的成本"。本文用三类公开证据（受控评测 + 过程诊断 + 失败案例）说明：协作场景下真正该比的是任务模型稳不稳定、你要纠正多少次、失败后能不能便宜地爬出来。</p>
+    </div>
+
+    <h2 class="sec">贯穿全文的类比：两个装修队，都声称懂"北欧风"</h2>
+    <div class="analogy blue">
+      <div class="row"><span class="label">生活类比：</span>你雇两个装修队，都说要做"北欧风"。A 队开工前先复述："我理解是浅色木地板、无主灯、收纳全部隐藏——对吗？"做完你基本满意，小修两处就好。B 队开局也利索，但干着干着墙刷成了米黄（"暖一点更显质感嘛"），柜子装满了整面墙（"北欧也流行收纳呀"）——每一步它都有自己的理由，最后"完工"了，可验收时几乎每间房都要返工。</div>
+      <div class="row"><span class="label">工程锚点：</span>两个队的"最终完成度"可能都是 78%——但 A 队的问题是<strong>低成本的局部修正</strong>，B 队的问题是<strong>目标表征本身漂了</strong>：它不是手艺不行，而是它心里那版"北欧风"已经和你说的不是同一个东西。编码 Agent 的"任务模型"就是这版"北欧风"：多轮对话、上下文压缩、连番纠正之后，它还记不记得你最初到底要什么。</div>
+      <div class="row edge"><span class="label">类比的边界：</span>碎裂的是<strong>目标表征</strong>，不是沟通态度——B 队不是不认真，它的"理解"在你看不见的地方悄悄换代了。另外装修队会主动跑来问你，而模型不一定会：所以工程上要把"先复述理解再动手"从美德变成机制。</div>
+    </div>
+
+    <h2 class="sec">核心证据：终点相同，路径不同</h2>
+    <p>把 TraceProbe 的数据画成一条"到达终点之路"：横轴是任务进度，纵轴是"离正确目标的距离"。两个 Agent 最终都到了（解决率 78.4% vs 77.4%），但一条线平稳收敛，另一条线反复冲进失败区再爬出来。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 380" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="通过率相同但稳定性不同的双线对比图">
+        <defs>
+          <marker id="arw-gray1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 坐标轴 -->
+        <line x1="70" y1="320" x2="840" y2="320" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arw-gray1)"/>
+        <line x1="70" y1="320" x2="70" y2="40" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arw-gray1)"/>
+        <text x="850" y="340" font-size="13" fill="#6b7280">任务进度</text>
+        <text x="40" y="36" font-size="13" fill="#6b7280">离正确目标的距离</text>
+        <!-- 失败区 -->
+        <rect x="70" y="230" width="760" height="90" fill="#fef2f2" opacity="0.7"/>
+        <text x="100" y="252" font-size="12" fill="#ef4444">失败动作区（Codex 占比 8.0% vs Claude 3.3%）</text>
+        <!-- Claude 线：平稳收敛 -->
+        <path d="M 90 290 C 220 240, 340 170, 480 130 C 600 105, 700 92, 810 86" fill="none" stroke="#3b82f6" stroke-width="3"/>
+        <!-- Codex 线：剧烈波动 -->
+        <path d="M 90 295 L 150 205 L 205 285 L 265 185 L 320 280 L 380 170 L 445 262 L 510 150 L 580 245 L 655 140 L 720 205 L 810 86" fill="none" stroke="#ef4444" stroke-width="3" stroke-linejoin="round"/>
+        <!-- 终点 -->
+        <circle cx="810" cy="86" r="6" fill="#10b981"/>
+        <text x="810" y="66" font-size="13" font-weight="700" fill="#10b981" text-anchor="middle">终点：解决率几乎相同</text>
+        <text x="810" y="110" font-size="12" fill="#6b7280" text-anchor="middle">78.4% vs 77.4%</text>
+        <!-- 图例 -->
+        <line x1="120" y1="60" x2="160" y2="60" stroke="#3b82f6" stroke-width="3"/>
+        <text x="168" y="64" font-size="13" fill="#1f2328">Claude Code（平稳收敛）</text>
+        <line x1="390" y1="60" x2="430" y2="60" stroke="#ef4444" stroke-width="3"/>
+        <text x="438" y="64" font-size="13" fill="#1f2328">Codex（反复试错）</text>
+        <!-- 底注 -->
+        <text x="455" y="362" font-size="13" fill="#6b7280" text-anchor="middle">两条线的"分数"一样，但你陪跑的时长、token 账单和焦虑完全不一样</text>
+      </svg>
+      <figcaption>图 1 · 通过率相同、稳定性不同（示意）：TraceProbe 实测 Codex 失败动作占比 8.0% vs 3.3%、有害动作 0.10 vs 0.07、工具成功率 91.9% vs 96.7%——单次通过率把这些全部抹平了</figcaption>
+    </figure>
+
+    <div class="evidence">证据出处：TraceProbe（arXiv 2607.06184，2026-07-07），2500 条轨迹、五个生产设置，数据与代码公开（Zenodo DOI 10.5281/zenodo.20789918）。SWE-Together（arXiv 2606.29957）则从 11,260 条真实会话筛出 109 个多轮任务，首次把"用户纠正次数"列为主要指标：模型越强纠正越少（Pearson −0.92），Claude Opus 4.8 以 63% 通过率 + 1.38 次纠正双第一。</div>
+
+    <h2 class="sec">第二个证据：长会话里，目标表征会悄悄碎裂</h2>
+    <p>比"做错"更危险的是"忘了自己在做什么"。7 个可点击核实的 Codex issue 描述了同一条退化路径：约束一层层加上去，上下文一压缩，只剩一份不完整的摘要——它还能复述"大概要做什么"，但执行时遗漏你几轮前定下的硬规则，甚至复活你明确否决过的方案。你每纠正一次，它又可能把最新一句话当成全部目标。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 360" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="模型框架产品三层图">
+        <defs>
+          <marker id="arw-amber2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/>
+          </marker>
+        </defs>
+        <!-- 三层 -->
+        <rect x="180" y="30" width="420" height="80" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="390" y="60" font-size="15" font-weight="700" fill="#3b82f6" text-anchor="middle">模型层：听懂意图、保持语义主线</text>
+        <text x="390" y="86" font-size="12" fill="#1f2328" text-anchor="middle">SWE-Together 的证据在这里（统一 OpenCode 框架，只比模型）</text>
+        <rect x="180" y="130" width="420" height="80" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+        <text x="390" y="160" font-size="15" font-weight="700" fill="#f59e0b" text-anchor="middle">代理框架层：工具、压缩、恢复、续跑</text>
+        <text x="390" y="186" font-size="12" fill="#1f2328" text-anchor="middle">TraceProbe 属于模型+框架混合证据（两者同时变了）</text>
+        <rect x="180" y="230" width="420" height="80" rx="10" fill="#ecfdf5" stroke="#86efac"/>
+        <text x="390" y="260" font-size="15" font-weight="700" fill="#10b981" text-anchor="middle">产品界面层：CLI / IDE、权限、会话恢复</text>
+        <text x="390" y="286" font-size="12" fill="#1f2328" text-anchor="middle">GitHub issue 是产品层的失败案例（证明存在，不算概率）</text>
+        <!-- 右侧提醒 -->
+        <line x1="620" y1="170" x2="700" y2="170" stroke="#f59e0b" stroke-width="2" marker-end="url(#arw-amber2)"/>
+        <rect x="704" y="120" width="176" height="110" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+        <text x="792" y="150" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">常见误读</text>
+        <text x="792" y="174" font-size="12" fill="#1f2328" text-anchor="middle">"模型层占优"</text>
+        <text x="792" y="194" font-size="12" fill="#1f2328" text-anchor="middle">≠ "产品更好用"</text>
+        <text x="792" y="214" font-size="12" fill="#6b7280" text-anchor="middle">三层各是各的变量</text>
+        <!-- 底注 -->
+        <text x="390" y="344" font-size="13" fill="#6b7280" text-anchor="middle">比较两个产品前先问：这条证据测的是哪一层？混层比较是本领域最常见的争吵来源</text>
+      </svg>
+      <figcaption>图 2 · 模型 / 框架 / 产品三层：SWE-Together 只测模型层，TraceProbe 是混合证据，issue 是产品层案例——把三者混为一谈，就会得出超出证据的结论</figcaption>
+    </figure>
+
+    <h2 class="sec">证据可信度分层：这篇文章的每个判断踩在哪层？</h2>
+    <p>证据评审和"听个瓜"的区别，在于分层。本文的证据金字塔从下到上：案例（证明存在）→ 过程诊断（证明分布差异）→ 受控评测（证明相关性）→ 顶部空缺（尚无成对实验）。结论的强度刻意跟金字塔对齐。</p>
+
+    <figure>
+      <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="证据金字塔">
+        <defs>
+          <marker id="arw-gray3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <!-- 顶层（虚线，尚不存在） -->
+        <polygon points="450,30 520,90 380,90" fill="#f3f4f6" stroke="#9ca3af" stroke-dasharray="6 4"/>
+        <text x="540" y="62" font-size="13" font-weight="700" fill="#6b7280">尚不存在：成对受控实验</text>
+        <text x="540" y="82" font-size="12" fill="#6b7280">（模糊意图 × 纠正吸收 × 失败恢复）</text>
+        <!-- 第二层 -->
+        <polygon points="372,100 528,100 568,170 332,170" fill="#dbeafe" stroke="#3b82f6"/>
+        <text x="450" y="128" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">受控评测（预印本）</text>
+        <text x="450" y="150" font-size="12" fill="#374151" text-anchor="middle">SWE-Together：109 任务 · 相关性 −0.92</text>
+        <text x="740" y="135" font-size="12" fill="#6b7280">可信度：中高（方法公开可复现，</text>
+        <text x="740" y="155" font-size="12" fill="#6b7280">但仅 109 任务、模型组层面相关）</text>
+        <!-- 第三层 -->
+        <polygon points="322,180 578,180 618,250 282,250" fill="#fef3c7" stroke="#f59e0b"/>
+        <text x="450" y="208" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">过程诊断（大样本）</text>
+        <text x="450" y="230" font-size="12" fill="#374151" text-anchor="middle">TraceProbe：2500 轨迹 · 数据公开</text>
+        <text x="740" y="215" font-size="12" fill="#6b7280">可信度：中（样本大，但模型与</text>
+        <text x="740" y="235" font-size="12" fill="#6b7280">框架同时变化，归因受限）</text>
+        <!-- 底层 -->
+        <polygon points="272,260 628,260 668,330 232,330" fill="#fee2e2" stroke="#ef4444"/>
+        <text x="450" y="288" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">公开 issue 案例（7 个，逐一核实）</text>
+        <text x="450" y="310" font-size="12" fill="#374151" text-anchor="middle">失败模式真实存在 · 无分母</text>
+        <text x="740" y="295" font-size="12" fill="#6b7280">可信度：低（只能证明"发生过"，</text>
+        <text x="740" y="315" font-size="12" fill="#6b7280">不能证明"多常发生"）</text>
+        <!-- 结论箭头 -->
+        <line x1="450" y1="345" x2="450" y2="345" stroke="#6b7280"/>
+        <text x="450" y="368" font-size="13" fill="#6b7280" text-anchor="middle">本文结论的强度 = 三层证据交叉指向的方向，而不是任何单层的分数</text>
+      </svg>
+      <figcaption>图 3 · 证据金字塔：每层标注了可信度与局限。塔尖是空心的——"Claude 更适合协商型协作"是三层证据共同指向的当前最优假设，不是已被实验钉死的结论</figcaption>
+    </figure>
+
+    <div class="quote">选型原则一句话：别问"谁的分数高"，问"它跑偏的时候，你把它拉回来的成本是多少"。</div>
+    <p style="margin-top:6px;">对照一下就用得上：把"任务模型稳定性"当作选型面试题——长会话压缩后让它复述当前约束清单，对照你自己的记录；给一次局部纠正，看它是增量更新还是整段覆盖；故意给一个做不了的任务，看它解释失败时暴露的是"动作流水账"还是"可编辑的理解"。三个答案比任何排行榜都更接近你将来的真实体验。</p>
+  </main>
+
+  <!-- ⑤ 面试官加分区 -->
+  <section class="interview">
+    <h2>面试官可能会追问</h2>
+    <details>
+      <summary>Q1：109 个任务、7 个 issue，样本量这么小凭什么下结论？</summary>
+      <div class="ans">直接回答：如果只有 SWE-Together 一项研究，确实不够下任何结论。这个判断的成立方式是三层独立证据交叉：受控评测（109 任务）给出"能力与纠正量强负相关（−0.92）"的方向；过程诊断（2500 条轨迹）在同解决率下测到失败动作 2.4 倍的分布差；7 个 issue 只负责证明"约束碎裂这种失败真实存在"。三者测量方式、数据来源、偏差结构都不同，却指向同一方向——这比任何单一大样本更有说服力。同时结论强度被刻意限定为"初步支持"，并写明了复核路径：数据全部公开，欢迎重算。</div>
+    </details>
+    <details>
+      <summary>Q2：解决率就差 1 个百分点，你怎么说一个是"平稳收敛"、一个是"反复试错"？</summary>
+      <div class="ans">因为过程指标不在排行榜里，但在轨迹里。TraceProbe 的实测：Codex 失败动作占比 8.0% vs Claude 3.3%，有害动作 0.10 vs 0.07，工具成功率 91.9% vs 96.7%。要诚实的是：这是模型与框架同时变化的混合证据，只能支持"组合设置"层面的比较；TraceProbe 自己也指出 Codex 的保留动作占比反而更大。所以精确的说法是"失败动作与有害动作两个维度更高"，而不是笼统的"Codex 更乱"。</div>
+    </details>
+    <details>
+      <summary>Q3：你自己是不是用惯了 Claude，确认偏差怎么排除？</summary>
+      <div class="ans">排除不了，只能管理——这正是深入版专设"用户观察方法说明"的原因：观察约一年、数十次长会话、非系统化记录，明确列出四类已知偏差（确认偏差、记忆偏差、版本漂移、任务难度不平衡），并把用户观察的功能严格降级为"提出研究问题"。成立与否交给可复核的公开证据检验：如果 SWE-Together 没有测出纠正量差异、TraceProbe 没有测出过程分布差异，我的个人体验就只能算轶事。</div>
+    </details>
+    <details>
+      <summary>Q4：这些都是预印本和企业自报 issue，可信吗？会不会半年后就过期？</summary>
+      <div class="ans">两层回答。可信度：SWE-Together 与 TraceProbe 方法、代码、数据全部公开，任何数字都能重算；issue 有完整复现步骤和日志，我核实过全部 7 个（2026-10-16）。时效性：具体版本号（Opus 4.8、GPT-5.4）当然会过期，但这篇要保留的不是排名，而是方法论——"通过率掩盖过程差异"这个命题在模型换代后依然可测、可证伪。METR 页面 2026-09 已声明不再活跃更新，这也如实写进了文中。</div>
+    </details>
+    <details>
+      <summary>Q5：既然 Codex 执行强又省 token，混合用两个不行吗？</summary>
+      <div class="ans">可以，而且这正是本文框架支持的做法：按任务类型分流——目标明确、验收清晰的任务（正是 Codex 强项，且 SWE-Together 数据里它最省 token：约 29.9k vs Opus 4.8 的 74.0k）交给 Codex；模糊口语需求、长会话持续演进、需要边聊边改的任务交给 Claude 系。真正的错误不是"选了谁"，而是假设"解决率高 = 协作好"，然后用管理执行器的方式去用协作者（或反过来）。</div>
+    </details>
+  </section>
+
+  <!-- ⑥ 出口 -->
+  <footer class="exit">
+    <p><strong>想核对每条数据与完整论证？</strong>深入版在这里：<a href="../来源/Claude Code 与 Codex 真实协作可靠性调研.md">Claude Code 与 Codex 真实协作可靠性调研.md</a>（含全部论文与 issue 链接、每条断言的证据标签、证据边界声明与数据核实记录）。</p>
+    <p style="margin-top:8px;">版本标注：对应深入版 v2（status: revised，2026-10-16；数据核实于 2026-10-16）。本页为讲解版，结论与深入版一致；图 1 为基于实测数据的示意，类比均已标注边界。</p>
+  </footer>
+
+</div>
+</body>
+</html>
