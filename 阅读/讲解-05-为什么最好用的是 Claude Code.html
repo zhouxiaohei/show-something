@@ -5,58 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>讲解-05 · 为什么最好用的是 Claude Code：分数打平之后，赢在协作可靠性</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px; }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px 64px; }
-  a { color: #2563eb; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .topbar { background: #f8fafc; border-bottom: 1px solid #e2e8f0; margin-bottom: 32px; }
-  .topbar-in { max-width: 860px; margin: 0 auto; padding: 10px 20px; font-size: 13px; display: flex; gap: 12px; align-items: center; }
-  .badge { font-size: 12px; font-weight: 600; color: #1d4ed8; background: #dbeafe; border-radius: 99px; padding: 2px 10px; }
-  .crumb { color: #6b7280; }
-  .hero { border-left: 4px solid #2563eb; padding: 4px 0 4px 20px; margin-bottom: 28px; }
-  .hero h1 { font-size: 27px; line-height: 1.4; margin-bottom: 10px; }
-  .hero .core { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
-  .hero .budget { font-size: 14px; color: #6b7280; }
-  .hero .budget code { background: #eff6ff; color: #1d4ed8; }
-  details.quick { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 16px 22px; margin-bottom: 36px; }
-  details.quick summary { cursor: pointer; font-weight: 600; color: #0369a1; }
-  details.quick ol { padding-left: 22px; margin-top: 10px; }
-  details.quick li { margin-bottom: 8px; }
-  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
-  h3 { font-size: 17px; margin: 26px 0 10px; }
-  p { margin-bottom: 12px; }
-  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
-  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
-  .callout { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
-  .callout .row { margin-bottom: 10px; }
-  .callout .row:last-child { margin-bottom: 0; }
-  .callout .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
-  .co-life  { background: #eff6ff; border-color: #93c5fd; } .co-life .label  { color: #2563eb; }
-  .co-eng   { background: #ecfdf5; border-color: #86efac; } .co-eng .label   { color: #059669; }
-  .co-warn  { background: #fffbeb; border-color: #fcd34d; } .co-warn .label  { color: #d97706; }
-  .co-supp  { background: #f9fafb; border-color: #e5e7eb; } .co-supp .label  { color: #6b7280; }
-  .co-key   { background: #fdf4ff; border-color: #f0abfc; } .co-key .label   { color: #a21caf; }
-  .edge { font-size: 14px; color: #6b7280; } .edge strong { color: #1f2328; }
-  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
-  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
-  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
-  figure { margin: 24px 0; }
-  figure svg { width: 100%; height: auto; display: block; }
-  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; line-height: 1.6; }
-  table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 20px; }
-  table.tbl th { background: #f8fafc; text-align: left; padding: 8px 12px; border: 1px solid #e2e8f0; font-weight: 600; }
-  table.tbl td { padding: 7px 12px; border: 1px solid #e2e8f0; }
-  table.tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  td.good { background: #ecfdf5; } td.bad { background: #fef2f2; }
-  .quiz { margin: 20px 0; }
-  details.q { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 18px; margin-bottom: 12px; }
-  details.q summary { cursor: pointer; font-weight: 600; }
-  details.q .qn { display: inline-block; font-size: 12px; font-weight: 700; color: #1d4ed8; background: #dbeafe; border-radius: 99px; padding: 1px 10px; margin-right: 8px; }
-  details.q .ans { margin-top: 10px; font-size: 15px; color: #374151; border-top: 1px dashed #e2e8f0; padding-top: 10px; }
-  .chain-note { font-size: 13px; color: #6b7280; margin: 4px 0 14px; }
-  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
-  .exit strong { color: #1f2328; }
+:root {
+  --bg:#ffffff; --bg-soft:#f7f8fa; --text:#1f2328; --muted:#6b7280; --line:#e5e7eb;
+  --brand:#2563eb; --brand-soft:#eff6ff; --brand-line:#bfdbfe;
+  --life:#b45309; --life-bg:#fffbeb; --life-line:#fde68a;
+  --key:#047857; --key-bg:#ecfdf5; --key-line:#a7f3d0;
+  --warn:#b91c1c; --warn-bg:#fef2f2; --warn-line:#fecaca;
+  --supp:#0369a1; --supp-bg:#f0f9ff; --supp-line:#bae6fd;
+  --quiz:#7c3aed; --quiz-bg:#faf5ff; --quiz-line:#ddd6fe;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:70px; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.9 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1020px; margin:0 auto; padding:0 22px 90px; }
+.topbar { position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+.topbar-in { max-width:1020px; margin:0 auto; padding:10px 22px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.topbar a { color:var(--brand); text-decoration:none; font-size:14px; }
+.topbar a:hover { text-decoration:underline; }
+.topbar .crumb { color:var(--muted); font-size:13px; }
+.badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:12.5px; font-weight:600; letter-spacing:.3px; background:var(--brand-soft); color:var(--brand); border:1px solid var(--brand-line); }
+.hero { padding:34px 0 8px; border-bottom:3px double var(--line); margin-bottom:26px; }
+.hero h1 { font-size:29px; line-height:1.45; margin:0 0 12px; }
+.hero .meta { color:var(--muted); font-size:13.5px; display:flex; gap:16px; flex-wrap:wrap; }
+.hero .meta a { color:var(--brand); text-decoration:none; }
+.prereq { margin-top:14px; padding:10px 14px; border-radius:8px; background:var(--bg-soft); border:1px solid var(--line); font-size:14px; color:var(--muted); }
+.prereq b { color:var(--text); }
+.prereq a { color:var(--brand); text-decoration:none; }
+.layout { display:grid; grid-template-columns:1fr; gap:34px; }
+@media (min-width:1180px) { .layout { grid-template-columns:minmax(0,1fr) 218px; } .toc { position:sticky; top:66px; align-self:start; max-height:calc(100vh - 90px); overflow:auto; } }
+.toc { font-size:13.5px; border-left:2px solid var(--line); padding-left:14px; }
+.toc .toc-t { font-weight:700; margin-bottom:8px; color:var(--muted); font-size:12.5px; letter-spacing:1px; }
+.toc a { display:block; color:var(--muted); text-decoration:none; padding:3px 0; border-left:2px solid transparent; margin-left:-16px; padding-left:14px; }
+.toc a:hover { color:var(--brand); border-left-color:var(--brand); }
+h2.sec { font-size:22.5px; margin:46px 0 18px; padding:9px 16px; border-left:5px solid var(--brand); background:var(--bg-soft); border-radius:6px; scroll-margin-top:70px; }
+h2.sec .no { color:var(--brand); font-family:ui-monospace,Menlo,monospace; margin-right:8px; font-size:19px; }
+h3.sub { font-size:18.5px; margin:32px 0 12px; color:#111827; scroll-margin-top:70px; }
+h3.sub::before { content:"▍"; color:var(--brand); margin-right:6px; }
+p { margin:10px 0; }
+strong { color:#111827; }
+.callout { border-radius:10px; padding:14px 18px; margin:16px 0; font-size:15px; border:1px solid; }
+.callout .co-t { font-weight:700; display:block; margin-bottom:4px; font-size:14px; letter-spacing:.5px; }
+.co-life { background:var(--life-bg); border-color:var(--life-line); } .co-life .co-t { color:var(--life); }
+.co-key { background:var(--key-bg); border-color:var(--key-line); } .co-key .co-t { color:var(--key); }
+.co-warn { background:var(--warn-bg); border-color:var(--warn-line); } .co-warn .co-t { color:var(--warn); }
+.co-supp { background:var(--supp-bg); border-color:var(--supp-line); border-style:dashed; } .co-supp .co-t { color:var(--supp); }
+.co-mentor { background:var(--quiz-bg); border-color:var(--quiz-line); } .co-mentor .co-t { color:var(--quiz); }
+.oneliner { background:linear-gradient(135deg,var(--brand-soft),#f5f8ff); border:1px solid var(--brand-line); border-radius:12px; padding:18px 22px; margin:20px 0; font-size:16.5px; line-height:1.9; }
+.oneliner .tag { font-weight:800; color:var(--brand); }
+code { background:#f1f3f5; border-radius:4px; padding:1.5px 6px; font-size:88%; font-family:ui-monospace,Menlo,Consolas,monospace; }
+figure { margin:22px 0; text-align:center; }
+figure svg { max-width:100%; height:auto; border:1px solid var(--line); border-radius:12px; background:#fff; }
+figcaption { color:var(--muted); font-size:13.5px; margin-top:8px; line-height:1.7; }
+figcaption b { color:var(--text); }
+table.tbl { width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px; }
+table.tbl th { background:var(--bg-soft); text-align:left; }
+table.tbl th, table.tbl td { border:1px solid var(--line); padding:8px 12px; vertical-align:top; }
+table.tbl tr:nth-child(even) td { background:#fbfcfd; }
+table.tbl td.num { text-align:right; font-variant-numeric:tabular-nums; }
+table.tbl .good { color:var(--key); font-weight:600; } table.tbl .bad { color:var(--warn); font-weight:600; }
+.term dt { font-weight:800; margin-top:14px; font-size:15.5px; }
+.term dt .en { color:var(--muted); font-weight:500; font-size:13px; margin-left:6px; }
+.term dd { margin:4px 0 0 0; padding-left:0; font-size:15px; }
+.term dd .essence { color:var(--key); font-weight:600; }
+.quiz { margin:18px 0; }
+details.q { background:var(--quiz-bg); border:1px solid var(--quiz-line); border-radius:10px; padding:12px 18px; margin:10px 0; }
+details.q summary { cursor:pointer; font-weight:700; color:#3b1d63; font-size:15.5px; }
+details.q summary .qn { color:var(--quiz); font-family:ui-monospace,Menlo,monospace; margin-right:8px; }
+details.q .ans { border-top:1px dashed var(--quiz-line); margin-top:10px; padding-top:10px; font-size:14.5px; }
+details.q .ans b { color:var(--quiz); }
+details.qs { background:var(--supp-bg); border:1px solid var(--supp-line); border-radius:10px; padding:12px 18px; margin:16px 0; }
+details.qs summary { cursor:pointer; font-weight:700; color:var(--supp); font-size:14.5px; }
+details.qs .ans { margin-top:10px; padding-top:10px; font-size:14.5px; color:#374151; border-top:1px dashed var(--supp-line); }
+.pager { display:flex; justify-content:space-between; gap:14px; margin-top:54px; padding-top:18px; border-top:1px solid var(--line); }
+.pager a { text-decoration:none; color:var(--brand); font-size:14.5px; border:1px solid var(--brand-line); background:var(--brand-soft); padding:10px 16px; border-radius:10px; }
+.pager a:hover { background:#e0edff; }
+.pager .ghost { visibility:hidden; }
+@media print { .topbar,.toc,.pager { display:none!important; } body { font-size:12px; } h2.sec { break-after:avoid; } figure,table.tbl,.callout { break-inside:avoid; } }
 </style>
 </head>
 <body>
@@ -64,43 +88,69 @@
   <a href="index.html">← 阅读目录</a>
   <span class="badge">证据评审</span>
   <span class="crumb">讲解 05 / 共 5 篇</span>
-  <span class="crumb" style="margin-left:auto">深入版（完整证据链）：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md">GitHub 上直接读 md</a></span>
+  <span class="crumb" style="margin-left:auto">深入版：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md">GitHub 上读 md</a></span>
 </div></div>
 <div class="wrap">
 
-  <header class="hero">
+  <div class="hero">
     <h1>为什么最好用的是 Claude Code：分数打平之后，赢在协作可靠性</h1>
-    <p class="core">一句话核心观点：单次通过率衡量的是终点，协作可靠性衡量的是到达终点的路上你要付出什么——两者解决率几乎打平（78.4% vs 77.4%），但失败动作差 2.4 倍；把用户换成人设，最强的模型面对非开发者也从 78.5% 跌到 23%。四类公开证据都指向同一个方向：选编码 Agent，别问分数，问"它跑偏时你拉回它的成本"。</p>
-    <p class="budget">本篇新名词预算：<strong>5 个</strong>——<code>任务模型</code> <code>协作可靠性</code> <code>失败动作占比</code> <code>用户纠正度</code> <code>证据标签</code>。都会在首次出现处用一句话讲清。</p>
-  </header>
+    <div class="meta">
+      <span>类型：证据评审</span>
+      <span>本篇新名词预算：<b>5 个</b>（任务模型 · 协作可靠性 · 失败动作占比 · 用户纠正度 · 证据标签）</span>
+      <span>深入版：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md">完整证据链 md</a></span>
+    </div>
+    <div class="prereq"><b>前置篇目：</b><a href="讲解-01-越聊越浅.html">01 · 为什么编码 Agent 越聊越浅</a>（上下文腐烂机制）｜本篇是五讲收尾：前面讲"为什么会出问题"，这篇用公开证据回答"选哪个"。</div>
+  </div>
 
-  <details class="quick" open>
-    <summary>3 分钟速览</summary>
-    <ol>
-      <li><strong>表面矛盾：</strong>Codex 在 SWE-bench 类基准上解决率还略高（78.4% vs 77.4%）。那为什么判 Claude 更好？——通过率相同，路径可以完全不同。</li>
-      <li><strong>过程证据：</strong>TraceProbe 分析 2500 条轨迹：Codex 失败动作占比 8.0% vs 3.3%（约 2.4 倍），有害动作 0.10 vs 0.07——它用更多试错换到同等结果。</li>
-      <li><strong>协作证据：</strong>SWE-Together 首次统计"用户要纠正几次"，模型越强纠正越少（相关性 −0.92）；Claude Opus 4.8 以 63% 通过率 + 最少纠正（1.38 次）双料第一。</li>
-      <li><strong>交互侧新证据：</strong>SWE-Journey 把用户换成人设——非开发者面前，最强模型通过率从 78.5% 跌到 23%；多数模型主动提问不到 20%。138 名开发者的调查里 75% 用 Claude Code，首要理由正是跨文件一致性和计划先行。</li>
-      <li><strong>诚实的边界：</strong>预印本和案例证据，不是定论；判断措辞是"初步支持"，复核数据和路径全部公开。</li>
-    </ol>
+  <details class="q" style="background:var(--supp-bg);border-color:var(--supp-line)" open>
+    <summary><span class="qn">速览</span>3 分钟看完本篇</summary>
+    <div class="ans">
+      <ol style="margin:0;padding-left:20px">
+        <li>Codex 解决率还略高（78.4% vs 77.4%）——但<strong>通过率相同，路径可以完全不同</strong>。</li>
+        <li>2500 条轨迹实测：Codex 失败动作占比 8.0% vs 3.3%，<strong>约 2.4 倍</strong>。</li>
+        <li>109 个多轮任务实测：Claude Opus 4.8 通过率与用户纠正次数<strong>双料第一</strong>。</li>
+        <li>把用户换成人设，最强模型面对非开发者从 78.5% 跌到 23%——<strong>协作能力才是主要矛盾</strong>。</li>
+        <li>这些是预印本与案例证据，结论措辞是"初步支持"，复核路径全部公开。</li>
+      </ol>
+    </div>
   </details>
 
-  <div class="sqa">
-    <p><span class="tag">情境 S</span>选编码 Agent 的人都在看同一类数字：SWE-bench 解决率。Codex 在这些榜上很强，Claude Code 也强，分数咬得很紧。</p>
-    <p><span class="tag">冲突 C</span>但真实用过的人体验差别很大：一个像靠谱的搭档，你说一半它懂一半；另一个单兵作战凶悍，长任务里却越干越偏——你让它改个按钮，它把后端也"顺手"重构了。分数一样，体验为什么两样？</p>
-    <p><span class="tag">问题 Q</span>排行榜到底漏掉了什么？"体验好"是玄学，还是有证据？</p>
-    <p><span class="tag">答案 A</span>排行榜测的是"终点对不对"，漏掉了"路径的成本"。四类公开证据（受控评测 + 过程诊断 + 失败案例 + 交互侧实验与调查）说明：协作场景下真正该比的是<strong>任务模型</strong>（agent 心里那版"你到底要什么"的工作表示）稳不稳定、你要纠正多少次、失败后能不能便宜地爬出来。</p>
-  </div>
+  <div class="layout">
+  <main>
 
-  <h2 class="sec">① 贯穿全文的类比：两个装修队，都声称懂"北欧风"</h2>
-  <div class="callout co-life">
-    <div class="row"><span class="label">生活类比：</span>你雇两个装修队，都说要做"北欧风"。A 队开工前先复述："我理解是浅色木地板、无主灯、收纳全部隐藏——对吗？"做完你基本满意，小修两处就好。B 队开局也利索，但干着干着墙刷成了米黄（"暖一点更显质感嘛"），柜子装满了整面墙（"北欧也流行收纳呀"）——每一步它都有自己的理由，最后"完工"了，可验收时几乎每间房都要返工。</div>
-    <div class="row"><span class="label">工程锚点：</span>这像分布式系统里的<strong>重试与状态补偿</strong>：两个服务最终成功率都是 78%，但一个是请求一次成功，另一个靠反复重试撞出来的——每次重试都可能产生副作用，你需要补偿逻辑去擦屁股。B 队（Codex）不是手艺不行，而是它心里那版"北欧风"——也就是<strong>任务模型</strong>——在你看不见的地方悄悄换代了；A 队（Claude）的问题多是低成本的局部修正，一行 compensate 就能拉回来。</div>
-    <div class="row edge"><span class="label">⚠️ 类比的边界：</span>装修队会主动跑来问你，模型不一定会——所以工程上要把"先复述理解再动手"从美德变成机制。另外碎裂的是<strong>目标表征</strong>，不是沟通态度：别把"B 队不认真"当成解释。</div>
-  </div>
+  <div class="oneliner"><span class="tag">一句话回答：</span>单次通过率衡量的是终点，协作可靠性衡量的是到达终点的路上你要付出什么——分数打平之后，赢在谁跑偏时你拉回它的成本更低。</div>
 
-  <h2 class="sec">② 核心证据：终点相同，路径不同</h2>
-  <p>把 TraceProbe 的数据画成一条"到达终点之路"：横轴是任务进度，纵轴是"离正确目标的距离"。两个 Agent 最终都到了（解决率 78.4% vs 77.4%），但一条线平稳收敛，另一条线反复冲进失败区再爬出来。</p>
+  <h2 class="sec" id="s1"><span class="no">①</span>整体认知：问题出在哪</h2>
+  <p>大家都看 SWE-bench 解决率选工具，但两个分数几乎重合的工具，真实体验却一头一尾。</p>
+  <div class="callout co-key"><span class="co-t">情境与冲突</span>
+    分数：Codex 78.4%，Claude Code 77.4%，统计上不可区分。<br>
+    体验：你让一个改按钮，它把后端也"顺手"重构了；另一个你说一半它懂一半。<br>
+    <strong>问题：排行榜漏掉了什么？</strong>答案：它只测终点，不测路径的成本。</div>
+  <p>真实协作比的不是"聪不聪明"，是三件事：<strong>任务模型稳不稳、你要纠正几次、失败后能不能便宜地爬出来</strong>。</p>
+
+  <div class="callout co-life"><span class="co-t">生活化类比：两个装修队</span>
+    都声称懂"北欧风"。<br>
+    A 队开工前先复述理解，做完小修两处就好。<br>
+    B 队每一步都有自己的理由，最后"完工"，验收几乎每间房返工。</div>
+  <div class="callout co-life"><span class="co-t">工程锚点：重试与状态补偿</span>
+    两个服务成功率都是 78%：一个是请求一次成功，一个是靠反复重试撞出来的——<br>
+    每次重试都可能带副作用，你得写补偿逻辑擦屁股。<br>
+    B 队不是手艺差，是它心里那版"北欧风"——<strong>任务模型</strong>——悄悄换代了。</div>
+  <div class="callout co-warn"><span class="co-t">⚠️ 类比的边界</span>
+    装修队会主动来问你，模型不一定会——所以"先复述再动手"要从美德变成机制。<br>
+    另外碎裂的是<strong>目标表征</strong>，不是态度：别用"B 队不认真"当解释。</div>
+
+  <h2 class="sec" id="s2"><span class="no">②</span>分块详解：四类证据各说了什么</h2>
+
+  <h3 class="sub" id="s2-1">2.1 过程诊断：终点相同，路径不同</h3>
+  <p>TraceProbe 分析 2500 条轨迹（arXiv 2607.06184）。两个 Agent 最终都到了，但过程分布完全两样：</p>
+  <table class="tbl">
+    <tr><th>指标</th><th style="text-align:right">Claude Code</th><th style="text-align:right">Codex</th><th>含义</th></tr>
+    <tr><td>解决率</td><td class="num">77.4%</td><td class="num good">78.4%</td><td>终点：几乎打平</td></tr>
+    <tr><td>失败动作占比</td><td class="num good">3.3%</td><td class="num bad">8.0%</td><td rowspan="2">Codex 用更多试错换同等结果</td></tr>
+    <tr><td>有害动作比例</td><td class="num good">0.07</td><td class="num bad">0.10</td></tr>
+    <tr><td>工具成功率</td><td class="num good">96.7%</td><td class="num">91.9%</td><td>Codex 的动作更容易落空</td></tr>
+  </table>
 
   <figure>
     <svg viewBox="0 0 900 380" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="通过率相同但稳定性不同的双线对比图">
@@ -124,15 +174,17 @@
       <text x="168" y="64" font-size="13" fill="#1f2328">Claude Code（平稳收敛）</text>
       <line x1="390" y1="60" x2="430" y2="60" stroke="#ef4444" stroke-width="2.5"/>
       <text x="438" y="64" font-size="13" fill="#1f2328">Codex（反复试错）</text>
-      <text x="455" y="364" font-size="13" fill="#6b7280" text-anchor="middle">先看绿色终点，再顺着蓝色线走一遍：同样的分数，陪跑的时长、token 账单和焦虑完全不一样</text>
+      <text x="455" y="364" font-size="13" fill="#6b7280" text-anchor="middle">先看绿色终点，再顺着蓝色线走一遍：同样的分数，陪跑成本完全不一样</text>
     </svg>
-    <figcaption><b>图 1</b>　通过率相同、稳定性不同（基于实测数据的示意）。TraceProbe 实测：失败动作占比 8.0% vs 3.3%、有害动作 0.10 vs 0.07、工具成功率 91.9% vs 96.7%——单次通过率把这些全部抹平了。看懂后记住一句：解决率衡量终点，协作可靠性衡量路径。</figcaption>
+    <figcaption><b>图 1</b>　基于实测数据的机制示意。看懂后记住一句：<b>解决率衡量终点，协作可靠性衡量路径</b>。</figcaption>
   </figure>
 
-  <div class="evidence">证据出处：TraceProbe（arXiv 2607.06184，2026-07-07），2500 条轨迹、五个生产设置，数据与代码公开（Zenodo DOI 10.5281/zenodo.20789918）。<b>这张表的证据标签是"框架与模型混合证据"：</b>两个设置里模型和代理框架同时变了，只能支持"组合"层面的比较，不能精确归因到"模型差"或"框架差"。</div>
+  <details class="qs"><summary>证据出处与边界（点开）</summary>
+    <div class="ans">TraceProbe（2026-07-07 提交），数据与代码公开（Zenodo DOI 10.5281/zenodo.20789918）。属于<b>框架与模型混合证据</b>：两个设置里模型和代理框架同时变了，只能支持"组合"层面的比较，不能精确归因。精确说法是"失败动作与有害动作两个维度更高"，不是笼统的"Codex 更乱"——论文自己也指出 Codex 的保留动作占比反而最大。</div>
+  </details>
 
-  <h2 class="sec">③ 更危险的失败：目标表征悄悄碎裂</h2>
-  <p>比"做错"更危险的是"忘了自己在做什么"。7 个可点击核实的 Codex issue 描述了同一条退化路径：约束一层层加上去，上下文一压缩，只剩一份不完整的摘要——它还能复述"大概要做什么"，但执行时遗漏你几轮前定下的硬规则，甚至复活你明确否决过的方案。你每纠正一次，它又可能把最新一句话当成全部目标。</p>
+  <h3 class="sub" id="s2-2">2.2 失败案例：目标表征会悄悄碎裂</h3>
+  <p>比"做错"更危险的是"忘了自己在做什么"。7 个可点击核实的 Codex issue 描述了同一条退化路径：</p>
 
   <figure>
     <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="任务模型随时间碎裂的退化路径">
@@ -163,42 +215,32 @@
       <rect x="530" y="304" width="280" height="60" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="0.5"/>
       <text x="670" y="328" font-size="13" font-weight="600" fill="#ef4444" text-anchor="middle">风险：只剩不完整摘要 → 约束碎裂</text>
       <text x="670" y="350" font-size="12" fill="#6b7280" text-anchor="middle">能复述"大概"，但丢硬规则、复活已否决方案</text>
-      <text x="450" y="392" font-size="13" fill="#6b7280" text-anchor="middle">视线跟着红色粗箭头走：危险的不是做错，而是碎裂之后每次纠正还在"修复"与"覆盖"之间掷骰子</text>
+      <text x="450" y="392" font-size="13" fill="#6b7280" text-anchor="middle">视线跟着红色粗箭头走：碎裂之后每次纠正还在"修复"与"覆盖"之间掷骰子</text>
     </svg>
-    <figcaption><b>图 2</b>　任务模型随时间碎裂（机制示意，对应 issue #33262 与原文深入版第八节的退化路径）。箭头从上往下是时间；压缩之后分出绿红两路，红色那路是 issue 里反复报告的失败模式。</figcaption>
+    <figcaption><b>图 2</b>　对应 issue #33262 与深入版第八节的退化路径。箭头从上往下是时间。</figcaption>
   </figure>
 
-  <div class="evidence">GitHub issue 能证明什么、不能证明什么：能证明某类失败真的发生过、有复现步骤、多个用户独立描述相似症状；不能证明发生概率（没有使用量分母）。7 个 issue 于 2026-10-16 逐一打开核实，链接见深入版附录 B。Claude Code 同样有 /compact 崩溃、恢复异常、忽略指令等报告——本文立场不是"一个稳一个不稳"，而是错误分布与纠偏成本的差别。</div>
+  <div class="callout co-warn"><span class="co-t">易错点</span>
+    Claude Code 也有同类问题（/compact 崩溃、恢复异常、忽略指令）。<br>
+    本文立场不是"一个稳一个不稳"，而是<strong>错误分布与纠偏成本</strong>的差别。</div>
 
-  <h2 class="sec">④ 交互侧的新证据：把用户放进实验，把调查摆上桌面</h2>
-  <p>光有论文还不够——2026 年 10 月的两条新证据把"协作体验"也拉进了可测量的范围。</p>
-
-  <h3>4.1 SWE-Journey：用户是谁，比模型多强更能决定成败</h3>
-  <p>这个研究（arXiv 2610.11559，2026-10-08）把"对面坐的是谁"变成实验变量：同一批长任务，用四种用户人设驱动多轮会话（非开发者、产品经理、新人开发、架构师），平均 18.28 轮——比旧基准的 5~9 轮长一截。结果：</p>
-
+  <h3 class="sub" id="s2-3">2.3 交互侧新证据（2026-10）：把用户放进实验</h3>
+  <p>SWE-Journey（arXiv 2610.11559，10-08）把"对面坐的是谁"变成实验变量，会话平均 18.28 轮：</p>
   <table class="tbl">
-    <tr><th>用户人设</th><th style="text-align:right">终点失败转通过率</th><th>这说明什么</th></tr>
-    <tr><td>架构师</td><td class="num good">78.50%</td><td>表达完整、能自己验收时，模型都强</td></tr>
-    <tr><td>新人开发</td><td class="num">35.57%</td><td rowspan="3">用户表达一弱，全线崩；缺口 55.5 个百分点</td></tr>
+    <tr><th>用户人设</th><th style="text-align:right">通过率</th></tr>
+    <tr><td>架构师</td><td class="num good">78.50%</td></tr>
+    <tr><td>新人开发</td><td class="num">35.57%</td></tr>
     <tr><td>产品经理</td><td class="num">30.48%</td></tr>
     <tr><td>非开发者</td><td class="num bad">23.00%</td></tr>
   </table>
+  <p>同一批模型，缺口 55.5 个百分点；而<strong>多数模型的主动提问轮次不到 20%</strong>。协作可靠性的主要矛盾，就在"从弱表达里恢复意图"。</p>
 
-  <p>更扎眼的细节：13 家模型里，<strong>多数模型的主动提问轮次占比不到 20%</strong>——它们宁可按自己的猜测做，也不问。这个研究对所有 Agent 成立（不是 Claude vs Codex 的正面对比），但它证实的正是本文的主线：协作可靠性的主要矛盾在"从弱表达里恢复意图"，谁澄清和纠偏做得好，谁就握住了真实体验。</p>
+  <div class="callout co-supp"><span class="co-t">补充：使用面印证</span>
+    ZDNet 调查 138 名活跃开发者（2026-10）：约 75% 用 Claude Code。<br>
+    理由前两名——跨文件改动保持连贯、先计划再动手少纠正——<br>
+    恰好落在上面两节测出的维度上。调查有自选偏差，取方向、不取比例。</div>
 
-  <h3>4.2 开发者调查：75% 的活跃用户选了 Claude Code，理由落点很说明问题</h3>
-  <p>ZDNet 对 138 名正在使用 AI 编码工具的开发者的调查（2026-10）：约 75% 用 Claude Code，约 1/3 用 Codex，22% 两者都用。被问及理由时，按提及频率排序是：</p>
-  <ol style="padding-left:22px; margin-bottom:12px;">
-    <li>大代码库跨文件改动保持连贯（14%）——对应"任务模型稳定性"；</li>
-    <li>先计划再动手，复杂重构需要更少纠正（9%）——对应"纠偏成本"；</li>
-    <li>同任务代码质量与推理更好（9%）；</li>
-    <li>在终端里对真实仓库执行，而不是编辑器自动补全（7%）；</li>
-    <li>先发者的 skills / 集成 / 工作流生态已成规模，切换成本实打实（5%）。</li>
-  </ol>
-  <p>调查是自愿应答，有自选偏差，比例不可引用——但<strong>方向</strong>可用：开发者自发给出的理由，恰好按顺序落在前两节测出的维度上。同时调查里也有人指出 Codex 的优势（更省 token、PR review 更强、单题推理更深），这与"执行器强、协作弱"的画像一致，而不是矛盾。</p>
-
-  <h2 class="sec">⑤ 证据可信度分层：这篇文章的每个判断踩在哪层？</h2>
-  <p>证据评审和"听个瓜"的区别，在于分层。本文的证据金字塔从下到上：案例（证明存在）→ 过程诊断（证明分布差异）→ 受控评测（证明相关性）→ 顶部空缺（尚无成对实验）。结论的强度刻意跟金字塔对齐。</p>
+  <h3 class="sub" id="s2-4">2.4 证据金字塔：结论的强度跟证据对齐</h3>
 
   <figure>
     <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="证据金字塔">
@@ -222,48 +264,89 @@
       <text x="740" y="315" font-size="12" fill="#6b7280">或"有人这么觉得"）</text>
       <text x="450" y="368" font-size="13" fill="#6b7280" text-anchor="middle">本文结论的强度 = 三层证据交叉指向的方向，而不是任何单层的分数</text>
     </svg>
-    <figcaption><b>图 3</b>　证据金字塔：每层标注了可信度与局限。塔尖是空心的——"Claude 更适合协商型协作"是三层证据共同指向的当前最优假设，不是已被实验钉死的结论。</figcaption>
+    <figcaption><b>图 3</b>　塔尖是空心的："Claude 更适合协商型协作"是三层证据共同指向的当前最优假设，不是被实验钉死的结论。</figcaption>
   </figure>
 
-  <div class="quote">选型原则一句话：别问"谁的分数高"，问"它跑偏的时候，你把它拉回来的成本是多少"。</div>
-  <p style="margin-top:6px;">对照一下就用得上——把"任务模型稳定性"当选型面试题：① 长会话压缩后让它复述当前约束清单，对照你自己的记录；② 给一次局部纠正，看它是增量更新还是整段覆盖；③ 故意给一个做不了的任务，看它解释失败时暴露的是"动作流水账"还是"可编辑的理解"。三个答案比任何排行榜都更接近你将来的真实体验。</p>
+  <div class="callout co-mentor"><span class="co-t">面试官视角 ①</span>
+    被问"AI 编码工具怎么选"时，别背结论，先反问一句：<br>
+    "您说的'好'，是单次通过率，还是纠偏成本？"——<strong>这一问就把你和背榜单的人分开了</strong>。</div>
 
-  <h2 class="sec">⑥ 质疑与追问</h2>
-  <p class="chain-note">这不是平铺的题单，是两条追问链：顺着每条链往下看，看能不能自己接出第四层。</p>
+  <h2 class="sec" id="s3"><span class="no">③</span>专业名词表</h2>
+  <dl class="term">
+    <dt>任务模型<span class="en">task model</span></dt>
+    <dd>Agent 执行时心里那版"你到底要什么"的工作表示：目标、约束、否决项、进度。<span class="essence">本质：它错了，后面每一步都对得很整齐地错。</span></dd>
+    <dt>协作可靠性<span class="en">collaboration reliability</span></dt>
+    <dd>多轮协作中维持目标一致、少让人陪跑、失败能爬出来的综合能力。<span class="essence">本质：衡量路径，不衡量终点。</span></dd>
+    <dt>失败动作占比<span class="en">failed action share</span></dt>
+    <dd>轨迹里落空或作废的动作占总动作的比例（TraceProbe 实测 8.0% vs 3.3%）。<span class="essence">本质：同样的分数，试错成本差 2.4 倍。</span></dd>
+    <dt>用户纠正度<span class="en">user correction count</span></dt>
+    <dd>完成任务需要用户明确纠正几次（SWE-Together 首次列为主要指标）。<span class="essence">本质：把"体验差"变成可数的量。</span></dd>
+    <dt>证据标签<span class="en">evidence tag</span></dt>
+    <dd>给每个判断标上证据类型：模型证据 / 混合证据 / 案例 / 调查 / 综合推断。<span class="essence">本质：结论的强度必须跟证据的强度对齐。</span></dd>
+  </dl>
+
+  <h2 class="sec" id="s4"><span class="no">④</span>回顾与追问</h2>
+  <p>知识地图一句话：<strong>分数打平（TraceProbe）→ 输赢在纠偏成本（SWE-Together）→ 碎裂是真实失败模式（7 个 issue）→ 协作能力是主要矛盾（SWE-Journey + 调查）。</strong></p>
+
   <div class="quiz">
     <details class="q">
-      <summary><span class="qn">追问链 A · 第 1 层</span>109 个任务、7 个 issue，样本量这么小凭什么下结论？</summary>
-      <div class="ans"><b>要点：</b>单看哪一项都不够。这个判断的成立方式是三层独立证据交叉：受控评测给出"能力与纠正量强负相关（−0.92）"的方向；过程诊断在同解决率下测到失败动作 2.4 倍的分布差；issue 只负责证明"约束碎裂真实存在"。三者测量方式、数据来源、偏差结构都不同，却指向同一方向。</div>
+      <summary><span class="qn">追问链 A · 第 1 层</span>109 个任务、7 个 issue，凭什么下结论？</summary>
+      <div class="ans"><b>要点：</b>单看哪项都不够。判断靠三层独立证据交叉：受控评测给方向（−0.92），过程诊断给分布差（2.4 倍），issue 只证明"碎裂真实存在"。三者测量方式、偏差结构都不同，却指向同一方向。</div>
     </details>
     <details class="q">
-      <summary><span class="qn">追问链 A · 第 2 层</span>那为什么不再等一等，等成对实验出来再下结论？</summary>
-      <div class="ans"><b>要点：</b>因为选型不能等。成对实验的缺失意味着结论必须降级为"初步支持"，但你现在就要选工具；正确的动作不是假装没有结论，而是带着"这是当前最优假设、可被推翻"的预期去用，用第八节那三个动作自己积累证据。</div>
+      <summary><span class="qn">追问链 A · 第 2 层</span>为什么不等成对实验出来再下结论？</summary>
+      <div class="ans"><b>要点：</b>选型不能等。缺失成对实验意味着结论必须降级为"初步支持"，但正确动作不是假装没有结论，而是带着"可被推翻"的预期去用，用下面的三个动作自己积累证据。</div>
     </details>
     <details class="q">
-      <summary><span class="qn">追问链 A · 第 3 层</span>如果半年后出了成对实验、结果反过来呢？</summary>
-      <div class="ans"><b>要点：</b>那本文的方法论依然成立，只有结论翻转——"通过率掩盖过程差异"这个命题在模型换代后依然可测、可证伪，这正是它比排行榜有用的原因。数据全部公开（Zenodo DOI、arXiv、issue 链接），任何人都能重算。</div>
+      <summary><span class="qn">追问链 A · 第 3 层</span>半年后成对实验结果反过来呢？</summary>
+      <div class="ans"><b>要点：</b>只有结论翻转，方法论依然成立——"通过率掩盖过程差异"在模型换代后依然可测、可证伪。数据全部公开（arXiv、Zenodo、issue 链接），任何人可重算。</div>
     </details>
     <details class="q">
-      <summary><span class="qn">追问链 B · 第 1 层</span>解决率就差 1 个百分点，凭什么说一个"平稳"、一个"反复试错"？</summary>
-      <div class="ans"><b>要点：</b>过程指标不在排行榜里，但在轨迹里：失败动作 8.0% vs 3.3%、有害动作 0.10 vs 0.07、工具成功率 91.9% vs 96.7%。要诚实：这是混合证据，精确说法是"失败动作与有害动作两个维度更高"，不是笼统的"Codex 更乱"——TraceProbe 自己也指出 Codex 的保留动作占比反而最大。</div>
+      <summary><span class="qn">追问链 B · 第 1 层</span>解决率就差 1 个点，凭什么说一个平稳一个反复试错？</summary>
+      <div class="ans"><b>要点：</b>过程指标不在排行榜里，但在轨迹里（失败动作 8.0% vs 3.3%、有害动作 0.10 vs 0.07、工具成功率 91.9% vs 96.7%）。要诚实：这是混合证据，只支持"组合"层面比较。</div>
     </details>
     <details class="q">
-      <summary><span class="qn">追问链 B · 第 2 层</span>你自己的使用体验算不算证据？确认偏差怎么排除？</summary>
-      <div class="ans"><b>要点：</b>排除不了，只能管理——深入版把用户观察的方法与四类偏差（确认、记忆、版本漂移、任务不平衡）写明，并把它的功能严格降级为"提出研究问题"；成立与否交给可复核的公开证据检验。2026-10 新增的开发者调查提供了独立的使用面印证，但它同样有自选偏差，只取方向、不取比例。</div>
+      <summary><span class="qn">追问链 B · 第 2 层</span>你自己的使用体验算证据吗？确认偏差呢？</summary>
+      <div class="ans"><b>要点：</b>排除不了，只能管理。深入版把观察方法与四类偏差写明，功能严格降级为"提出研究问题"；2026-10 新增的开发者调查提供独立印证，但同样有自选偏差，只取方向。</div>
     </details>
     <details class="q">
-      <summary><span class="qn">追问链 B · 第 3 层</span>既然 Codex 执行强又省 token，混合用两个不行吗？</summary>
-      <div class="ans"><b>要点：</b>行，而且这正是本文框架支持的做法：按任务类型分流——目标明确、验收清晰的任务（Codex 强项，SWE-Together 里它最省 token：29.9k vs 74.0k）交给 Codex；模糊口语需求、长会话持续演进、边聊边改交给 Claude 系。真正的错误不是"选了谁"，而是假设"解决率高 = 协作好"，用管理执行器的方式去用协作者。</div>
+      <summary><span class="qn">追问链 B · 第 3 层</span>Codex 执行强又省 token，混合用两个不行吗？</summary>
+      <div class="ans"><b>要点：</b>行，这正是本文框架支持的做法：明确、验收清晰的任务（Codex 强项，29.9k vs 74.0k token）给 Codex；模糊口语、长会话、边聊边改给 Claude 系。真正的错误是用管理执行器的方式去用协作者。</div>
     </details>
     <details class="q">
-      <summary><span class="qn">加分题</span>你们团队如果要自己验证一遍，实验怎么设计才不作弊？</summary>
-      <div class="ans"><b>要点：</b>同一真实项目、相同初始状态、成对任务，两边用各自推荐的前沿模型，固定 commit / 权限 / 工具 / 时间预算，每任务独立运行至少 10 次，不把一方的澄清答案复制给另一方，保存完整轨迹并由不知情的评审者盲评。结果别只报平均分：报中位数、90 分位监督成本、最坏 10% 的失败、同任务方差、可恢复与必须重开的占比。</div>
+      <summary><span class="qn">加分题</span>团队要自己验证，实验怎么设计才不作弊？</summary>
+      <div class="ans"><b>要点：</b>同一项目、相同初始状态、成对任务，固定 commit/权限/时间预算，每任务独立跑至少 10 次，不把一方的澄清答案复制给另一方，不知情评审者盲评。报中位数、90 分位、最坏 10%、可恢复占比——不只报平均分。</div>
     </details>
   </div>
 
-  <footer class="exit">
-    <p><strong>想核对每条数据与完整论证？</strong>深入版在这里：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md">为什么最好用的是 Claude Code（GitHub 上直接渲染）</a>——含全部论文与 issue 链接、每条断言的证据标签、证据边界声明与数据核实记录；本地对应文件在仓库 <code>原文/</code> 目录。</p>
-    <p style="margin-top:8px;">版本标注：对应深入版 v3（2026-10-21；数据核实 2026-10-16，增量证据补于 2026-10-21）。本页为讲解版，结论与深入版一致；图 1、图 2 为基于实测数据或已核实案例的机制示意，类比均已标注边界。</p>
+  <h3 class="sub" id="s4-1">落地视角：今天就能用的三个动作</h3>
+  <p>把"任务模型稳定性"当选型面试题：① 长会话压缩后，让它<strong>复述当前约束清单</strong>，对照你的记录；② 给一次局部纠正，看它是<strong>增量更新</strong>还是整段覆盖；③ 故意给个做不了的任务，看它解释失败时是"动作流水账"还是"可编辑的理解"。</p>
+  <div class="callout co-mentor"><span class="co-t">面试官视角 ②</span>
+    这三个动作本身就是加分素材：<strong>你不引用任何排行榜，就给出了可执行的选型方法</strong>——比"我用过 X 觉得好"高一个档次。</div>
+
+  <div class="pager">
+    <a href="讲解-04-提示词与代码边界.html">← 上一篇：Agent 系统可靠性</a>
+    <a href="index.html">返回总目录 →</a>
+  </div>
+
+  </main>
+  <aside class="toc">
+    <div class="toc-t">目录</div>
+    <a href="#s1">① 整体认知</a>
+    <a href="#s2">② 分块详解</a>
+    <a href="#s2-1" style="padding-left:26px;font-size:13px">2.1 终点相同，路径不同</a>
+    <a href="#s2-2" style="padding-left:26px;font-size:13px">2.2 目标表征碎裂</a>
+    <a href="#s2-3" style="padding-left:26px;font-size:13px">2.3 交互侧新证据</a>
+    <a href="#s2-4" style="padding-left:26px;font-size:13px">2.4 证据金字塔</a>
+    <a href="#s3">③ 专业名词表</a>
+    <a href="#s4">④ 回顾与追问</a>
+    <a href="#s4-1" style="padding-left:26px;font-size:13px">落地：三个动作</a>
+  </aside>
+  </div>
+
+  <footer style="margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)">
+    <p><strong>想核对每条数据与完整论证？</strong>深入版：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md">为什么最好用的是 Claude Code（GitHub 上直接渲染）</a>，本地在仓库 <code>原文/</code> 目录。</p>
+    <p style="margin-top:6px;">版本：对应深入版 v3（2026-10-21）。本页为讲解版，结论与深入版一致；图 1、图 2 为基于实测数据或已核实案例的机制示意，类比均已标注边界。</p>
   </footer>
 
 </div>
