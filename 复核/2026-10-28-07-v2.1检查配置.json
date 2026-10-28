@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "direction": "show",
+  "title": "第07篇 v2.1 本轮检查范围",
+  "entry": "阅读/index.html",
+  "metadata_required": true,
+  "readers": {
+    "deep": "做过 AI/Agent 项目、需要核对推理与依据的工程师和技术负责人",
+    "quick": "希望快速理解场景、机制与工程取舍的同类读者"
+  },
+  "delivery": {
+    "offline": true,
+    "public": false,
+    "sensitive_constraints": [
+      "不披露内部地址、凭据、用户数据和项目专名；所有解释案例明确为构造",
+      "只在本地落地，未授权发布或推送"
+    ]
+  },
+  "documents": [
+    {
+      "id": "show-07",
+      "version": "2.1-review",
+      "status": "local-review",
+      "markdown": "原文/文档明明写了，Agent 为什么还是答错：把知识库变成可测试接口.md",
+      "html": "阅读/讲解-07-文档可测试化.html"
+    }
+  ],
+  "markdown_reader": "Markdown 正本使用支持显式 HTML id 与相对链接的阅读器。新增 HTML 将正本预渲染为离线深入视图，?view=deep#锚点用于真实浏览器定位；Markdown 定位链接保留给相容阅读器。",
+  "supporting_documents": [
+    "README.md",
+    "复核/2026-10-28-07-v2.1图文复核.md"
+  ],
+  "specification": "SHOW v3.2；本配置仅检查07双版、公共入口和本轮记录，不为08/09或历史篇目签发结论。"
+}

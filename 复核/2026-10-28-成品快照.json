@@ -1,0 +1,15 @@
+{
+  "algorithm": "sha256",
+  "date": "2026-10-28",
+  "files": {
+    "README.md": "fbfbfe18ec61887e032ea865b3e6fd08baa71c716b915a06772985f62a4071ae",
+    "阅读/index.html": "d69a537f0804b1973d79c9886936a30c952b4d133269b6c0272a71bc02c0b5a8",
+    "project.json": "ff92d12572b34cd639315d36616cfebe4360bf54c4e288be7e3176b3c8ce0853",
+    "原文/文档明明写了，Agent 为什么还是答错：把知识库变成可测试接口.md": "959bd1a64f7c90a30fd8fa59a5c4ca782751d2d60c551acc29c9a1bb6306c17b",
+    "阅读/讲解-07-文档可测试化.html": "61b7989d79ffd1d1452ef203fcc597a7f32800edeeb9345c68bb7e1194e94b89",
+    "原文/Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环.md": "c457b9e956d8f0367c516fa5f9e74b224c5da4bb62d41c2dc0eb346cf79427ee",
+    "阅读/讲解-08-Agent评测闭环.html": "ae8a79ccd140874719a6f0101458b0f5a8aa888dc5d5d75016b12d1ec66118b0",
+    "原文/读完代码，还不算了解这个系统：陌生后端的事实核验七步法.md": "02081bca57651a2581d4fb6765cbea8e71e1aa63f705a88cc8168e92efd5aa10",
+    "阅读/讲解-09-项目事实核验.html": "4ae5886497d8560917763a909aea94a1665a183e27777748a4b9f9499ada7e76"
+  }
+}

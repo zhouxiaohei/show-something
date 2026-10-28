@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="document-id" content="show-09"><meta name="document-version" content="1.1"><meta name="description" content="从背景难点、总体设计到七步操作，用导出服务解释陌生后端的事实核验。12幅图解，内置完整深入论证，离线可读。"><title>读完代码，还不算了解这个系统 · 事实核验七步法</title><style>:root{--bg:#f6f8fb;--paper:#fff;--ink:#243247;--muted:#63748a;--line:#dbe3ed;--blue:#315f9c;--soft-blue:#edf3fc;--green:#306d60;--soft-green:#edf6f2;--amber:#8c612d;--soft-amber:#fbf4e8;--soft:#f1f4f8}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:100px}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}a{color:var(--blue);text-decoration:none;text-underline-offset:4px}a:hover{text-decoration:underline}button{font:inherit}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #80a5d6;outline-offset:5px}[hidden]{display:none!important}.masthead{background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.masthead-inner{max-width:1360px;margin:auto;padding:15px 34px;display:flex;align-items:center;gap:25px;font-size:14px}.masthead .brand{color:var(--ink);font-weight:650;letter-spacing:.03em;margin-right:auto}.mode-links{display:flex;gap:8px;align-items:center}.mode-links a{padding:5px 12px;border-radius:7px}.mode-links a[aria-current=page]{background:var(--soft-blue);color:#224c85;font-weight:600}.layout{max-width:1360px;margin:0 auto;padding:48px 34px 100px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:56px}.toc{align-self:start;position:sticky;top:108px;font-size:13px;line-height:1.7}.toc .toc-label{font-size:11px;letter-spacing:.15em;color:var(--muted);margin-bottom:16px}.toc a{display:block;padding:9px 12px;border-left:2px solid var(--line);color:var(--muted)}.toc a:hover,.toc a.active{border-left-color:var(--blue);color:var(--blue);background:var(--soft-blue);text-decoration:none}.toc .toc-foot{font-size:12px;color:var(--muted);padding:16px 12px;margin-top:18px;border-top:1px solid var(--line)}main{min-width:0}.hero{padding:9px 0 40px}.eyebrow,.section-label{font-size:12px;color:var(--blue);font-weight:650;letter-spacing:.1em}.eyebrow{display:block}.hero h1{font-size:42px;line-height:1.4;letter-spacing:-1px;margin:15px 0 12px;max-width:920px}.hero .subtitle{font-size:23px;color:var(--muted);margin:0 0 25px}.hero .lead{font-size:20px;line-height:1.9;max-width:800px}.meta{font-size:12px;color:var(--muted);display:flex;gap:17px;flex-wrap:wrap}.abstract{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--soft-blue);border-radius:12px;padding:24px 15px;margin-top:30px}.abstract div{padding:0 18px;border-right:1px solid #d2dff0}.abstract div:last-child{border:0}.abstract b{display:block;font-size:16px;margin-bottom:7px;color:#274f85}.abstract p{font-size:14px;line-height:1.8;margin:0}.case-note{padding:21px 25px;border-left:3px solid #b6c8df;background:#f0f4fa;margin-bottom:45px}.case-note p{font-size:15px;line-height:1.85;margin:7px 0 0;max-width:800px}.chapter{border-top:1px solid var(--line);padding:39px 0 29px;scroll-margin-top:90px}.chapter h2{font-size:29px;line-height:1.55;letter-spacing:-.3px;margin:9px 0 23px}.chapter h3{font-size:21px;line-height:1.6;margin:29px 0 14px}.chapter p{max-width:850px;margin:0 0 18px}.chapter strong{font-weight:650}.chapter h4{font-size:17px;margin:0 0 12px}.step-section{scroll-margin-top:100px}.step-no{display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:white;min-width:28px;height:28px;border-radius:6px;font-size:15px;margin-right:10px;vertical-align:2px}.explain-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 34px;margin:28px 0 20px}.explain-grid h3{font-size:18px;margin:0 0 8px}.explain-grid p{font-size:15px}.insight,.deliverable,.example-line{padding:20px 24px;background:var(--paper);border-left:3px solid #95b0d0;margin:23px 0}.insight b,.example-line b{font-size:15px;color:var(--blue)}.insight p,.example-line p{font-size:16px;margin:7px 0 0}.deliverable{background:var(--soft-green);border-color:#8db6a6}.deliverable span{font-size:12px;font-weight:650;color:var(--green)}.deliverable p{font-size:15px;margin:5px 0 0}.proof{font-size:12px;color:var(--muted);margin:17px 0!important;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.proof a{border-bottom:1px solid #c6d5e7}.proof .md-link{color:var(--muted);border:0}.figure{margin:30px 0 25px;background:#fbfcfe;border:1px solid var(--line);border-radius:12px;overflow:hidden}.figure .figure-heading{padding:19px 23px 0;display:flex;justify-content:space-between;align-items:baseline;gap:16px}.figure .figure-heading b{font-size:15px;line-height:1.6}.figure .figure-heading span{font-size:11px;color:var(--muted);white-space:nowrap}.diagram-scroll{overflow:auto;padding:10px 12px 0}.diagram{display:block;width:100%;height:auto;min-width:760px;overflow:visible;font-family:inherit}.diagram text{fill:var(--ink);font-weight:450}.diagram text.muted{fill:var(--muted)}.diagram .node{stroke:#d9e2ec;stroke-width:1.2;fill:#f0f3f7}.diagram .node.candidate{fill:#edf3fc;stroke:#c5d5eb}.diagram .node.observed{fill:#edf6f2;stroke:#b4d4c7}.diagram .node.unknown{fill:#fbf4e8;stroke:#deccaf}.diagram .soft{fill:#f0f3f7}.figure figcaption{padding:12px 23px 19px;font-size:13px;line-height:1.8;color:var(--muted);border-top:1px solid #e7ecf3}.step-map{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:25px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.step-map a{display:flex;align-items:center;gap:12px;padding:12px;font-size:14px}.step-map span{font:600 12px/1.5 ui-monospace,monospace;color:var(--muted)}details{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:17px 5px;margin:21px 0;background:rgba(255,255,255,.55)}details+details{margin-top:-22px}summary{cursor:pointer;font-size:15px;font-weight:600;color:#36516f}details p{font-size:15px;margin:16px 0 0!important}code{font: .88em/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#eaf0f6;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{background:#eaf0f6;border-radius:8px;padding:18px 21px;overflow:auto;font:14px/1.8 ui-monospace,monospace}pre code{padding:0;background:none;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.8;margin:0}th,td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{color:#37516f;background:#edf2f8;font-weight:600}td{background:#fff}td:first-child{font-weight:550;min-width:105px}.table-scroll{overflow:auto;margin:23px 0}.table-scroll table{min-width:650px}.small{font-size:13px!important;color:var(--muted)}.evidence-tool{padding:26px;background:var(--paper);border:1px solid var(--line);border-radius:12px;margin:30px 0}.evidence-tool h3{margin:0 0 12px}.tool-controls{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.evidence-button{border:1px solid #c5d3e3;border-radius:7px;background:transparent;padding:8px 14px;color:#35526f;font-size:14px;cursor:pointer}.evidence-button[aria-pressed=true]{color:#fff;background:#315f9c;border-color:#315f9c}.evidence-panel{padding-top:15px;border-top:1px solid var(--line)}.evidence-panel+ .evidence-panel{margin-top:24px}.evidence-panel dl{display:grid;grid-template-columns:105px 1fr;gap:12px;margin:0;font-size:15px}.evidence-panel dt{font-weight:600;color:#48627d}.evidence-panel dd{margin:0}.conclusion{margin:25px 0;padding:22px 25px;border-left:3px solid #7cae9c;background:var(--soft-green)}.conclusion p{font-size:16px;margin:0}.boundary{margin-top:35px;padding:23px 25px;background:var(--soft-amber);border-left:3px solid #bd9c69}.boundary b{font-size:15px;color:var(--amber)}.boundary p{font-size:14px;margin:10px 0 0}.closing-links{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding-top:28px;font-size:14px}.primary-link{font-weight:600}.page-footer{max-width:1360px;margin:auto;padding:24px 34px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:24px}.deep-wrap{max-width:1080px;margin:40px auto 90px;padding:0 32px}.deep-intro{border-left:3px solid var(--blue);padding:12px 22px;margin:20px 0 32px;font-size:14px;background:var(--soft-blue)}.deep{padding:38px 44px;background:#fff;border:1px solid var(--line);border-radius:12px}.deep h1{font-size:33px;line-height:1.55}.deep h2{font-size:26px;margin:45px 0 22px;line-height:1.6;border-top:1px solid var(--line);padding-top:27px}.deep h3{font-size:21px;margin:30px 0 14px}.deep p,.deep li{font-size:16px}.deep blockquote{margin:20px 0;padding:3px 21px;border-left:3px solid #b6c8df;color:var(--muted)}.deep a[id]{display:block;scroll-margin-top:100px}.deep table{display:block;overflow:auto}.deep .figure{margin-left:0;margin-right:0}.deep .diagram{min-width:760px}.noscript-notice{padding:20px;margin:20px;background:var(--soft-amber)}@media(min-width:1600px){.layout,.masthead-inner,.page-footer{max-width:1420px}.layout{grid-template-columns:190px minmax(0,1fr);gap:70px}}@media(max-width:1050px){.layout{display:block;padding:34px 26px 65px;max-width:1000px}.toc{display:none}.hero h1{font-size:35px}.masthead-inner{padding:12px 24px}.masthead .brand{font-size:12px}}@media(max-width:640px){body{font-size:16px}.layout{padding:25px 17px 50px}.masthead-inner{padding:10px 16px;gap:6px;flex-wrap:wrap}.masthead .brand{width:100%;margin:0}.mode-links{gap:2px}.mode-links a{padding:5px 8px;font-size:12px}.hero h1{font-size:29px}.hero .subtitle{font-size:19px}.hero .lead{font-size:17px}.abstract{grid-template-columns:1fr;gap:18px;padding:22px}.abstract div{border:0;padding:0}.chapter h2{font-size:24px}.chapter h3{font-size:19px}.explain-grid{grid-template-columns:1fr;gap:5px}.chapter{padding-top:30px}.step-map{grid-template-columns:1fr}.figure .figure-heading{padding:15px 16px 0;display:block}.figure .figure-heading span{display:block;margin-top:5px}.figure figcaption{padding:10px 16px 16px}.evidence-tool{padding:20px}.evidence-panel dl{grid-template-columns:1fr;gap:4px}.evidence-panel dd{margin-bottom:13px}.deep-wrap{padding:0 15px}.deep{padding:23px 18px}.deep h1{font-size:26px}.deep h2{font-size:23px}.deep h3{font-size:19px}.page-footer{padding:20px 17px;display:block}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{.masthead,.toc,.proof,.tool-controls,.page-footer{display:none}.layout{display:block;padding:0}.figure,.chapter{break-inside:avoid}.diagram{min-width:0}.deep-wrap{margin:0}.deep{border:0}.evidence-panel[hidden]{display:block!important}body{background:white}}
+</style></head>
+<body><header class="masthead"><nav class="masthead-inner" aria-label="文章与阅读模式"><a class="brand" href="index.html">SHOW SOMETHING / 09</a><div class="mode-links"><a id="nav-lecture" href="?view=lecture" aria-current="page">图解讲解</a><a id="nav-deep" href="?view=deep#repo-design">深入全文</a><a href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md">Markdown 正本</a></div></nav></header>
+<div class="layout" id="lecture-layout"><aside class="toc"><div class="toc-label">本篇阅读路线</div><nav aria-label="章节目录"><a href="#background">01 &nbsp; 背景与目标</a><a href="#difficulty">02 &nbsp; 信息为何对不上</a><a href="#design">03 &nbsp; 总体设计与七步</a><a href="#map-config">04 &nbsp; 范围、读码与配置</a><a href="#data-interface">05 &nbsp; 数据与接口口径</a><a href="#business-relations">06 &nbsp; 业务路径与关系</a><a href="#runtime">07 &nbsp; 运行来源</a><a href="#reconcile-deliver">08 &nbsp; 对账与交付判断</a><a href="#maintain">09 &nbsp; 维护与证据边界</a></nav><div class="toc-foot">从背景到总方案<br>再沿一笔导出展开<br><br>案例为构造<br>图文与深入全文可离线读</div></aside>
+<main id="lecture"><header class="hero"><span class="eyebrow">项目接手 / 可复核的系统认知</span><h1>读完代码，还不算<br>了解这个系统</h1><p class="subtitle">陌生后端的事实核验七步法</p><p class="lead">把代码声明、业务行为和运行身份对齐，形成足以支持当前决策的系统画像。</p><div class="meta"><span>2026-10-28 · v1.1</span><span>工程师与技术负责人</span><span>12 幅图解 · 内置完整深入版</span></div><div class="abstract"><div><b>为什么要查</b><p>入口、数据、职责和运行版本，决定接入与迁移范围。</p></div><div><b>怎样查清</b><p>读码建图，沿业务观察，溯源对齐；冲突就回查。</p></div><div><b>查到哪里停</b><p>证据够当前决定就交付，未知保留影响与下一步。</p></div></div></header><div class="case-note"><span class="eyebrow">贯穿全文的构造案例</span><p>把一个导出服务接到新入口，并评估迁往另一环境需要哪些组件、数据和配置。所有资源代号、任务记录及版本均为示意。</p></div>
+
+<section class="chapter" id="background" data-title="背景与目标">
+<div class="section-label">01 / 背景与目标</div><h2>接手一个后端，先知道自己要交付什么</h2>
+<p>你拿到一份仓库，产品同事要接入导出功能，负责人想评估迁移范围。此时最有价值的成果，是能说清<strong>入口与职责、数据与依赖、关键业务路径、实际运行内容</strong>的系统画像。它们分别决定接入谁、准备什么资源、怎样判断成功、基于哪个版本继续工作。</p>
+<p>接手像接管一间工厂：设备清单帮助定位，沿一张订单走完交付才能理解各岗位如何配合；还要核对现场实际使用的设备与工艺。类比只说明调查视角，软件还需要处理身份、动态配置和运行版本。</p>
+<p>在本文案例中，API 是接收 HTTP 请求的应用进程；worker 是执行后台导出任务的独立进程。<strong>接口返回任务 ID 时，文件可能尚未生成。</strong>若只迁走 API，用户仍可能等不到结果。</p>
+<figure class="figure" id="fig-sequence"><div class="figure-heading"><b>图 01 · 受理之后，还有后台处理和结果核对</b><span>构造案例</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 650" role="img" aria-labelledby="d-sequence-title d-sequence-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-sequence-title">图 1：导出任务的时间顺序</title><desc id="d-sequence-desc">构造案例。创建任务返回后，后台处理、文件生成、下载与内容核对仍是不同环节。垂直间距不表示实际耗时。</desc><defs><marker id="d-sequence-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="20" y="20" width="180" height="55" rx="10" class="node neutral"/><text x="110.0" y="54.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="110.0" dy="0">测试用户</tspan></text><path d="M110,75 L110,605" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6"/><rect x="275" y="20" width="180" height="55" rx="10" class="node neutral"/><text x="365.0" y="54.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="365.0" dy="0">导出 API</tspan></text><path d="M365,75 L365,605" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6"/><rect x="535" y="20" width="180" height="55" rx="10" class="node neutral"/><text x="625.0" y="54.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="625.0" dy="0">后台 worker</tspan></text><path d="M625,75 L625,605" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6"/><rect x="790" y="20" width="180" height="55" rx="10" class="node neutral"/><text x="880.0" y="54.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="880.0" dy="0">文件存储</tspan></text><path d="M880,75 L880,605" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6"/><path d="M110,120 L365,120" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="182.1" y="92" width="109.8" height="25" rx="3" fill="#fbfcfe"/><text x="237" y="109" text-anchor="middle" class="muted" font-size="17"><tspan x="237" dy="0">提交导出请求</tspan></text><path d="M365,170 L110,170" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="174.45" y="142" width="125.10000000000001" height="25" rx="3" fill="#fbfcfe"/><text x="237" y="159" text-anchor="middle" class="muted" font-size="17"><tspan x="237" dy="0">返回任务 ID</tspan></text><path d="M365,225 L625,225" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-sequence-arrow)"/><rect x="424.8" y="197" width="140.4" height="25" rx="3" fill="#fbfcfe"/><text x="495" y="214" text-anchor="middle" class="muted" font-size="17"><tspan x="495" dy="0">通过任务机制交接</tspan></text><rect x="537" y="252" width="176" height="64" rx="10" class="node observed"/><text x="625.0" y="277.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="625.0" dy="0">读取业务数据</tspan><tspan x="625.0" dy="28">生成结果文件</tspan></text><path d="M625,342 L880,342" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="697.1" y="314" width="109.8" height="25" rx="3" fill="#fbfcfe"/><text x="752" y="331" text-anchor="middle" class="muted" font-size="17"><tspan x="752" dy="0">写入结果文件</tspan></text><path d="M110,385 L365,385" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="182.1" y="357" width="109.8" height="25" rx="3" fill="#fbfcfe"/><text x="237" y="374" text-anchor="middle" class="muted" font-size="17"><tspan x="237" dy="0">查询任务状态</tspan></text><path d="M365,425 L110,425" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="134.39999999999998" y="398" width="205.20000000000002" height="24" rx="3" fill="#fbfcfe"/><text x="237" y="414" text-anchor="middle" class="muted" font-size="16"><tspan x="237" dy="0">返回状态（读取任务库 T）</tspan></text><path d="M110,470 L365,470" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="182.1" y="442" width="109.8" height="25" rx="3" fill="#fbfcfe"/><text x="237" y="459" text-anchor="middle" class="muted" font-size="17"><tspan x="237" dy="0">请求下载结果</tspan></text><path d="M365,505 L880,505" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="562.45" y="477" width="125.10000000000001" height="25" rx="3" fill="#fbfcfe"/><text x="625" y="494" text-anchor="middle" class="muted" font-size="17"><tspan x="625" dy="0">下载时读取文件</tspan></text><path d="M880,545 L365,545" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="570.1" y="517" width="109.8" height="25" rx="3" fill="#fbfcfe"/><text x="625" y="534" text-anchor="middle" class="muted" font-size="17"><tspan x="625" dy="0">返回文件内容</tspan></text><path d="M365,585 L110,585" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-sequence-arrow)"/><rect x="151.5" y="557" width="171.0" height="25" rx="3" fill="#fbfcfe"/><text x="237" y="574" text-anchor="middle" class="muted" font-size="17"><tspan x="237" dy="0">API 交付结果文件</tspan></text><text x="500" y="636" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">顺序示意：图中间距不表示耗时；取得文件后还需核对内容。</tspan></text></svg></div><figcaption>关注先后关系：返回任务 ID 之后，业务链仍在继续；间距不表示实际耗时。</figcaption></figure>
+<div class="insight"><b>本轮调查要支持的决定</b><p>明确新入口接入哪一段能力，以及迁移涉及哪些执行角色和资源。生产切换承诺还需要目标环境、数据、容量和回退等专项验证。</p></div>
+<p class="proof"><a href="?view=deep#repo-case">依据与展开：背景、四类问题与适用范围 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-case">MD 定位</a></p>
+</section>
+
+<section class="chapter" id="difficulty" data-title="信息为何对不上">
+<div class="section-label">02 / 背景难点</div><h2>难点在于，把不同来源的材料对应起来</h2>
+<p>仓库保存实现和默认值，部署给进程提供运行输入，实例选择其中的有效配置，业务记录只呈现被观察到的一段行为。它们之间存在关联，却不会因为服务名相同就自动对齐。</p>
+<figure class="figure" id="fig-planes"><div class="figure-heading"><b>图 02 · 材料来自四个观察面，对应关系需要查证</b><span>机制示意</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 360" role="img" aria-labelledby="d-planes-title d-planes-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-planes-title">图 2：四类材料需要建立对应关系</title><desc id="d-planes-desc">源码、部署输入、运行实例和业务观察有不同身份条件。材料间的关联需要查证，不能用同名替代。</desc><defs><marker id="d-planes-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="25" y="55" width="220" height="105" rx="10" class="node candidate"/><text x="135.0" y="100.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="135.0" dy="0">源码快照</tspan><tspan x="135.0" dy="28">入口／路由／默认值</tspan></text><path d="M245,106 L275,106" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-planes-arrow)"/><rect x="275" y="55" width="220" height="105" rx="10" class="node candidate"/><text x="385.0" y="100.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="385.0" dy="0">部署输入</tspan><tspan x="385.0" dy="28">命令／挂载／环境值</tspan></text><path d="M495,106 L525,106" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-planes-arrow)"/><rect x="525" y="55" width="220" height="105" rx="10" class="node observed"/><text x="635.0" y="100.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="635.0" dy="0">运行实例</tspan><tspan x="635.0" dy="28">制品／已加载配置</tspan></text><path d="M745,106 L775,106" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-planes-arrow)"/><rect x="775" y="55" width="220" height="105" rx="10" class="node observed"/><text x="885.0" y="100.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="885.0" dy="0">业务观察</tspan><tspan x="885.0" dy="28">身份／输入／结果</tspan></text><text x="250" y="195" text-anchor="middle" class="muted" font-size="17"><tspan x="250" dy="0">输入是否被加载？</tspan></text><text x="500" y="195" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">实例采用哪个值？</tspan></text><text x="750" y="195" text-anchor="middle" class="muted" font-size="17"><tspan x="750" dy="0">结果由谁处理？</tspan></text><path d="M135,222 L135,250 L885,250 L885,222" class="edge" fill="none" stroke="#60748d" stroke-width="2"/><text x="500" y="290" text-anchor="middle" class="" font-size="20"><tspan x="500" dy="0">关联条件：对象 · 环境 · 身份 · 版本 · 时点 · 覆盖范围</tspan></text><text x="500" y="332" text-anchor="middle" class="muted" font-size="18"><tspan x="500" dy="0">名称相同只是线索；每一段对应关系都需要证据。</tspan></text></svg></div><figcaption>横向连线表示需要建立的关联；对象与时点不一致时，材料不能直接拼成一个结论。</figcaption></figure>
+<div class="explain-grid">
+<div><h3>配置会覆盖</h3><p>默认库、挂载文件、环境变量可能给出不同地址。需要检查对应版本的加载机制，再核对进程最终采用的值。</p></div>
+<div><h3>职责会跨组件</h3><p>接口描述没有直接解释后台执行。任务保存、消息传递、worker 处理和结果交付需要连成业务路径。</p></div>
+<div><h3>观察有范围</h3><p>身份、环境、时间和输入都会限定结论。查不到表应保留权限或 schema 等解释；一笔成功不能概括所有条件。</p></div>
+<div><h3>运行版本会分化</h3><p>API、worker 可以来自同仓库却运行不同制品。滚动更新时新旧实例也可能共存，需要定位实际处理对象。</p></div>
+</div>
+<p>这些差异决定了调查顺序：先形成候选解释，再用对应证据检查；遇到冲突时，把问题定位到具体对象和环节。</p>
+<p class="proof"><a href="?view=deep#repo-difficulty">依据与展开：四类难点、官方机制与竞争解释 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-difficulty">MD 定位</a></p>
+</section>
+
+<section class="chapter" id="design" data-title="总体设计">
+<div class="section-label">03 / 解决思路与总体设计</div><h2>读码建图，沿业务观察，把运行来源对上</h2>
+<p><strong>读码</strong>产出带出处的候选结构和待核实命题；<strong>受控观察</strong>核对影响当前决策的行为、数据与结果；<strong>运行溯源</strong>将观察关联到实例、制品、源码和有效配置。三类工作互相修正，最终形成附有证据和未知项的系统画像。</p>
+<figure class="figure" id="fig-method"><div class="figure-heading"><b>图 03 · 从候选结构到可复查判断的调查闭环</b><span>方法设计</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 570" role="img" aria-labelledby="d-method-title d-method-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-method-title">图 3：读码、观察、溯源与回查组成调查闭环</title><desc id="d-method-desc">综合方法设计。先明确决策与范围，读码形成待核实命题，观察关键路径，关联运行来源；一致且足够时交付，矛盾或缺证时回查。执行可以往返。</desc><defs><marker id="d-method-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="300" y="20" width="400" height="60" rx="10" class="node neutral"/><text x="500.0" y="57.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="500.0" dy="0">明确决策、对象与观察范围</tspan></text><path d="M500,80 L500,110 L175,110 L175,150" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-method-arrow)"/><rect x="35" y="150" width="270" height="92" rx="10" class="node candidate"/><text x="170.0" y="189.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="170.0" dy="0">读码建立候选结构</tspan><tspan x="170.0" dy="28">入口、职责、数据、依赖</tspan></text><rect x="365" y="150" width="270" height="92" rx="10" class="node observed"/><text x="500.0" y="189.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="500.0" dy="0">观察核对关键事实</tspan><tspan x="500.0" dy="28">业务路径、身份、结果</tspan></text><rect x="695" y="150" width="270" height="92" rx="10" class="node observed"/><text x="830.0" y="189.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="830.0" dy="0">溯源对齐运行内容</tspan><tspan x="830.0" dy="28">实例、制品、源码、配置</tspan></text><path d="M305,195 L365,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-method-arrow)"/><rect x="297.2" y="121" width="75.6" height="24" rx="3" fill="#fbfcfe"/><text x="335" y="137" text-anchor="middle" class="muted" font-size="16"><tspan x="335" dy="0">待核命题</tspan></text><path d="M635,195 L695,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-method-arrow)"/><path d="M830,242 L830,310 L635,310" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-method-arrow)"/><path d="M500,265 L635,310 L500,355 L365,310 Z" class="node neutral"/><text x="500" y="306" text-anchor="middle" class="" font-size="18"><tspan x="500" dy="0">证据一致</tspan><tspan x="500" dy="28">且足够？</tspan></text><rect x="35" y="300" width="270" height="90" rx="10" class="node unknown"/><text x="170.0" y="338.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="170.0" dy="0">回查差异来源</tspan><tspan x="170.0" dy="28">对象／版本／配置／覆盖</tspan></text><path d="M365,310 L305,335" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-method-arrow)"/><rect x="309.35" y="275" width="33.3" height="25" rx="3" fill="#fbfcfe"/><text x="326" y="292" text-anchor="middle" class="muted" font-size="17"><tspan x="326" dy="0">否</tspan></text><path d="M170,300 L170,275 L335,275 L335,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-method-arrow)"/><path d="M500,355 L500,430" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-method-arrow)"/><rect x="510.35" y="384" width="33.3" height="25" rx="3" fill="#fbfcfe"/><text x="527" y="401" text-anchor="middle" class="muted" font-size="17"><tspan x="527" dy="0">是</tspan></text><rect x="280" y="430" width="440" height="78" rx="10" class="node observed"/><text x="500.0" y="462.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="500.0" dy="0">系统画像＋证据索引</tspan><tspan x="500.0" dy="28">明确剩余未知及其决策影响</tspan></text><text x="500" y="552" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">可以提前核对运行身份，也可以发现依赖后返回读码；这是一条可往返的调查路线。</tspan></text></svg></div><figcaption>矛盾或缺证会触发回查。最终保留的未知，需要说明它会影响哪个决定。</figcaption></figure>
+<p>这条路线可以往返。为了确认正在观察谁，运行身份常常要提前查；发现新的依赖，也要回到代码补追。图中“证据足够”始终相对于当前决策，没有统一覆盖率门槛。</p>
+<nav class="step-map" aria-label="七步操作索引">
+<a href="#scope-step"><span>1</span>锁范围与快照</a><a href="#map-step"><span>2</span>读码建候选图</a><a href="#data-step"><span>3</span>核对数据依赖</a><a href="#business-step"><span>4</span>追关键业务路径</a><a href="#relation-step"><span>5</span>核对关系类型</a><a href="#runtime-step"><span>6</span>反查运行来源</a><a href="#reconcile-step"><span>7</span>对账并交付</a>
+</nav>
+<p>七步是总方案的操作展开。每一步都留下产物、证据位置和剩余问题，避免最后再给整份报告统一贴上“已验证”。</p>
+<p class="proof"><a href="?view=deep#repo-design">依据与展开：总方案、反馈关系与七步分工 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-design">MD 定位</a></p>
+</section>
+
+<section class="chapter" id="map-config" data-title="范围、读码与配置">
+<div class="section-label">04 / 第一步、第二步</div><h2>把“仓库里有什么”，追到“进程采用了什么”</h2>
+<div id="scope-step" class="step-section"><h3><span class="step-no">1</span>先锁定范围，保证后面可以比较</h3>
+<p>记录要支持的决定、仓库提交、本地改动、目标环境、观察身份和时间窗口。将“读到的代码版本”和“目标环境运行版本”分列，后面再建立对应关系。</p>
+<div class="example-line"><b>范围记录示意</b><p>读取源码快照 R；观察测试环境 E 的导出 API 与 worker；按测试身份核对一笔导出。生产环境行为与来源尚未覆盖。</p></div>
+<p>本地提交标识不能包含未提交改动，需要另留差异。普通 clone 不默认浅克隆；历史分析需要核对浅仓库状态、已有分支引用和更新时间。</p>
+<details><summary>代码快照最小检查</summary><pre><code>git rev-parse HEAD
+git status --short
+git rev-parse --is-shallow-repository</code></pre><p>只有分析依赖缺失的祖先历史时，才按实际情况补取历史和必要引用。命令结果只描述本地仓库状态。</p></details>
+<p class="proof"><a href="?view=deep#repo-scope">依据与展开：快照、浅克隆与比较基准 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-scope">MD 定位</a></p>
+</div>
+<div id="map-step" class="step-section"><h3><span class="step-no">2</span>沿构建、启动、配置和业务模块建图</h3>
+<p>先确认构建与启动入口，再看入口注册了哪些路由、消费者和配置来源。在示意仓库里，<code>app/api.py</code> 与 <code>app/worker.py</code> 分别连接任务创建和文件生成逻辑，形成“两种执行角色”的候选解释；部署与运行材料继续核实它们怎样启动。</p>
+<p>配置调查要跨过“文件里写了什么”这一步。下面追踪案例自定义字段 <code>task_db</code>，把默认值、覆盖来源、程序最终取值与实际连接串起来。</p>
+<figure class="figure" id="fig-config"><div class="figure-heading"><b>图 04 · task_db：从默认 T0 追到最终采用的 T</b><span>构造案例</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 440" role="img" aria-labelledby="d-config-title d-config-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-config-title">图 4：一个配置值如何从声明变成可核实的依赖</title><desc id="d-config-desc">构造案例的 task_db 加载顺序为默认值、挂载文件、环境输入。最终采用 T 要由进程摘要与实际连接关联确认；该顺序不通用于其他项目。</desc><defs><marker id="d-config-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="30" y="40" width="210" height="80" rx="10" class="node candidate"/><text x="135.0" y="73.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="135.0" dy="0">源码默认值</tspan><tspan x="135.0" dy="28">T0</tspan></text><rect x="30" y="155" width="210" height="80" rx="10" class="node candidate"/><text x="135.0" y="188.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="135.0" dy="0">挂载文件</tspan><tspan x="135.0" dy="28">T1</tspan></text><rect x="30" y="270" width="210" height="80" rx="10" class="node candidate"/><text x="135.0" y="303.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="135.0" dy="0">进程环境输入</tspan><tspan x="135.0" dy="28">T</tspan></text><path d="M240,80 L330,80 L330,195 L400,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-config-arrow)"/><path d="M240,195 L400,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-config-arrow)"/><path d="M240,310 L330,310 L330,225 L400,225" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-config-arrow)"/><rect x="400" y="150" width="245" height="110" rx="10" class="node neutral"/><text x="522.5" y="184.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="522.5" dy="0">此案例的加载器</tspan><tspan x="522.5" dy="28">按已核对顺序覆盖</tspan><tspan x="522.5" dy="28">最终选择 T</tspan></text><path d="M645,205 L715,205" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-config-arrow)"/><rect x="715" y="135" width="255" height="140" rx="10" class="node observed"/><text x="842.5" y="184.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="842.5" dy="0">实例配置摘要：T</tspan><tspan x="842.5" dy="28">关联实际连接：T</tspan><tspan x="842.5" dy="28">保留加载与观察时点</tspan></text><text x="500" y="393" text-anchor="middle" class="" font-size="20"><tspan x="500" dy="0">部署输入 → 进程采用 → 实际访问，三者需要分别核对。</tspan></text><text x="500" y="425" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">示意中的覆盖顺序来自构造案例；真实项目按对应版本的加载机制确定。</tspan></text></svg></div><figcaption>先核对本版本的加载逻辑，再关联进程取值和连接。环境输入本身只说明提供了什么。</figcaption></figure>
+<p>如果只有部署模板或环境输入，记录停留在“提供了这个值”。取得实例启动后的脱敏摘要，才能核对程序实际选择；再关联连接记录，确认它访问的资源。动态配置还要与业务观察时点对应。</p>
+<div class="deliverable"><span>本步产物</span><p>候选结构＋带出处的待核实命题：两种角色分别从哪里启动？API 任务库和 worker 业务库是什么？任务怎样传递、文件放在哪里？</p></div>
+<p class="proof"><a href="?view=deep#repo-map">依据与展开：文件证据、加载顺序与有效配置示例 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-map">MD 定位</a></p>
+</div>
+</section>
+
+<section class="chapter" id="data-interface" data-title="数据与接口口径">
+<div class="section-label">05 / 第三步与第四步的准备</div><h2>把资源、身份和接口口径分清，观察才有意义</h2>
+<div id="data-step" class="step-section"><h3><span class="step-no">3</span>沿配置、身份、对象和用途核对数据依赖</h3>
+<p>本案例 API 创建任务，worker 读取业务数据并回写状态。任务库 T 和业务库 B 需要各自的资源身份、访问身份与业务用途。相同数据库产品、同名库或相似地址，都不足以把两个依赖合并。</p>
+<figure class="figure" id="fig-data"><div class="figure-heading"><b>图 05 · 观察到哪一层，结论就限定在哪一层</b><span>观察范围示意</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 435" role="img" aria-labelledby="d-data-title d-data-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-data-title">图 5：逐层观察要形成对应范围的结论</title><desc id="d-data-desc">连接、身份、对象与业务结果是不同观察目标。查询者身份不一定等于应用身份。任务库和业务库需要分别记录。</desc><defs><marker id="d-data-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="25" y="20" width="280" height="60" rx="10" class="node candidate"/><text x="165.0" y="57.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="165.0" dy="0">TCP 连接成功</tspan></text><path d="M305,50 L365,50" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-data-arrow)"/><text x="390" y="57" text-anchor="start" class="" font-size="19"><tspan x="390" dy="0">这个端点在本次观察中网络可达</tspan></text><rect x="25" y="106" width="280" height="60" rx="10" class="node candidate"/><text x="165.0" y="143.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="165.0" dy="0">身份被接受</tspan></text><path d="M305,136 L365,136" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-data-arrow)"/><text x="390" y="143" text-anchor="start" class="" font-size="19"><tspan x="390" dy="0">当前使用的身份通过认证</tspan></text><rect x="25" y="192" width="280" height="60" rx="10" class="node candidate"/><text x="165.0" y="229.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="165.0" dy="0">目标对象可见</tspan></text><path d="M305,222 L365,222" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-data-arrow)"/><text x="390" y="229" text-anchor="start" class="" font-size="19"><tspan x="390" dy="0">这个身份可见该库、schema 和表</tspan></text><rect x="25" y="278" width="280" height="60" rx="10" class="node observed"/><text x="165.0" y="315.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="165.0" dy="0">业务结果符合预期</tspan></text><path d="M305,308 L365,308" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-data-arrow)"/><text x="390" y="315" text-anchor="start" class="" font-size="19"><tspan x="390" dy="0">该输入、身份与环境下的结果已核对</tspan></text><text x="500" y="390" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">在任务库 T 与业务库 B 的独立连接中分别记录；查不到先保留权限、schema、环境等解释。</tspan></text><text x="500" y="422" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">这些步骤限定观察范围，不代表所有证据存在固定高低等级。</tspan></text></svg></div><figcaption>同样的查询在不同身份与资源上支持不同结论。T、B 需要分别记录，不能用一次连接概括。</figcaption></figure>
+<p>以 PostgreSQL 为例，应在 T、B 的独立连接中分别记录数据库、当前用户、schema 搜索路径和目标表。<code>information_schema.tables</code> 只显示当前用户有权限访问的表与视图；查询者的权限也不自动等于应用权限。</p>
+<p>查不到先核对环境、schema 与身份。不同地址可能是代理或副本，同名库也可能属于不同集群，需要资源或拓扑记录继续确认。只有体量影响当前决策时才取行数；大表统计估计要注明口径，只读查询同样可能消耗资源。</p>
+<div class="deliverable"><span>本步产物</span><p>按组件和用途区分的数据依赖记录：配置来源、资源身份、访问范围、业务对象及尚未核实的部分。</p></div>
+<p class="proof"><a href="?view=deep#repo-data">依据与展开：分别连库、可见性、资源身份与查询成本 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-data">MD 定位</a></p>
+</div>
+<h3>接口清单先对齐，再用于解释业务</h3>
+<p>源码定义、实例提供的 OpenAPI 描述、实际观察记录是三份不同材料。先按方法、路径、外部入口前缀和环境版本对齐，才能解释差异。</p>
+<figure class="figure" id="fig-interface"><div class="figure-heading"><b>图 06 · 统一外部入口、内部操作与三份接口材料</b><span>构造映射</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 360" role="img" aria-labelledby="d-interface-title d-interface-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-interface-title">图 6：对齐接口时，先把外部入口和内部操作对应起来</title><desc id="d-interface-desc">构造映射示意。外部 POST /reports/exports 可经入口前缀改写为内部 POST /exports。源码清单、实例描述和验证记录需要对齐口径与环境版本。</desc><defs><marker id="d-interface-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="25" y="30" width="300" height="90" rx="10" class="node neutral"/><text x="175.0" y="68.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="175.0" dy="0">外部入口</tspan><tspan x="175.0" dy="28">POST /reports/exports</tspan></text><rect x="370" y="30" width="235" height="90" rx="10" class="node candidate"/><text x="487.5" y="68.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="487.5" dy="0">网关／入口</tspan><tspan x="487.5" dy="28">前缀改写</tspan></text><rect x="650" y="30" width="325" height="90" rx="10" class="node neutral"/><text x="812.5" y="68.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="812.5" dy="0">应用内部操作</tspan><tspan x="812.5" dy="28">POST /exports</tspan></text><path d="M325,75 L370,75" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-interface-arrow)"/><path d="M605,75 L650,75" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-interface-arrow)"/><rect x="25" y="200" width="275" height="72" rx="10" class="node candidate"/><text x="162.5" y="229.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="162.5" dy="0">源码定义清单</tspan><tspan x="162.5" dy="28">以对应提交为准</tspan></text><rect x="362" y="200" width="275" height="72" rx="10" class="node candidate"/><text x="499.5" y="229.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="499.5" dy="0">实例接口描述</tspan><tspan x="499.5" dy="28">环境与版本要记录</tspan></text><rect x="700" y="200" width="275" height="72" rx="10" class="node observed"/><text x="837.5" y="229.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="837.5" dy="0">实际观察记录</tspan><tspan x="837.5" dy="28">保留身份与输入</tspan></text><path d="M163,200 L163,155 L812,155 L812,120" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#d-interface-arrow)"/><path d="M500,200 L500,155" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6"/><path d="M838,200 L838,155" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6"/><text x="500" y="323" text-anchor="middle" class="muted" font-size="18"><tspan x="500" dy="0">按方法、路径、前缀与环境版本对齐；描述中出现，不等于业务已经验证。</tspan></text></svg></div><figcaption>外部与内部路径可以因前缀改写而不同；先对齐口径，再解释数量或内容差异。</figcaption></figure>
+<p>代码有操作而实例描述缺失时，可继续检查版本、条件注册、网关改写和文档过滤。取得接口描述，只能说明取得了该环境的这份声明。</p>
+<details><summary>需要数接口时，保留统计口径</summary><p>OpenAPI 3.1 的 Path Item 除 HTTP 方法，还有摘要、参数等字段，不能直接累加所有键。深入全文给出只统计 <code>paths</code> 下直接列出方法的离线脚本；它不展开 <code>$ref</code>，不包含 webhook，也不代表全部暴露或已验证接口。</p><p><a href="?view=deep#repo-business">查看完整计数示例与边界 →</a></p></details>
+<p class="proof"><a href="?view=deep#repo-business">依据与展开：接口映射、差异来源与计数示例 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-business">MD 定位</a></p>
+</section>
+
+<section class="chapter" id="business-relations" data-title="业务路径与关系">
+<div class="section-label">06 / 第四步、第五步</div><h2>用一笔导出，把组件职责和每条箭头连起来</h2>
+<div id="business-step" class="step-section"><h3><span class="step-no">4</span>从输入追到结果，并核对结果内容</h3>
+<p>选择会影响当前决定的关键路径。本案例选“一位有导出权限的测试用户，导出已知的小数据集”：追踪鉴权、任务创建、传递、worker 数据读取、状态更新、文件生成和下载。</p>
+<p>借助同一个任务 ID 关联各段记录，同时核对环境、租户、身份与时间。拿到文件后，用业务规则或独立参考检查字段与数据内容；同一段导出逻辑再算一次，不能当成独立核验。</p>
+<figure class="figure" id="fig-architecture"><div class="figure-heading"><b>图 07 · 同一笔导出的执行角色、资源与关系</b><span>构造案例 E1—E5</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 540" role="img" aria-labelledby="d-architecture-title d-architecture-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-architecture-title">图 7：导出能力的组件关系与数据依赖</title><desc id="d-architecture-desc">构造案例 E1 至 E5 的关系图。用户经 API 创建任务、查状态与下载；API 写任务库并发消息，worker 消费任务、读业务库、更新任务并写文件；本案例 API 从文件存储读取并交付。</desc><defs><marker id="d-architecture-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="20" y="220" width="135" height="70" rx="10" class="node neutral"/><text x="87.5" y="262.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="87.5" dy="0">测试用户</tspan></text><rect x="200" y="220" width="190" height="70" rx="10" class="node neutral"/><text x="295.0" y="248.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="295.0" dy="0">导出 API</tspan><tspan x="295.0" dy="28">创建／查询／下载</tspan></text><rect x="450" y="45" width="220" height="75" rx="10" class="node observed"/><text x="560.0" y="75.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="560.0" dy="0">任务库 T</tspan><tspan x="560.0" dy="28">任务与处理状态</tspan></text><rect x="460" y="220" width="190" height="70" rx="10" class="node neutral"/><text x="555.0" y="262.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="555.0" dy="0">任务队列</tspan></text><rect x="740" y="220" width="220" height="70" rx="10" class="node neutral"/><text x="850.0" y="248.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="850.0" dy="0">导出 worker</tspan><tspan x="850.0" dy="28">执行后台导出</tspan></text><rect x="755" y="30" width="205" height="75" rx="10" class="node observed"/><text x="857.5" y="60.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="857.5" dy="0">业务库 B</tspan><tspan x="857.5" dy="28">导出所需数据</tspan></text><rect x="530" y="405" width="220" height="75" rx="10" class="node observed"/><text x="640.0" y="435.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="640.0" dy="0">文件存储 F</tspan><tspan x="640.0" dy="28">导出结果文件</tspan></text><path d="M155,255 L200,255" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><path d="M295,220 L295,82 L450,82" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="265.6" y="136" width="118.8" height="24" rx="3" fill="#fbfcfe"/><text x="325" y="152" text-anchor="middle" class="muted" font-size="16"><tspan x="325" dy="0">创建／读取任务</tspan></text><path d="M390,255 L460,255" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="401.6" y="194" width="46.8" height="24" rx="3" fill="#fbfcfe"/><text x="425" y="210" text-anchor="middle" class="muted" font-size="16"><tspan x="425" dy="0">发送</tspan></text><path d="M650,255 L740,255" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="671.6" y="224" width="46.8" height="24" rx="3" fill="#fbfcfe"/><text x="695" y="240" text-anchor="middle" class="muted" font-size="16"><tspan x="695" dy="0">消费</tspan></text><path d="M858,220 L858,105" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="813.0" y="158" width="90.0" height="24" rx="3" fill="#fbfcfe"/><text x="858" y="174" text-anchor="middle" class="muted" font-size="16"><tspan x="858" dy="0">读业务数据</tspan></text><path d="M770,220 L770,150 L600,150 L600,120" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="622.2" y="122" width="75.6" height="24" rx="3" fill="#fbfcfe"/><text x="660" y="138" text-anchor="middle" class="muted" font-size="16"><tspan x="660" dy="0">更新状态</tspan></text><path d="M850,290 L850,442 L750,442" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="819.4" y="358" width="61.2" height="24" rx="3" fill="#fbfcfe"/><text x="850" y="374" text-anchor="middle" class="muted" font-size="16"><tspan x="850" dy="0">写文件</tspan></text><path d="M295,290 L295,442 L530,442" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-architecture-arrow)"/><rect x="357.75" y="408" width="94.5" height="25" rx="3" fill="#fbfcfe"/><text x="405" y="425" text-anchor="middle" class="muted" font-size="17"><tspan x="405" dy="0">读取并交付</tspan></text><text x="500" y="520" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">构造案例：每条关系有演示证据，图不表达吞吐、耗时或所有任务的覆盖。</tspan></text></svg></div><figcaption>组件图解释依赖结构，图 01 解释时间顺序。本例 API 读取 F 的箭头有相应的演示实现与访问证据。</figcaption></figure>
+<p>图把最初“一个应用连一个库”的认识，修正为两种执行角色与多项依赖。任务库、业务库、消息通道和文件存储因此进入迁移资源清单；新入口则需要理解“创建、查询、下载”的异步语义。</p>
+<details><summary>这张图的演示证据 E1—E5 分别是什么？</summary>
+<div class="table-scroll"><table><thead><tr><th>编号</th><th>构造证据</th><th>支持的判断</th></tr></thead><tbody>
+<tr><td>E1</td><td>源码与启动材料区分 API、worker 入口及职责。</td><td>有两种执行角色，需分别调查。</td></tr>
+<tr><td>E2</td><td>目标配置与资源记录区分任务库 T、业务库 B 及各自用途。</td><td>数据依赖不能按名称直接合并。</td></tr>
+<tr><td>E3</td><td>任务 t_demo 的发送、消费与处理记录已按环境关联。</td><td>本次任务经所记录的消息通道交接。</td></tr>
+<tr><td>E4</td><td>实现与本次访问记录表明 API 读取 F 并返回文件；内容符合独立参考。</td><td>本例由 API 读取并交付，且核对该笔结果。</td></tr>
+<tr><td>E5</td><td>处理时段的实例、制品与构建记录分别关联 API R2、worker R1。</td><td>观察限定于这组版本和已记录配置。</td></tr>
+</tbody></table></div><p>E1—E5 均为演示编号。真实报告需要链接对应原始材料并保留条件，不是编几个编号就构成证据。</p>
+</details>
+<p>这笔成功仍只覆盖对应输入、身份、环境与版本；大数据量、其他身份、失败重试和生产条件需要另外验证。新触发任务前，应明确数据库、消息、存储及通知等影响，采用获授权的操作。</p>
+<p class="proof"><a href="?view=deep#repo-business">依据与展开：关键路径、任务关联与结果核对 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-business">MD 定位</a></p><p class="proof"><a href="?view=deep#repo-example">依据与展开：完整案例、E1—E5 与可交付结论 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-example">MD 定位</a></p>
+</div>
+<div id="relation-step" class="step-section"><h3><span class="step-no">5</span>核对关系类型，再画依赖箭头</h3>
+<figure class="figure" id="fig-relations"><div class="figure-heading"><b>图 08 · 服务调用、任务传递和共享库，画法不同</b><span>关系示意</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 355" role="img" aria-labelledby="d-relations-title d-relations-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-relations-title">图 8：三种箭头对应三种依赖</title><desc id="d-relations-desc">HTTP 调用需要发送与接收证据；任务传递需要发送、队列与消费关联；共享数据库访问需要分别核对两组件访问同一资源。不能把共享数据库画成服务调用。</desc><defs><marker id="d-relations-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><text x="165" y="35" text-anchor="middle" class="" font-size="21"><tspan x="165" dy="0">HTTP 调用</tspan></text><rect x="35" y="80" width="100" height="65" rx="10" class="node neutral"/><text x="85.0" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="85.0" dy="0">A</tspan></text><rect x="195" y="80" width="100" height="65" rx="10" class="node neutral"/><text x="245.0" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="245.0" dy="0">B</tspan></text><path d="M135,112 L195,112" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-relations-arrow)"/><rect x="102.44999999999999" y="153" width="125.10000000000001" height="25" rx="3" fill="#fbfcfe"/><text x="165" y="170" text-anchor="middle" class="muted" font-size="17"><tspan x="165" dy="0">请求／响应关联</tspan></text><text x="500" y="35" text-anchor="middle" class="" font-size="21"><tspan x="500" dy="0">异步任务</tspan></text><rect x="360" y="80" width="85" height="65" rx="10" class="node neutral"/><text x="402.5" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="402.5" dy="0">A</tspan></text><rect x="475" y="80" width="85" height="65" rx="10" class="node neutral"/><text x="517.5" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="517.5" dy="0">队列</tspan></text><rect x="590" y="80" width="85" height="65" rx="10" class="node neutral"/><text x="632.5" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="632.5" dy="0">B</tspan></text><path d="M445,112 L475,112" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-relations-arrow)"/><path d="M560,112 L590,112" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-relations-arrow)"/><text x="515" y="170" text-anchor="middle" class="muted" font-size="17"><tspan x="515" dy="0">发送、资源身份、消费关联</tspan></text><text x="835" y="35" text-anchor="middle" class="" font-size="21"><tspan x="835" dy="0">共享数据访问</tspan></text><rect x="715" y="80" width="95" height="65" rx="10" class="node neutral"/><text x="762.5" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="762.5" dy="0">A</tspan></text><rect x="875" y="80" width="95" height="65" rx="10" class="node neutral"/><text x="922.5" y="119.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="922.5" dy="0">B</tspan></text><rect x="760" y="205" width="170" height="60" rx="10" class="node observed"/><text x="845.0" y="242.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="845.0" dy="0">同一数据资源</tspan></text><path d="M762,145 L762,177 L800,177 L800,205" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-relations-arrow)"/><path d="M922,145 L922,177 L890,177 L890,205" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-relations-arrow)"/><text x="835" y="300" text-anchor="middle" class="muted" font-size="17"><tspan x="835" dy="0">A 与 B 之间未画调用边</tspan></text><text x="330" y="280" text-anchor="middle" class="" font-size="18"><tspan x="330" dy="0">图上每条边都要说明关系类型。</tspan><tspan x="330" dy="28">一条记录支持这次发生过；检索为空还需检查窗口、埋点与采样。</tspan></text></svg></div><figcaption>关系类型改变网络、账号与迁移边界。共享资源不能替代 A 调用 B 的证据。</figcaption></figure>
+<p>同步调用结合实现、有效配置和对应请求记录核对；异步任务关联发送、资源身份和消费；共享数据访问分别核对各组件的访问用途。已有 trace 可以帮助关联，缺少 trace 时也可使用可靠的业务 ID 与日志。</p>
+<p>trace 是一次请求相关工作的追踪，span 是其中一个操作；异步工作可以通过 span links 关联，也可以用业务标识关联，不要求所有环节都在同一个 trace。缺少日志时还需检查时间窗口、埋点、采样、过滤与保留范围。</p>
+<div class="deliverable"><span>本步产物</span><p>带关系类型、证据和观察范围的组件图。缺证的箭头保留候选状态，并注明它是否影响当前资源范围判断。</p></div>
+<p class="proof"><a href="?view=deep#repo-relations">依据与展开：三类关系、异步关联与采样盲区 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-relations">MD 定位</a></p>
+</div>
+</section>
+
+<section class="chapter" id="runtime" data-title="运行来源">
+<div class="section-label">07 / 第六步</div><h2>API 查清了版本，worker 仍要单独查</h2>
+<div id="runtime-step" class="step-section"><h3><span class="step-no">6</span>从实际处理对象追到制品、构建和源码</h3>
+<p>先关联处理这笔请求或任务的实例与时段，再查运行制品身份、匹配制品的构建记录及源码提交，同时核对启动命令、有效配置、挂载和动态开关。</p>
+<figure class="figure" id="fig-provenance"><div class="figure-heading"><b>图 09 · 两条运行来源链，各自核实版本与配置</b><span>构造案例</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 405" role="img" aria-labelledby="d-provenance-title d-provenance-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-provenance-title">图 9：API 与 worker 必须分别追溯运行来源</title><desc id="d-provenance-desc">构造案例。处理时段 API 实例经制品和构建记录关联到 R2；worker 经另一制品和构建记录关联到 R1。两条链均需核对有效配置、时点和来源可信度，不同提交不直接意味着故障。</desc><defs><marker id="d-provenance-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="20" y="70" width="190" height="75" rx="10" class="node observed"/><text x="115.0" y="100.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="115.0" dy="0">API 实例</tspan><tspan x="115.0" dy="28">处理时段已关联</tspan></text><path d="M210,107 L275,107" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-provenance-arrow)"/><rect x="275" y="70" width="190" height="75" rx="10" class="node neutral"/><text x="370.0" y="100.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="370.0" dy="0">制品 A</tspan><tspan x="370.0" dy="28">具体镜像身份</tspan></text><path d="M465,107 L530,107" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-provenance-arrow)"/><rect x="530" y="70" width="190" height="75" rx="10" class="node neutral"/><text x="625.0" y="100.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="625.0" dy="0">构建记录 A</tspan><tspan x="625.0" dy="28">匹配制品与输入</tspan></text><path d="M720,107 L785,107" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-provenance-arrow)"/><rect x="785" y="70" width="190" height="75" rx="10" class="node observed"/><text x="880.0" y="100.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="880.0" dy="0">源码提交 R2</tspan><tspan x="880.0" dy="28">仓库与提交</tspan></text><rect x="20" y="205" width="190" height="75" rx="10" class="node observed"/><text x="115.0" y="235.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="115.0" dy="0">worker 实例</tspan><tspan x="115.0" dy="28">处理时段已关联</tspan></text><path d="M210,242 L275,242" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-provenance-arrow)"/><rect x="275" y="205" width="190" height="75" rx="10" class="node neutral"/><text x="370.0" y="235.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="370.0" dy="0">制品 B</tspan><tspan x="370.0" dy="28">具体镜像身份</tspan></text><path d="M465,242 L530,242" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-provenance-arrow)"/><rect x="530" y="205" width="190" height="75" rx="10" class="node neutral"/><text x="625.0" y="235.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="625.0" dy="0">构建记录 B</tspan><tspan x="625.0" dy="28">匹配制品与输入</tspan></text><path d="M720,242 L785,242" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-provenance-arrow)"/><rect x="785" y="205" width="190" height="75" rx="10" class="node observed"/><text x="880.0" y="235.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="880.0" dy="0">源码提交 R1</tspan><tspan x="880.0" dy="28">仓库与提交</tspan></text><rect x="20" y="320" width="955" height="60" rx="10" class="soft"/><text x="500" y="357" text-anchor="middle" class="" font-size="19"><tspan x="500" dy="0">同时核对：启动命令 · 有效配置 · 挂载与动态开关 · 观察时点</tspan></text><text x="500" y="30" text-anchor="middle" class="muted" font-size="18"><tspan x="500" dy="0">同一仓库可以产生不同角色、不同制品和不同运行版本。</tspan></text></svg></div><figcaption>R2 与 R1 是演示提交代号，不直接表示故障。历史任务还需对应处理时段的材料。</figcaption></figure>
+<p>digest 是用于标识特定镜像内容的摘要；标签可能变化。构建记录还需要匹配实际制品，判断来源可信度与构建输入是否完整。单独一段自报的提交信息不足以完成可信核验。</p>
+<p>在 Kubernetes 中，要定位集群、命名空间、工作负载及相关 Pod，滚动更新时关注不同实例；其他运行方式则用进程、发布目录、包校验值和部署记录回答同样的问题。历史任务还需要当时的日志或发布记录，当前实例状态不能直接代表过去。</p>
+<div class="example-line"><b>R2 与 R1 不同，说明什么？</b><p>首先说明观察覆盖的是这组运行组合；是否影响目标功能，还要看对应代码与业务证据。改为两个角色都运行 R2 后，需要重新检查受影响行为。</p></div>
+<details><summary>为什么 git branch --contains 不能证明部署来源？</summary><p>它只回答当前已知分支中，哪些历史包含指定提交。同一提交可以被多个分支包含。要查构建使用哪个分支，应看匹配当前制品的构建触发与输入记录。</p></details>
+<div class="deliverable"><span>本步产物</span><p>分别属于 API 与 worker 的运行来源记录。链条断在哪就保留到哪一层，并标明缺口对版本选择或后续验证的影响。</p></div>
+<p class="proof"><a href="?view=deep#repo-runtime">依据与展开：实例、镜像、构建、源码与配置的完整链条 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-runtime">MD 定位</a></p>
+</div>
+</section>
+
+<section class="chapter" id="reconcile-deliver" data-title="对账与交付判断">
+<div class="section-label">08 / 第七步</div><h2>处理证据差异，交付有范围的判断</h2>
+<div id="reconcile-step" class="step-section"><h3><span class="step-no">7</span>把差异追到对应环节，再修正系统画像</h3>
+<p>对账是检查材料是否描述同一对象、条件与关系。先从对象和口径、时间与运行来源、观察覆盖等方向排查，优先级随证据调整。</p>
+<figure class="figure" id="fig-reconcile"><div class="figure-heading"><b>图 10 · 差异回查：对象、版本、覆盖要对应具体环节</b><span>方法示意</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 400" role="img" aria-labelledby="d-reconcile-title d-reconcile-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-reconcile-title">图 10：差异应回查到发生差异的环节</title><desc id="d-reconcile-desc">方法示意。代码有某操作而实例描述缺失时，分别核对对象口径、时间版本和观察覆盖。找到 worker 旧版本不能直接解释 API 路由缺失，还需对应到该环节。</desc><defs><marker id="d-reconcile-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="245" y="20" width="510" height="60" rx="10" class="node unknown"/><text x="500.0" y="57.0" text-anchor="middle" class="node-label" font-size="21"><tspan x="500.0" dy="0">发现差异：源码有操作，实例描述里没有</tspan></text><rect x="25" y="145" width="275" height="90" rx="10" class="node neutral"/><text x="162.5" y="183.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="162.5" dy="0">对象与口径</tspan><tspan x="162.5" dy="28">环境、方法、前缀是否一致？</tspan></text><path d="M500,80 L500,110 L162,110 L162,145" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-reconcile-arrow)"/><rect x="362" y="145" width="275" height="90" rx="10" class="node neutral"/><text x="499.5" y="183.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="499.5" dy="0">时间与版本</tspan><tspan x="499.5" dy="28">观察对应哪一个 API 制品？</tspan></text><path d="M500,80 L500,110 L499,110 L499,145" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-reconcile-arrow)"/><rect x="700" y="145" width="275" height="90" rx="10" class="node neutral"/><text x="837.5" y="183.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="837.5" dy="0">观察覆盖</tspan><tspan x="837.5" dy="28">文档过滤、条件注册？</tspan></text><path d="M500,80 L500,110 L837,110 L837,145" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-reconcile-arrow)"/><path d="M162,235 L162,270 L838,270 L838,235" class="edge" fill="none" stroke="#60748d" stroke-width="2"/><path d="M500,270 L500,310" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-reconcile-arrow)"/><rect x="170" y="310" width="660" height="65" rx="10" class="node observed"/><text x="500.0" y="349.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="500.0" dy="0">解释必须对应出问题的环节，再修正结论与依赖图。</tspan></text></svg></div><figcaption>一个看似合理的原因，只有能解释发生差异的环节时，才能支持修订判断。</figcaption></figure>
+<p>找到 worker 仍运行旧版本，不一定能解释 API 路由为何缺失。解释要能连接到发生差异的那一段，才能修正地图和下游判断。</p>
+<figure class="figure" id="fig-ledger"><div class="figure-heading"><b>图 11 · 结论、条件、证据与未知一起进入底账</b><span>构造记录</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 375" role="img" aria-labelledby="d-ledger-title d-ledger-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-ledger-title">图 11：一条结论怎样挂到证据与剩余未知上</title><desc id="d-ledger-desc">事实底账示意。结论绑定任务、环境、身份、时间、实例版本与输入范围，证据支持当前结论，未知说明对下一步决策的影响。四类记录不是固定高低等级。</desc><defs><marker id="d-ledger-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="200" y="15" width="600" height="65" rx="10" class="node observed"/><text x="500.0" y="54.5" text-anchor="middle" class="node-label" font-size="21"><tspan x="500.0" dy="0">结论：这笔小数据集导出在测试身份下完成</tspan></text><path d="M500,80 L500,120" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-ledger-arrow)"/><rect x="85" y="120" width="830" height="60" rx="10" class="node neutral"/><text x="500.0" y="157.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="500.0" dy="0">限定条件：环境 E · 任务 t_demo · 测试身份 · 时点 · API R2／worker R1</tspan></text><path d="M500,180 L500,220" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-ledger-arrow)"/><rect x="25" y="220" width="580" height="95" rx="10" class="node observed"/><text x="315.0" y="260.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="315.0" dy="0">支持材料：E1—E5</tspan><tspan x="315.0" dy="28">源码、配置、任务链、文件参考、构建来源</tspan></text><rect x="645" y="220" width="330" height="95" rx="10" class="node unknown"/><text x="810.0" y="260.5" text-anchor="middle" class="node-label" font-size="18"><tspan x="810.0" dy="0">未覆盖：生产与其他条件</tspan><tspan x="810.0" dy="28">权限分支／大数据量／重试</tspan></text><text x="500" y="358" text-anchor="middle" class="muted" font-size="18"><tspan x="500" dy="0">记录原始材料的位置与必要上下文；未知要写清会改变什么决定。</tspan></text></svg></div><figcaption>证据编号要能指向原始材料；这条观察不能自动升级为生产或全部身份的可用性结论。</figcaption></figure>
+<p>底账可以分为声明、观察、推断、未知；它们描述记录性质，不是固定的证据高低排名。源码可以直接证明实现存在，运行观察则核对某环境的一段行为。每条重要判断都链接支持材料，保留对象和范围，并说明剩余问题。</p>
+<div class="evidence-tool" id="evidence-tool"><h3>换一种材料，结论能走到哪里？</h3><p class="small">选择构造材料，比较当前能说什么，以及下一步还需要什么。默认展示全部，启用交互后可聚焦一类。</p>
+<div class="tool-controls" aria-label="选择观察材料"><button type="button" class="evidence-button" data-evidence="tcp" aria-pressed="false">TCP 连接成功</button><button type="button" class="evidence-button" data-evidence="spec" aria-pressed="false">取得 OpenAPI</button><button type="button" class="evidence-button" data-evidence="export" aria-pressed="false">一笔导出完成</button></div>
+<div class="evidence-panel" id="evidence-tcp"><h4>TCP 连接成功</h4><dl><dt>当前能说</dt><dd>本次观察时，该端点在网络层可达。</dd><dt>尚不能推出</dt><dd>认证成功、应用有权访问对象或业务可用。</dd><dt>下一步</dt><dd>按已授权身份逐层核对访问与业务需要。</dd></dl></div>
+<div class="evidence-panel" id="evidence-spec"><h4>取得 OpenAPI</h4><dl><dt>当前能说</dt><dd>该环境在本次观察中提供了这份接口描述。</dd><dt>尚不能推出</dt><dd>全部接口已暴露、所有身份都能访问或每项业务都正确。</dd><dt>下一步</dt><dd>对齐方法、路径、入口前缀和版本，追踪关键业务路径。</dd></dl></div>
+<div class="evidence-panel" id="evidence-export"><h4>一笔导出完成</h4><dl><dt>当前能说</dt><dd>在所记录输入、身份、环境、运行组合下，这笔导出及结果内容已核对。</dd><dt>尚不能推出</dt><dd>生产、其他身份、大数据量与失败重试全部可用。</dd><dt>下一步</dt><dd>围绕当前决定，补充会影响结论的条件与分支。</dd></dl></div>
+</div>
+<h3>什么时候可以结束本轮调查？</h3>
+<p>问：“这个未知如果取另一种可能的值，会改变当前决定吗？”会改变，就补证或限制决定；不会改变，可以明确保留未知并停止本轮调查。</p>
+<div class="table-scroll"><table><thead><tr><th>当前任务</th><th>需要的调查材料示例</th><th>需要补证或限制的地方</th></tr></thead><tbody>
+<tr><td>结构导读</td><td>职责、入口、候选依赖与路径，均有出处。</td><td>核心职责还靠目录名猜测，关键角色遗漏。</td></tr>
+<tr><td>接口对接评估</td><td>目标入口、身份、异步状态与结果获取方式，关键路径有对应证据。</td><td>只有接口描述，任务怎样完成或鉴权条件不清。</td></tr>
+<tr><td>迁移依赖评估</td><td>角色、资源、版本配置、网络权限需求及未知影响。</td><td>关键依赖的身份或来源会改变范围与版本选择。</td></tr>
+<tr><td>生产迁移承诺</td><td>在调查之上，另做目标环境、数据一致性、业务、容量和回退验证。</td><td>仅有旧环境成功样本，目标环境与关键失败分支未验证。</td></tr>
+</tbody></table></div>
+<p class="small">上表是判断示例；业务可能另有成本、性能、合规等要求，没有通用接口覆盖率阈值。没有生产权限仍能交付有范围的分析；若决定依赖生产事实，应由有权限者提供可追溯材料或等待补证。</p>
+<blockquote class="conclusion"><p>本案例已识别测试环境的执行角色和资源依赖，一笔小数据集导出在测试身份与所记录运行组合下完成了请求到结果内容的核对。它可用于接入与迁移依赖评估；生产来源、其他权限、大数据量和失败重试仍需验证。</p></blockquote>
+<p class="proof"><a href="?view=deep#repo-ledger">依据与展开：四类记录及事实底账 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-ledger">MD 定位</a></p><p class="proof"><a href="?view=deep#repo-reconcile">依据与展开：对账、竞争解释与修正判断 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-reconcile">MD 定位</a></p><p class="proof"><a href="?view=deep#repo-branch">依据与展开：按任务区分的停止条件 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-branch">MD 定位</a></p>
+</div>
+</section>
+
+<section class="chapter" id="maintain" data-title="维护与证据边界">
+<div class="section-label">09 / 持续维护与证据边界</div><h2>保留当前事实，也保留当时作判断的依据</h2>
+<p>明确谁维护数据源、组件关系和部署来源。专项报告引用条目与版本，同时保存本次调查的证据时点；发布、配置或依赖变化后，定向复查受影响的关系与结论。</p>
+<figure class="figure" id="fig-maintain"><div class="figure-heading"><b>图 12 · 当前清单与调查快照之间保留版本关系</b><span>维护方法示意</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 325" role="img" aria-labelledby="d-maintain-title d-maintain-desc" xmlns="http://www.w3.org/2000/svg"><title id="d-maintain-title">图 12：当前清单与调查快照各自保留什么</title><desc id="d-maintain-desc">维护示意。当前清单维护当下资源、依赖和部署，调查报告保留当时版本、证据与判断。配置或依赖变化时，定向复查受影响的连接和结论。</desc><defs><marker id="d-maintain-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="25" y="50" width="280" height="105" rx="10" class="node neutral"/><text x="165.0" y="95.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="165.0" dy="0">当前权威清单</tspan><tspan x="165.0" dy="28">谁维护、当前是什么</tspan></text><rect x="695" y="50" width="280" height="105" rx="10" class="node neutral"/><text x="835.0" y="95.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="835.0" dy="0">调查报告快照</tspan><tspan x="835.0" dy="28">当时证据、版本与判断</tspan></text><path d="M695,102 L305,102" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-maintain-arrow)"/><rect x="418.1" y="70" width="163.8" height="26" rx="3" fill="#fbfcfe"/><text x="500" y="88" text-anchor="middle" class="muted" font-size="18"><tspan x="500" dy="0">报告引用条目与版本</tspan></text><rect x="310" y="225" width="380" height="65" rx="10" class="node unknown"/><text x="500.0" y="264.5" text-anchor="middle" class="node-label" font-size="20"><tspan x="500.0" dy="0">变更：worker 更换业务库</tspan></text><path d="M500,225 L500,180 L165,180 L165,155" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-maintain-arrow)"/><path d="M500,225 L500,180 L835,180 L835,155" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#d-maintain-arrow)"/><rect x="360.95" y="182" width="278.1" height="25" rx="3" fill="#fbfcfe"/><text x="500" y="199" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">复查资源身份、权限、查询与导出结果</tspan></text><text x="500" y="36" text-anchor="middle" class="muted" font-size="18"><tspan x="500" dy="0">权威位置是维护约定，仍要保留证据与复核。</tspan></text></svg></div><figcaption>更新当前清单，也要复查受影响的判断；调查报告保留当时的证据时点。</figcaption></figure>
+<p>例如 worker 更换业务库，应重新核对资源身份、权限、查询条件与导出结果。AI 可以帮忙查变更、整理受影响条目和待核问题；结论状态的升级仍需要证据。</p>
+<details><summary>没有生产权限，调查还值得交付吗？</summary><p>可以交付带出处的声明地图、已取得观察和未知影响。是否足够取决于当前任务；结构导读和生产迁移承诺需要的证据不同。</p></details>
+<details><summary>健康检查成功，能说“服务可用”吗？</summary><p>先看检查覆盖了什么。存活、就绪和启动探针职责不同，业务依赖与最终结果需要对应证据。</p></details>
+<details><summary>是不是每个项目都必须有消息队列、容器和 trace？</summary><p>不是。它们是本文案例的组件或可选证据通道。纯库、离线工具和其他部署方式应调整步骤，保留“声明、行为和运行对象相互核对”的思路。</p></details>
+<div class="boundary"><b>本文的证据范围</b><p>全文案例、E1—E5、资源代号与 R1/R2 均为构造。公开资料支撑配置、权限、接口、追踪、镜像与构建溯源等机制；三阶段七步及停止判断属于综合方法设计，没有量化效率实验。本轮没有连接生产数据库、调用内部服务或重跑部署调查。</p><p>持续更新的资料需要结合实际项目版本使用；OpenAPI 计数固定在 3.1 口径。正文与配图均可离线阅读，外部资料链接用于联网核查。</p></div>
+<p class="proof"><a href="?view=deep#repo-boundary">依据与展开：完整证据边界与 12 组一手参考 →</a><a class="md-link" href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md#repo-boundary">MD 定位</a></p>
+<div class="closing-links"><a class="primary-link" href="?view=deep#repo-design">进入深入全文：总体设计与完整论证 →</a><a href="index.html">返回阅读目录</a></div>
+</section>
+</main></div>
+<section id="deep-document" class="deep-wrap" hidden><nav class="mode-links"><a href="?view=lecture">← 返回图解讲解</a><a href="../%E5%8E%9F%E6%96%87/%E8%AF%BB%E5%AE%8C%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%BF%98%E4%B8%8D%E7%AE%97%E4%BA%86%E8%A7%A3%E8%BF%99%E4%B8%AA%E7%B3%BB%E7%BB%9F%EF%BC%9A%E9%99%8C%E7%94%9F%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C%E4%B8%83%E6%AD%A5%E6%B3%95.md">Markdown 正本</a></nav><div class="deep-intro">深入全文保留与 Markdown 正本一致的论证、操作示例、竞争解释和参考资料。两张关系图以离线图形呈现；图解中的关键判断可精确跳转到这里。</div><article class="deep" id="deep-article"><!-- document-id: show-09 -->
+<!-- document-version: 1.1 -->
+
+<h1>读完代码，还不算了解这个系统：陌生后端的事实核验七步法</h1>
+<blockquote>
+<p>2026-10-28 · 方法指南 · 面向接手、对接和评估陌生后端的工程师与技术负责人<br>v1.1 · <a href="../%E9%98%85%E8%AF%BB/%E8%AE%B2%E8%A7%A3-09-%E9%A1%B9%E7%9B%AE%E4%BA%8B%E5%AE%9E%E6%A0%B8%E9%AA%8C.html">离线图解讲解</a> · <a href="../%E9%98%85%E8%AF%BB/index.html">阅读目录</a></p>
+</blockquote>
+<p>接手一个陌生后端，首先要建立一份能指导行动的系统画像：请求从哪里进来，核心业务由哪些组件完成，数据与外部依赖在哪里，目标环境实际运行哪个版本。AI 可以帮助搜索代码、整理线索，但这些线索必须和运行对象对应起来，才能支持后续对接、改造或接管判断。</p>
+<p><strong>本文的方法是：读码建立候选结构，沿关键业务路径观察实际行为，再把观察关联到运行实例、构建来源和有效配置；遇到矛盾就回查，最终交付附有证据与未知项的系统画像。</strong> 下文先解释调查为什么困难，再给出总体方案，最后用七步展开具体做法。全文的导出服务均为构造案例；流程是综合方法设计，未做量化效率实验。</p>
+<p><a id="repo-case"></a></p>
+<h2>一、背景：接手一个服务，需要回答哪些问题</h2>
+<p>设想你接手一个导出服务。产品同事希望把它接到新的业务入口，负责人还想评估能否迁到另一个环境。你需要先回答四类问题：</p>
+<table>
+<thead>
+<tr>
+<th>必须查清的问题</th>
+<th>它影响什么判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>入口在哪里，服务负责什么，哪些工作由其他组件完成？</td>
+<td>新入口应该调用谁，改造范围覆盖哪些组件</td>
+</tr>
+<tr>
+<td>它读取、写入哪些数据，还依赖哪些服务或基础设施？</td>
+<td>需要哪些网络、账号、数据与外部资源</td>
+</tr>
+<tr>
+<td>一次导出从请求到结果怎样完成？</td>
+<td>接口返回表示什么，如何判断任务真的成功</td>
+</tr>
+<tr>
+<td>目标环境运行什么制品、源码与配置？</td>
+<td>当前代码能解释哪部分现象，后续验证应该基于哪个版本</td>
+</tr>
+</tbody></table>
+<p>只整理框架、目录、数据库地址和接口数量，尚不足以完成这些判断。导出接口可能只负责创建任务，真正生成文件的是后台 worker。<strong>本文的 worker 指独立执行后台任务的进程</strong>；它可能使用另一套启动命令、配置和发布制品。若迁移计划只覆盖 HTTP 服务，即使接口能接收请求，文件也可能永远生成不了。</p>
+<p>本文用下面的业务链贯穿调查，具体组件关系将在后续逐项核对：用户提交导出请求，API 完成鉴权并创建任务；worker 取得任务后读取业务数据、生成文件；用户随后查询状态或下载结果。这里的 <strong>API</strong> 指接收 HTTP 请求的应用进程，任务传递方式和文件存放位置暂时都是待核实项。</p>
+<p>这项调查的交付应能让接手者说明：“哪些组件一起完成导出；迁移它们需要什么；哪些判断已有对应证据；哪些未知仍会改变方案。”有了明确用途，才知道哪些线索值得继续追，哪些细节可以稍后再查。</p>
+<p><a id="repo-difficulty"></a></p>
+<h2>二、难点：为什么读到的信息经常对不上</h2>
+<h3>1. 仓库保存的是实现与默认选择，环境决定了其中哪些实际生效</h3>
+<p>仓库里有 <code>application.yml</code> 或 <code>.env.example</code>，不意味着运行进程就使用其中的地址。启动参数、环境变量、挂载文件、动态配置以及程序自身的加载逻辑都可能改变结果。</p>
+<p>例如，导出 API 的默认配置连接开发库，部署时却通过环境变量选择任务库；worker 又从另一份挂载文件读取业务库。若只搜索一次数据库配置，调查者既可能漏掉真正的数据依赖，也可能把仅供本地启动的库写成生产依赖。以 Spring Boot 为例，官方明确规定了多类属性来源的覆盖顺序；其他框架与自定义加载器要按各自机制核对。[1]</p>
+<h3>2. 接口声明描述能力，业务路径解释怎样完成工作</h3>
+<p>路由里定义了“创建导出”“查询状态”“下载文件”，可以说明代码提供了这些操作，却没有直接说明一次导出如何完成。要解释业务，还需要追踪入口后的鉴权、任务持久化、后台处理、数据读取和文件交付。</p>
+<p>在本案例中，“创建任务成功”只覆盖业务链的前半段。若 worker 没有收到任务，或生成的文件不属于当前用户，HTTP 层看起来正常也无法满足用户目标。因此，调查必须选一条实际业务路径，把零散接口和组件组织起来。</p>
+<h3>3. 每次观察都带着环境、身份、时点和覆盖范围</h3>
+<p>本地账号看不到某张表，可能是表不存在，也可能是 schema、权限或连接环境不同。某次健康检查返回成功，只说明该检查覆盖的条件在那个时刻满足；存活、就绪、启动探针本身也有不同职责。[2]</p>
+<p>同样，一笔导出成功说明该笔输入在对应条件下完成，不能直接推出大数据量、不同身份、失败重试和所有租户都正常。调查记录必须能回答“观察了什么、在哪看、以谁的身份看、看到了哪一段”，才能判断证据是否足够。</p>
+<h3>4. 代码、制品与运行实例之间，需要另外建立对应关系</h3>
+<p>本地分支叫 <code>main</code>，不能说明正在运行的服务由它构建。镜像标签看起来像提交哈希，也需要构建记录把它与源码关联起来。即使源码相同，API 与 worker 的有效配置也可能不同。</p>
+<p>运行环境还可能同时存在新旧实例。Kubernetes 的滚动更新会逐步增加新 ReplicaSet 的 Pod、减少旧 Pod；只看一份部署清单或一个实例，可能遗漏正在共存的版本。[3] <strong>Pod</strong> 在这里指 Kubernetes 中承载容器的运行单元；未使用 Kubernetes 的项目应换成进程、虚拟机或其他实际运行对象。</p>
+<p>这四个难点说明，调查需要把不同来源的信息逐项关联：文件中的声明用来提出解释，业务观察用来核对行为，运行来源用来限定这些解释和观察属于谁。</p>
+<p><a id="repo-design"></a></p>
+<h2>三、解决思路与总方案：先建图，再观察，最后对账</h2>
+<h3>1. 三类工作各自解决什么问题</h3>
+<p><strong>读码建立候选结构。</strong> 从构建文件、启动入口、配置加载、路由和关键模块中，画出“可能由哪些组件完成什么工作”。它的产物是一张带出处的候选地图，以及需要进一步核实的命题。例如：“API 创建任务后，是否通过消息队列通知 worker？”</p>
+<p><strong>受控观察核对关键事实。</strong> 在已明确的环境与身份下，查看相关配置、元数据、日志，必要时执行获授权且影响已知的业务验证。观察围绕会影响当前决策的命题进行。例如，借助同一个任务 ID 关联请求受理、任务创建、worker 处理和文件结果，核对候选路径是否成立。</p>
+<p><strong>运行溯源把对象对齐。</strong> 找到这些观察对应的进程或实例、运行制品、构建来源、源码提交及有效配置。这里的“溯源”是查明运行内容从何而来。例如，发现 worker 用的源码提交早于本地代码，就能解释为什么本地新增的处理逻辑没有出现在任务记录中。</p>
+<p>三类证据共同形成系统画像。这与架构重建的基本目标相近：从已实现的系统中提取信息，逐层形成可供推理的结构表示。[4] 本文的三阶段、七步和记录方式是综合设计，并非该报告提出的原样流程。</p>
+<figure class="figure" id="deep-method"><div class="figure-heading"><b>图 03 · 从候选结构到可复查判断的调查闭环</b><span>方法设计</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 570" role="img" aria-labelledby="deep-d-method-title deep-d-method-desc" xmlns="http://www.w3.org/2000/svg"><title id="deep-d-method-title">图 3：读码、观察、溯源与回查组成调查闭环</title><desc id="deep-d-method-desc">综合方法设计。先明确决策与范围，读码形成待核实命题，观察关键路径，关联运行来源；一致且足够时交付，矛盾或缺证时回查。执行可以往返。</desc><defs><marker id="deep-d-method-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="300" y="20" width="400" height="60" rx="10" class="node neutral"/><text x="500.0" y="57.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="500.0" dy="0">明确决策、对象与观察范围</tspan></text><path d="M500,80 L500,110 L175,110 L175,150" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-method-arrow)"/><rect x="35" y="150" width="270" height="92" rx="10" class="node candidate"/><text x="170.0" y="189.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="170.0" dy="0">读码建立候选结构</tspan><tspan x="170.0" dy="28">入口、职责、数据、依赖</tspan></text><rect x="365" y="150" width="270" height="92" rx="10" class="node observed"/><text x="500.0" y="189.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="500.0" dy="0">观察核对关键事实</tspan><tspan x="500.0" dy="28">业务路径、身份、结果</tspan></text><rect x="695" y="150" width="270" height="92" rx="10" class="node observed"/><text x="830.0" y="189.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="830.0" dy="0">溯源对齐运行内容</tspan><tspan x="830.0" dy="28">实例、制品、源码、配置</tspan></text><path d="M305,195 L365,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-method-arrow)"/><rect x="297.2" y="121" width="75.6" height="24" rx="3" fill="#fbfcfe"/><text x="335" y="137" text-anchor="middle" class="muted" font-size="16"><tspan x="335" dy="0">待核命题</tspan></text><path d="M635,195 L695,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-method-arrow)"/><path d="M830,242 L830,310 L635,310" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-method-arrow)"/><path d="M500,265 L635,310 L500,355 L365,310 Z" class="node neutral"/><text x="500" y="306" text-anchor="middle" class="" font-size="18"><tspan x="500" dy="0">证据一致</tspan><tspan x="500" dy="28">且足够？</tspan></text><rect x="35" y="300" width="270" height="90" rx="10" class="node unknown"/><text x="170.0" y="338.0" text-anchor="middle" class="node-label" font-size="18"><tspan x="170.0" dy="0">回查差异来源</tspan><tspan x="170.0" dy="28">对象／版本／配置／覆盖</tspan></text><path d="M365,310 L305,335" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-method-arrow)"/><rect x="309.35" y="275" width="33.3" height="25" rx="3" fill="#fbfcfe"/><text x="326" y="292" text-anchor="middle" class="muted" font-size="17"><tspan x="326" dy="0">否</tspan></text><path d="M170,300 L170,275 L335,275 L335,195" class="edge" fill="none" stroke="#60748d" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#deep-d-method-arrow)"/><path d="M500,355 L500,430" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-method-arrow)"/><rect x="510.35" y="384" width="33.3" height="25" rx="3" fill="#fbfcfe"/><text x="527" y="401" text-anchor="middle" class="muted" font-size="17"><tspan x="527" dy="0">是</tspan></text><rect x="280" y="430" width="440" height="78" rx="10" class="node observed"/><text x="500.0" y="462.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="500.0" dy="0">系统画像＋证据索引</tspan><tspan x="500.0" dy="28">明确剩余未知及其决策影响</tspan></text><text x="500" y="552" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">可以提前核对运行身份，也可以发现依赖后返回读码；这是一条可往返的调查路线。</tspan></text></svg></div><figcaption>矛盾或缺证会触发回查。最终保留的未知，需要说明它会影响哪个决定。</figcaption></figure>
+<p>图示为调查方法设计。实际执行可以往返：为了确定观察的是哪个服务，运行身份通常需要提前确认；发现依赖后，也可能返回代码继续追踪。图中箭头表示信息如何推进和修正判断，不要求把溯源全部留到最后。</p>
+<h3>2. 七步如何展开总方案</h3>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>主要工作</th>
+<th>本步形成的产物</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1. 锁定范围与快照</td>
+<td>明确决策、仓库、环境、身份和时点</td>
+<td>调查范围与比较基准</td>
+</tr>
+<tr>
+<td>2. 读码建立候选地图</td>
+<td>找入口、组件、配置来源及关键业务代码</td>
+<td>候选结构、待核实命题</td>
+</tr>
+<tr>
+<td>3. 核对数据源</td>
+<td>关联有效配置、访问身份、业务对象及用途</td>
+<td>有范围的数据依赖记录</td>
+</tr>
+<tr>
+<td>4. 追踪关键业务路径</td>
+<td>对齐接口清单，连接输入、处理和结果</td>
+<td>业务路径及已验证范围</td>
+</tr>
+<tr>
+<td>5. 核对组件关系</td>
+<td>区分服务调用、任务传递和共享数据访问</td>
+<td>有依据的组件关系图</td>
+</tr>
+<tr>
+<td>6. 反查运行来源</td>
+<td>关联实例、制品、构建、源码与配置</td>
+<td>运行身份与来源链条</td>
+</tr>
+<tr>
+<td>7. 对账并交付</td>
+<td>处理差异，判断剩余未知的影响</td>
+<td>可支持当前决策的系统画像</td>
+</tr>
+</tbody></table>
+<p><a id="repo-ledger"></a></p>
+<h3>3. 事实底账怎样贯穿全程</h3>
+<p><strong>事实底账</strong>是结论与证据的索引，用来记录每条重要判断的当前依据。可将记录分为声明、观察、推断、未知；这些类别描述信息性质，不是从低到高的固定等级。源码可以直接证明某段实现存在，运行观察则适合核对某个环境的行为。</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>本案例中的记录</th>
+<th>必须保留的限定</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>声明</td>
+<td>某提交中的 API 代码包含任务创建逻辑</td>
+<td>文件位置、源码版本、是否有本地改动</td>
+</tr>
+<tr>
+<td>观察</td>
+<td>测试环境一笔任务被 worker 处理并生成文件</td>
+<td>对象、身份、时间、输入与观察范围</td>
+</tr>
+<tr>
+<td>推断</td>
+<td>两个组件可能访问同一个业务数据源</td>
+<td>支持依据、竞争解释及需要补的证据</td>
+</tr>
+<tr>
+<td>未知</td>
+<td>未取得 worker 当前制品的构建来源记录</td>
+<td>缺口会影响什么判断、由谁或何种证据补齐</td>
+</tr>
+</tbody></table>
+<p>记录可以采用：<code>问题 → 对象/环境/身份/时点 → 证据位置 → 取得的内容 → 当前结论及范围 → 剩余未知/下一步</code>。证据位置应指向有权限复查的原始材料，正文保留必要摘要，避免只留一张难以追溯的结果表。</p>
+<p>一条命题可以同时引用多类记录。例如，“这笔任务由当前 worker 完成”需要任务处理记录和实例身份；若还要说明“由某提交的逻辑完成”，就要继续关联构建来源。这种关联比给整份报告统一标注“已验证”更有用。</p>
+<p><a id="repo-steps"></a></p>
+<h2>四、七步展开：沿一笔导出任务查清系统</h2>
+<p>以下文件、接口、组件名和观察结果均属同一个构造案例，不是对某个真实项目的测量。</p>
+<p><a id="repo-scope"></a></p>
+<h3>第一步：锁定调查范围，给后续比较设定基准</h3>
+<p>先写清这次调查要支持什么决定。本案例的目标是“识别导出能力接入与迁移涉及的组件和依赖，列出仍需验证的条件”。它可以产出迁移评估输入，距离承诺生产切换成功还需要专门的迁移验证。</p>
+<p>调查范围至少注明仓库与提交、是否有本地改动、目标环境、可用观察身份及时间窗口。代码快照可先用以下命令确认：</p>
+<pre><code class="language-bash">git rev-parse HEAD
+git status --short
+git rev-parse --is-shallow-repository
+</code></pre>
+<p>源码提交标识只能定位已提交内容；工作区有修改时，需额外保留相关差异。记录中把“本地读到的版本”和“目标环境运行的版本”分列，后续再建立对应关系。</p>
+<p>普通 <code>git clone</code> 不应一概视为浅克隆。<code>--depth</code> 等选项会限制历史；如果调查涉及缺失的祖先关系，才需要按实际情况补取历史与必要引用。仓库不浅也不等于远程所有分支和最新提交都已取回，分支分析还要说明使用了哪些引用及其更新时间。[5]</p>
+<p>本步产物是一段明确的范围说明。例如：“读取仓库快照 R；观察测试环境 E 中的导出 API 与 worker；按测试身份查看任务链路；生产环境的行为与构建来源尚未核实。”后续证据无法对应这些条件时，先补齐对象信息再比较。</p>
+<p><a id="repo-map"></a></p>
+<h3>第二步：从文件证据建立候选地图，并列出待核实命题</h3>
+<p>先找“程序怎样被构建和启动”，再找“启动后怎样接收并完成工作”。构建文件提供依赖与框架线索，启动命令确定执行哪个入口，入口决定加载哪些配置和路由，路由或消费者再连接业务模块。</p>
+<p>假设在仓库中读到以下文件与职责线索：</p>
+<pre><code class="language-text">pyproject.toml          依赖与项目入口线索
+Dockerfile              制品构建与默认启动命令
+app/api.py              HTTP 应用及路由注册
+app/worker.py           后台任务执行入口
+app/settings.py         配置读取逻辑
+app/export_service.py   创建、查询导出任务的逻辑
+app/export_job.py       读取业务数据、生成文件的逻辑
+deploy/                 部署模板与配置引用
+</code></pre>
+<p>此时已经可以提出一个比目录摘要更有价值的候选解释：“同仓库中至少存在 API 和 worker 两种执行角色；API 负责任务入口，worker 负责生成结果。”接下来分别检查启动入口、业务调用与部署模板，判断这两种角色是否真的独立启动，模板是否对应目标环境。</p>
+<p><strong>配置要追到加载逻辑和运行来源。</strong> 在本构造案例中，假设 API 加载器按“默认值→挂载文件→环境变量”覆盖，而 worker 还会读取一份单独的业务数据源配置。这里的顺序来自案例设定；真实项目要由对应版本的加载实现和框架规则确认，不能照搬。</p>
+<p>例如，跟踪本案例自定义的配置键 <code>task_db</code>：源码默认值指向任务库 T0，挂载文件改为 T1，目标 API 进程的环境输入又指定 T。核对该版本加载器的覆盖逻辑，再由该实例启动后的脱敏配置摘要确认最终选择 T，才能把候选依赖修订为 T。摘要需注明实例、配置加载时点与材料取得身份；还要结合该实例的连接记录核对实际访问。若只有部署模板或环境输入，就只能说明提供了什么值，尚不能证明程序最终采用了它。动态配置发生变化时，还需对应观察时点。</p>
+<p>再把重要字段列成待核实项：worker 的业务库由谁指定，任务传递地址如何配置，结果文件放在哪里。搜索时优先定位字段名和文件，确需查看值时按权限最小化读取并脱敏；凭据只记录引用方式。</p>
+<p>本步的候选地图可以先写为“API→任务记录；API→待确认的任务传递机制→worker；worker→业务数据；worker→文件存储”。每个箭头带代码出处。尚未读到的组件保留未知，不用常见架构把空白补齐。</p>
+<p>读码与维护者介绍不一致时，先列竞争解释：文档是否过期、代码是否属于另一版本、启动时是否选择了另一条入口、相关逻辑是否已停用。本步完成后，交付候选结构和一组有优先级的问题；影响本次接入与迁移的依赖应优先核对。</p>
+<p><a id="repo-data"></a></p>
+<h3>第三步：把候选数据源追到有效配置、身份、对象和业务用途</h3>
+<p>对每个候选数据源，按这条链核对：<strong>哪个组件读取哪项配置→目标环境使用什么端点与身份→该身份能访问什么对象→这些对象参与什么业务。</strong> 这样才能把一个连接字段转化为对接或迁移依赖。</p>
+<p>在导出案例中，API 可能写任务状态，worker 则读取业务数据并回写处理结果。即使两者使用相同数据库产品，也应分别记录用途。只读数据库、缓存、搜索索引、消息系统和文件存储可按业务角色检查，不必为了清单完整而把所有产品命令都跑一遍。</p>
+<p>观察可以逐层推进：网络是否可达，身份是否被接受，目标对象是否可见，业务所需的数据是否能在预期条件下取得。<strong>TCP 成功只支持网络可达；登录成功只支持该身份被接受。</strong> 调查者自己的只读账号能查表，也不能直接证明应用账号具有同样权限；要么核对应用身份，要么写明身份差异。</p>
+<p>以 PostgreSQL 为例，分别在任务库 T 与业务库 B 的已授权连接中记录数据库、当前用户和 schema 搜索路径。[6] 下面先在连接 T 中检查任务表：</p>
+<pre><code class="language-sql">-- 连接任务库 T 后执行
+SELECT current_database(), current_user;
+SHOW search_path;
+
+SELECT table_schema, table_name, table_type
+FROM information_schema.tables
+WHERE table_schema = &#39;reporting&#39;
+  AND table_name = &#39;export_tasks&#39;;
+</code></pre>
+<p>再切换到业务库 B 的独立连接，重新记录数据库、身份与搜索路径，并将目标表改为 <code>business_orders</code> 核对。两次观察分别入账；这里的 schema 和表名均为构造名称。<code>information_schema.tables</code> 只展示当前用户有访问权限的表与视图。[6] 若查不到，先检查数据库、schema 和可见性，保留权限不足等解释；数据库还有其他 schema 时，不应只盯默认 <code>public</code>。</p>
+<p>端点身份也要认真核对：同名数据库可能属于不同集群，不同地址可能是代理或副本。需要结合数据库或平台可提供的身份信息与拓扑记录，才能判断是否属于同一套资源；无法确认时保留“候选共享数据源”。数据是否符合业务所需的时间范围，也应结合更新时间、查询条件及业务定义判断，不能从一条连接成功记录推出。</p>
+<p>本步产物可是一条依赖记录：“worker 的业务库配置来源已定位；目标测试环境的运行配置指向数据源 D；已确认的访问身份可见 <code>reporting.business_orders</code>；该任务读取哪些字段与条件，留待业务路径核对。”若只取得维护者导出的元数据，注明提供者、时间和可见范围。</p>
+<p>行数只有在影响当前决策时才需要取得，例如估算迁移体量。大表优先使用适当统计估计并标明估算口径；即使查询只读，也要考虑资源开销。权限不足时请求有权限者提供最小必要证据，不把换入口绕过授权当作默认步骤。</p>
+<p><a id="repo-business"></a></p>
+<h3>第四步：沿关键业务路径解释系统，并对齐接口清单</h3>
+<p>挑选关键路径时，先看本次决策最依赖什么：高频核心操作、跨组件流程、对结果正确性敏感的功能，通常值得优先追。路径范围要写清；若不同租户或数据源走不同分支，只验证其中一种就只能支持对应范围。</p>
+<p>在本案例中，选择“一位有导出权限的测试用户，导出一个已知的小数据集”。代码追踪要回答：权限在哪里检查，任务怎样保存，后台工作怎样触发，worker 读取什么数据，文件怎样关联回任务，下载时如何判断当前用户有权取得它。</p>
+<p>先按代码形成候选业务路径，再用获授权的观察补充。一次完整观察至少需要把请求、任务、后台处理和最终结果关联起来。HTTP 返回成功后，继续核对任务状态变化、文件可取得性，以及文件中的数据是否符合这次输入和权限范围。预期字段、记录或汇总值应来自业务规则或独立参考，不能仅用同一段导出逻辑再算一次，就宣称结果已独立验证。</p>
+<p>如果系统通过任务 ID 关联流程，就记录该 ID 在哪些材料中出现，并核对身份和时间；若 ID 只在某租户或某环境内唯一，关联时也需带上这些条件。已有可信的业务记录可以用来观察；新触发任务则要明确写入、消息、存储和通知等影响。方法名为 GET 也不足以保证实现没有副作用。</p>
+<p><strong>接口清单服务于这条路径的解释。</strong> 至少区分源码定义、目标实例提供的接口描述、已观察到的操作。清单记录 HTTP 方法、路径、外部入口前缀及环境版本；需要时还要区分网关路径和应用内部路径。例如，外部 <code>POST /reports/exports</code> 经前缀改写后可能对应内部 <code>POST /exports</code>，不能把它们机械算成两个业务操作。</p>
+<p>发现代码清单与实例描述不一致时，先统一方法、路径和版本口径，再检查条件注册、入口前缀、网关改写、文档过滤及不同部署版本。接口描述返回成功只证明取得了那份声明，不证明其中每项操作都已可用。</p>
+<p>如果确实需要统计接口数量，可对已经取得的 OpenAPI 3.1 JSON 只统计 <code>paths</code> 下直接列出的方法：</p>
+<pre><code class="language-python">import json
+from pathlib import Path
+
+spec = json.loads(Path(&quot;openapi.json&quot;).read_text())
+if not str(spec.get(&quot;openapi&quot;, &quot;&quot;)).startswith(&quot;3.1.&quot;):
+    raise ValueError(&quot;本示例只适用于 OpenAPI 3.1 文档&quot;)
+methods = {&quot;get&quot;, &quot;put&quot;, &quot;post&quot;, &quot;delete&quot;, &quot;options&quot;, &quot;head&quot;, &quot;patch&quot;, &quot;trace&quot;}
+paths = {p: item for p, item in spec.get(&quot;paths&quot;, {}).items()
+         if p.startswith(&quot;/&quot;)}
+operations = [(p, method) for p, item in paths.items()
+              for method in methods if method in item]
+print({&quot;described_paths&quot;: len(paths),
+       &quot;directly_described_operations&quot;: len(operations)})
+</code></pre>
+<p>Path Item 还包含参数、摘要等非方法字段，不能直接累加对象键数作为操作数。[7] 上例不解析 <code>$ref</code>，不包含 webhook；引用中的操作可能未计入。输出只是该口径下的描述数量，不代表全部暴露接口、已验证操作数或系统业务复杂度。</p>
+<p>本步交付“业务路径＋接口映射＋观察范围”。例如：“测试环境的小数据集导出在该身份下完成，结果内容已按参考核对；大数据量、失败重试和其他权限分支尚未验证。”如果只能受理却没有结果，就沿任务创建、传递、后台处理与文件交付逐段查找缺失环节。</p>
+<p><a id="repo-relations"></a></p>
+<h3>第五步：用不同证据核对服务调用、任务传递和共享数据访问</h3>
+<p>理解系统依赖时，箭头的含义必须明确。A 调用 B 的 HTTP API、A 给队列发送任务、A 和 B 访问同一数据库，是三种不同关系，决定了不同的网络、账号、发布和故障排查边界。</p>
+<p>对同步调用，结合调用代码、目标环境实际配置及对应请求记录核对发送方和接收方。存在分布式追踪时，可以借助 trace 中的相关 span。<strong>trace</strong> 表示一次请求相关工作的追踪，<strong>span</strong> 表示其中一个操作；它们仍受埋点正确性与覆盖范围限制。[8]</p>
+<p>对异步任务，继续关联发送与消费记录，确认任务 ID、队列或主题的身份、环境和时间条件。OpenTelemetry 支持通过 span links 关联异步操作；实际系统也可以使用可靠的业务 ID 和日志，不要求所有工作一定落在同一个 trace 中。[8]</p>
+<p>对共享数据库访问，要分别证明两个组件访问同一资源及各自的读写用途。即使两边都能看到同一张表，也不能画成“A 调用了 B”。本案例中，若 worker 直接读取订单数据，应把它画为 worker 到业务库的访问边，而不是虚构一个订单服务 API 调用。</p>
+<p>日志里没查到某条关系时，检查观察窗口是否包含相关业务，埋点是否覆盖该路径，以及采样、过滤和日志保留情况。未采样的 trace 或 span 可能根本没有被处理与导出，因此一次检索为空不足以证明从不调用。[9] 反过来，一条关联记录通常支持“这次发生过”，仍不足以说明每次都走同一路径。</p>
+<p>本步产物是在候选地图上标清关系类型、证据和范围。没有足够证据的箭头保留候选状态；它若影响迁移资源清单，就明确列为待补项。</p>
+<p><a id="repo-runtime"></a></p>
+<h3>第六步：把观察到的行为关联到实际运行内容</h3>
+<p>API 与 worker 要分别查，因为同仓库的两个角色可能由不同流水线、不同提交或不同配置部署。沿以下链条追溯：</p>
+<pre><code class="language-text">观察到的请求/任务
+  → 处理它的实例与时间窗口
+  → 该实例的运行制品身份
+  → 与该制品对应的构建记录
+  → 源码仓库、提交及其他构建输入
+
+另行关联：启动命令、有效配置、挂载内容、动态开关及其版本/时点
+</code></pre>
+<p>在 Kubernetes 环境中，先确认集群、命名空间、工作负载及相关 Pod，再核对容器运行状态、镜像标识和实际启动配置；滚动更新中要关注仍在工作的不同实例。运行平台返回的镜像身份需按相应容器运行时语义解释，并与制品记录核对。未用 Kubernetes 时，同样的问题可以由进程、发布目录、包校验值和部署记录回答。</p>
+<p>镜像标签可能变化，digest 用于标识特定镜像内容。[10] 取得具体制品身份后，再查对应的构建任务和来源记录。SLSA 的构建溯源格式提供了制品、构建平台、构建输入和解析后依赖等关联方式；实际项目也可以从能追溯且可信的流水线记录开始。[11] 记录里自报一个提交仍需要核对来源可信度、制品是否匹配，以及是否存在未记录的构建输入。</p>
+<p><code>git branch --contains</code> 回答的是“哪些已知分支的历史包含这个提交”。同一提交被 <code>main</code> 与 <code>release</code> 同时包含很正常，它不回答哪条流水线构建了当前制品。[12] 因此，报告优先记录可追溯的提交与制品身份；确需调查构建所用分支时，应从对应构建触发与输入记录查证。</p>
+<p>即使源码和制品对应，配置仍可能改变行为。假设 API 的制品能关联到提交 R2，worker 则关联到 R1；worker 配置又选择了不同的数据源。这样的证据可以解释一部分差异，但是否影响目标功能还需要回到实际代码与业务路径核对。</p>
+<p>本步交付的是各个运行角色的来源记录。若只能核实实例和制品，就写到这一层，同时保留“源码来源未核实”。不要让 API 已查清的版本覆盖 worker 的未知，也不要用当前实例的状态倒推一笔历史任务的处理版本；历史关联还需要当时的日志或发布记录。</p>
+<p><a id="repo-reconcile"></a></p>
+<h3>第七步：对账，形成能支持当前决策的系统画像</h3>
+<p>汇总时，把候选结构、业务观察与运行来源放在一起逐项比较。<strong>对账</strong>指检查这些材料是否描述同一对象、条件和关系；出现矛盾就找到差异来源，再修正相应结论。</p>
+<p>可以先查对象与口径，再查时间和运行来源，最后检查观察覆盖。例如，同样叫“导出服务”的两个实例是否属于同一环境；一份清单统计的是外部路由还是内部操作；日志是否来自部署前；某条链路是否被采样丢弃。这是方便推进的检查顺序，具体优先级要随现有证据调整。</p>
+<p>若本地代码提供了一个新版导出操作，而实例文档里没有，先保留“版本差异、入口改写、文档过滤、条件注册”等解释。找到 worker 仍运行旧制品后，也不能自动结束：要确认缺失操作由 API 还是 worker 实现，并核对对应实例的实际版本。<strong>差异解释必须能连接到发生差异的那个环节。</strong></p>
+<p>每个问题最后落到明确状态：证据足够则给出有范围的结论；只是某种条件下成立则写清条件；仍缺证则列出补证方式与影响；若证据直接反驳原解释，就修改地图和下游依赖清单。这样，最终文档才能从一批资料摘要变成能被复查、能指导下一步的调查结果。</p>
+<p><a id="repo-example"></a></p>
+<h2>五、完整案例：调查怎样改变接入与迁移判断</h2>
+<p>回到最初的导出服务。下面是一组<strong>构造的调查材料与结果</strong>，用于展示证据如何改变判断，不代表真实环境已经验证。</p>
+<p>最初只看到一个仓库、一份数据库配置和三类 HTTP 接口，很容易得出一个粗略方案：“部署这个应用，接好数据库，再把三个接口接到新入口。”按前面的七步推进后，得到以下材料：</p>
+<table>
+<thead>
+<tr>
+<th>证据索引</th>
+<th>构造材料摘要</th>
+<th>它支持的判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>E1：源码与启动材料</td>
+<td>API 和 worker 有各自的启动入口；创建任务与生成文件由不同入口调用</td>
+<td>仓库内存在两种执行角色，需要分别调查</td>
+</tr>
+<tr>
+<td>E2：目标配置与资源记录</td>
+<td>测试环境 API 使用任务库 T；worker 使用业务库 B，并回写任务库 T；平台记录区分了两套资源</td>
+<td>本案例涉及任务数据与业务数据两类依赖；不能按库名直接合并</td>
+</tr>
+<tr>
+<td>E3：任务关联材料</td>
+<td>一笔测试请求对应任务 t_demo；同环境中有对应消息发送、消费和 worker 处理记录</td>
+<td>该笔任务经所记录的消息通道交给 worker 处理</td>
+</tr>
+<tr>
+<td>E4：结果与交付材料</td>
+<td>任务完成，文件位于 F；已关联的实现与本次存储访问记录表明 API 读取该文件并返回；下载内容符合该测试输入的独立参考</td>
+<td>本案例的结果经 API 读取并交付，这笔小数据集导出包含结果内容核对</td>
+</tr>
+<tr>
+<td>E5：运行与构建材料</td>
+<td>处理时段的 API 制品关联源码提交 R2，worker 制品关联 R1；相关配置来源已记录</td>
+<td>本次观察覆盖的是这组运行版本与配置，不能按本地单一提交概括</td>
+</tr>
+</tbody></table>
+<p>E1—E5 是演示证据编号。在真实报告里，每个编号需要链接到带对象、时间、身份和版本条件的材料，并保留必要上下文。</p>
+<p>据此，原本的“一个应用连接一个库”被修订为以下结构：</p>
+<figure class="figure" id="deep-architecture"><div class="figure-heading"><b>图 07 · 同一笔导出的执行角色、资源与关系</b><span>构造案例 E1—E5</span></div><div class="diagram-scroll"><svg class="diagram" viewBox="0 0 1000 540" role="img" aria-labelledby="deep-d-architecture-title deep-d-architecture-desc" xmlns="http://www.w3.org/2000/svg"><title id="deep-d-architecture-title">图 7：导出能力的组件关系与数据依赖</title><desc id="deep-d-architecture-desc">构造案例 E1 至 E5 的关系图。用户经 API 创建任务、查状态与下载；API 写任务库并发消息，worker 消费任务、读业务库、更新任务并写文件；本案例 API 从文件存储读取并交付。</desc><defs><marker id="deep-d-architecture-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#60748d"/></marker></defs><rect x="20" y="220" width="135" height="70" rx="10" class="node neutral"/><text x="87.5" y="262.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="87.5" dy="0">测试用户</tspan></text><rect x="200" y="220" width="190" height="70" rx="10" class="node neutral"/><text x="295.0" y="248.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="295.0" dy="0">导出 API</tspan><tspan x="295.0" dy="28">创建／查询／下载</tspan></text><rect x="450" y="45" width="220" height="75" rx="10" class="node observed"/><text x="560.0" y="75.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="560.0" dy="0">任务库 T</tspan><tspan x="560.0" dy="28">任务与处理状态</tspan></text><rect x="460" y="220" width="190" height="70" rx="10" class="node neutral"/><text x="555.0" y="262.0" text-anchor="middle" class="node-label" font-size="20"><tspan x="555.0" dy="0">任务队列</tspan></text><rect x="740" y="220" width="220" height="70" rx="10" class="node neutral"/><text x="850.0" y="248.0" text-anchor="middle" class="node-label" font-size="19"><tspan x="850.0" dy="0">导出 worker</tspan><tspan x="850.0" dy="28">执行后台导出</tspan></text><rect x="755" y="30" width="205" height="75" rx="10" class="node observed"/><text x="857.5" y="60.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="857.5" dy="0">业务库 B</tspan><tspan x="857.5" dy="28">导出所需数据</tspan></text><rect x="530" y="405" width="220" height="75" rx="10" class="node observed"/><text x="640.0" y="435.5" text-anchor="middle" class="node-label" font-size="19"><tspan x="640.0" dy="0">文件存储 F</tspan><tspan x="640.0" dy="28">导出结果文件</tspan></text><path d="M155,255 L200,255" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><path d="M295,220 L295,82 L450,82" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="265.6" y="136" width="118.8" height="24" rx="3" fill="#fbfcfe"/><text x="325" y="152" text-anchor="middle" class="muted" font-size="16"><tspan x="325" dy="0">创建／读取任务</tspan></text><path d="M390,255 L460,255" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="401.6" y="194" width="46.8" height="24" rx="3" fill="#fbfcfe"/><text x="425" y="210" text-anchor="middle" class="muted" font-size="16"><tspan x="425" dy="0">发送</tspan></text><path d="M650,255 L740,255" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="671.6" y="224" width="46.8" height="24" rx="3" fill="#fbfcfe"/><text x="695" y="240" text-anchor="middle" class="muted" font-size="16"><tspan x="695" dy="0">消费</tspan></text><path d="M858,220 L858,105" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="813.0" y="158" width="90.0" height="24" rx="3" fill="#fbfcfe"/><text x="858" y="174" text-anchor="middle" class="muted" font-size="16"><tspan x="858" dy="0">读业务数据</tspan></text><path d="M770,220 L770,150 L600,150 L600,120" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="622.2" y="122" width="75.6" height="24" rx="3" fill="#fbfcfe"/><text x="660" y="138" text-anchor="middle" class="muted" font-size="16"><tspan x="660" dy="0">更新状态</tspan></text><path d="M850,290 L850,442 L750,442" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="819.4" y="358" width="61.2" height="24" rx="3" fill="#fbfcfe"/><text x="850" y="374" text-anchor="middle" class="muted" font-size="16"><tspan x="850" dy="0">写文件</tspan></text><path d="M295,290 L295,442 L530,442" class="edge" fill="none" stroke="#60748d" stroke-width="2" marker-end="url(#deep-d-architecture-arrow)"/><rect x="357.75" y="408" width="94.5" height="25" rx="3" fill="#fbfcfe"/><text x="405" y="425" text-anchor="middle" class="muted" font-size="17"><tspan x="405" dy="0">读取并交付</tspan></text><text x="500" y="520" text-anchor="middle" class="muted" font-size="17"><tspan x="500" dy="0">构造案例：每条关系有演示证据，图不表达吞吐、耗时或所有任务的覆盖。</tspan></text></svg></div><figcaption>组件图解释依赖结构，图 01 解释时间顺序。本例 API 读取 F 的箭头有相应的演示实现与访问证据。</figcaption></figure>
+<p>图示是上述构造材料对应的结构，箭头表示已设定取得证据的关系，不表达吞吐、时延或所有任务的覆盖率。API、worker 分别有版本与有效配置；它们虽然来自同仓库，调查和迁移时仍需分别识别。</p>
+<p>这张图对决策的作用很具体：新入口需要接入 API 的创建、查询与下载语义；迁移评估则需要把 worker、任务库、业务库访问、消息通道和文件存储一起列入依赖。API 返回任务已创建时，新入口还需要继续查询状态；下载成功以后，业务结果是否正确仍有自己的验收条件。</p>
+<p>发现 API 与 worker 对应不同提交，并不直接意味着系统有故障。它提醒评估者：后续验证要固定这组版本及配置，或验证计划采用的另一组组合。若直接用本地 R2 同时构建两个角色，得到的是另一组运行条件，需要重新检查相关业务行为。</p>
+<p>调查还没有覆盖生产环境、其他身份、跨用户下载、大数据量、任务失败和重试。因此，本案例可以给出下面这段交付结论：</p>
+<blockquote>
+<p>已识别测试环境导出能力涉及的 API、worker、任务数据、业务数据、任务队列及文件存储依赖。按 E1—E5，测试身份的一笔小数据集导出完成了请求到结果内容的核对；观察对应 API 的 R2 制品和 worker 的 R1 制品及所记录配置。以上材料可作为接入和迁移依赖评估的输入。生产来源、跨用户权限、大数据量与失败重试尚未覆盖，会影响生产迁移与完整业务可用性的承诺，需要另行验证。</p>
+</blockquote>
+<p>这段结论同时解释了系统是什么、查清到哪一步、下一步为什么要补证。接手者可以据此调整工作范围，而无需从命令输出里重新猜测系统关系。</p>
+<p><a id="repo-branch"></a></p>
+<h2>六、交付、停止与维护：怎样判断查得够不够</h2>
+<h3>1. 交付物要同时回答结构、行为、来源和未知</h3>
+<p>一份可用的调查文档可以从简短结论开始，再给出系统职责与入口、组件关系图、关键业务路径、数据及外部依赖、运行来源、证据索引和待核实项。结构可随项目调整，读者应能沿一个结论找到它的支持材料。</p>
+<p>证据记录最好保留“下一步是什么”。例如：“生产 worker 制品来源尚未取得，影响迁移时构建版本选择；需由发布维护者提供对应制品的构建记录，再核对提交与构建输入。”这比只写“待确认版本”更容易推动后续工作。</p>
+<p>数据源记录应能区分组件、用途、环境、资源身份和访问范围；运行来源记录应能区分不同执行角色；业务路径应说明哪些环节已经观察，哪些只由代码声明支持。用户数据、凭据和内部地址按交付范围处理，必要时使用受控证据链接，公开摘要不复制秘密。</p>
+<h3>2. 停止条件跟着当前决策走</h3>
+<p>停止前把问题改写为：“如果这个未知取另一种可能的值，会改变当前决定吗？”会改变，就补证或明确限制决定；不会改变，可以保留未知并停止本轮调查。这里没有通用的“覆盖多少接口就够了”阈值。</p>
+<table>
+<thead>
+<tr>
+<th>当前任务</th>
+<th>可以支持本轮结论的材料示例</th>
+<th>应触发补证或限制结论的情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>结构导读</td>
+<td>有出处的职责、入口、候选依赖和关键路径，明确哪些未核实</td>
+<td>核心职责仍靠目录名猜测，关键执行角色遗漏</td>
+</tr>
+<tr>
+<td>接口对接评估</td>
+<td>目标入口与接口口径、身份要求、异步状态语义和结果取得方式；关键路径对应证据</td>
+<td>只取得 OpenAPI，尚不清楚任务如何完成，或鉴权条件未确认</td>
+</tr>
+<tr>
+<td>迁移依赖评估</td>
+<td>API 与 worker 等角色清单、数据与外部依赖、版本及配置来源、权限和网络需求、未知影响</td>
+<td>仍不知道某关键依赖的身份或来源，导致资源范围和版本选择可能变化</td>
+</tr>
+<tr>
+<td>生产迁移承诺</td>
+<td>在上述调查基础上，另有适配目标环境的迁移、数据一致性、业务、容量及回退验证</td>
+<td>只有旧环境成功样本，目标环境或关键失败分支尚未验证</td>
+</tr>
+</tbody></table>
+<p>表中是判断示例，不是覆盖所有项目的验收规范。具体业务可能还需要合规、成本、性能或其他条件。本文的摸底方法形成调查输入，不能用一笔成功样本替代完整的发布与迁移验证。</p>
+<p>没有生产权限仍可以完成声明地图和已有证据范围内的分析。权限本身不一定阻断结构导读；若当前决定依赖生产事实，就需要有权限的维护者提供可追溯材料，或把决定推迟到补证之后。对于纯库、离线算法或没有部署态的工具，应删减不适用的运行调查。</p>
+<h3>3. 稳定事实有维护位置，调查报告保留自己的证据时点</h3>
+<p>调查完成后，明确谁维护数据源清单、组件关系和部署来源，专项报告引用相应条目与版本。报告可以保留必要摘要和本次调查快照，以解释当时的判断；实时清单则记录当前状态。二者用途不同，需要能看出对应时点。</p>
+<p>“权威维护位置”是一项组织约定，仍需要证据和复核。发布版本、配置、路由、数据 schema 或关键依赖变化时，按受影响的关系和结论定向复查。例如，worker 更换业务库后，应重新检查资源身份、访问权限、查询条件和对应导出结果；仅修改报告日期不会更新这些证据。</p>
+<p>底账也可以交给 AI 协助更新：搜索变更、提示受影响条目、整理待核实问题。事实状态的升级仍要有相应证据，新版本的流畅说明不能覆盖旧版本留下的未知。</p>
+<p><a id="repo-boundary"></a></p>
+<h2>七、证据边界与参考资料</h2>
+<p>全文的导出服务、文件名、接口、资源与观察结果均为构造案例，用于展示调查过程。本次重写核对的是原有素材与公开机制说明，没有连接生产数据库、调用内部服务或重跑真实部署调查；不把旧素材中的事故、数量或经验结论冒充本次实测成绩。</p>
+<p>配置覆盖、接口字段、数据库可见性、追踪、镜像和构建溯源语义分别由下列公开资料支持。三阶段七步组织、事实底账、差异检查顺序和停止判断属于本文的综合方法；没有量化证明它比其他调查方法更快，也不要求所有后端都有队列、容器或分布式追踪。</p>
+<p>参考资料核对日期为 2026-10-28。Git、Kubernetes、OpenTelemetry 等持续更新页面应结合目标项目实际版本使用；OpenAPI 计数示例固定为 3.1 口径。框架与标准说明支撑的是各自机制，整体调查结论仍需要对应项目的证据。</p>
+<ol>
+<li><a href="https://docs.spring.io/spring-boot/reference/features/external-config.html">Spring Boot：Externalized Configuration</a>。支撑多配置来源与覆盖顺序；本案例的具体加载顺序为构造设定。</li>
+<li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/">Kubernetes：存活、就绪与启动探针</a>。支撑探针职责与观察范围的区别。</li>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/">Kubernetes：Deployments</a>。支撑期望态、实际状态与滚动更新期间的实例变化。</li>
+<li><a href="https://www.sei.cmu.edu/library/architecture-reconstruction-guidelines/">CMU SEI：Architecture Reconstruction Guidelines</a>。官方摘要支撑从已实现系统提取信息、逐层形成结构表示的目标；本轮未成功取得报告全文，不据此归因本文完整流程。</li>
+<li><a href="https://git-scm.com/docs/git-clone">Git：clone</a>。支撑浅克隆与历史获取选项；分支分析还受本地已有引用与更新时间影响。</li>
+<li>PostgreSQL 18：<a href="https://www.postgresql.org/docs/18/infoschema-tables.html">information_schema.tables</a> 支撑当前身份可见表与视图的语义；<a href="https://www.postgresql.org/docs/18/functions-info.html#FUNCTIONS-INFO-SESSION">会话信息函数</a> 支撑数据库与当前用户记录。其他引擎需查各自元数据与权限规则。</li>
+<li><a href="https://spec.openapis.org/oas/v3.1.1.html#path-item-object">OpenAPI 3.1.1：Path Item Object</a>。支撑 HTTP 方法字段与其他字段的区分；示例未做引用展开。</li>
+<li><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry：Traces</a>。支撑 trace、span 与异步操作关联的概念。</li>
+<li><a href="https://opentelemetry.io/docs/concepts/sampling/">OpenTelemetry：Sampling</a>。支撑未采样记录可能不被处理与导出的机制；“缺少记录不足以证明从不调用”还需结合埋点与观察范围判断。</li>
+<li><a href="https://kubernetes.io/docs/concepts/containers/images/">Kubernetes：Images</a>。支撑标签、digest 与具体镜像内容的区别。</li>
+<li><a href="https://slsa.dev/spec/v1.2/build-provenance">SLSA v1.2：Build Provenance</a>。支撑制品与构建过程、输入及源码依赖的关联模型；核验仍需匹配实际制品并判断来源可信度。</li>
+<li><a href="https://git-scm.com/docs/git-branch">Git：branch</a>。支撑 <code>--contains</code> 的分支包含语义，不用于证明部署或构建来源。</li>
+</ol>
+</article><nav class="closing-links"><a href="?view=lecture">← 返回图解讲解</a><a href="index.html">阅读目录</a></nav></section>
+<noscript><style>#deep-document[hidden]{display:block!important}.tool-controls{display:none}</style><p class="noscript-notice">未启用 JavaScript：图解、证据示例和深入全文均可直接阅读；深入全文位于图解之后。</p></noscript>
+<footer class="page-footer"><span>show-09 · v1.1 · 2026-10-28</span><span>案例为构造 · 方法未经量化效率实验 · 无远端资源依赖</span></footer><script>
+function setView(){
+ const isDeep=new URLSearchParams(location.search).get('view')==='deep';
+ document.getElementById('lecture-layout').hidden=isDeep;
+ document.getElementById('deep-document').hidden=!isDeep;
+ document.getElementById('nav-lecture').setAttribute('aria-current',isDeep?'false':'page');
+ document.getElementById('nav-deep').setAttribute('aria-current',isDeep?'page':'false');
+ if(location.hash){requestAnimationFrame(()=>{const target=document.getElementById(decodeURIComponent(location.hash.slice(1))); if(target)target.scrollIntoView({behavior:'instant',block:'start'});});}
+}
+setView();
+window.addEventListener('popstate',setView);
+window.addEventListener('hashchange',()=>{if(new URLSearchParams(location.search).get('view')==='deep')setView();});
+document.addEventListener('click',event=>{
+ const link=event.target.closest('a');
+ if(!link||!link.getAttribute('href')?.startsWith('?view='))return;
+ if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button!==0)return;
+ event.preventDefault();history.pushState({},'',link.getAttribute('href'));setView();
+ if(!location.hash)window.scrollTo({top:0,behavior:'instant'});
+});
+const buttons=Array.from(document.querySelectorAll('[data-evidence]'));
+function focusEvidence(key){
+ for(const button of buttons)button.setAttribute('aria-pressed',String(button.dataset.evidence===key));
+ for(const panel of document.querySelectorAll('.evidence-panel'))panel.hidden=panel.id!=='evidence-'+key;
+}
+for(const button of buttons)button.addEventListener('click',()=>focusEvidence(button.dataset.evidence));
+focusEvidence('spec');
+if('IntersectionObserver' in window){
+ const sections=Array.from(document.querySelectorAll('.chapter'));
+ const observer=new IntersectionObserver(entries=>{
+  for(const entry of entries){if(entry.isIntersecting){
+    for(const a of document.querySelectorAll('.toc a[href^="#"]'))a.classList.toggle('active',a.getAttribute('href')==='#'+entry.target.id);
+  }}
+ },{rootMargin:'-90px 0px -65% 0px',threshold:0});
+ for(const section of sections)observer.observe(section);
+}
+</script></body></html>

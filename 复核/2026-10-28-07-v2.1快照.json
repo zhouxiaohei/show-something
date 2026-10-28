@@ -1,0 +1,32 @@
+{
+  "captured_at": "2026-10-28T20:48:40.319864+08:00",
+  "document_id": "show-07",
+  "paired_version": "2.1-review",
+  "scope": "第07篇本地交付；不是整库验收",
+  "files": [
+    {
+      "path": "原文/文档明明写了，Agent 为什么还是答错：把知识库变成可测试接口.md",
+      "sha256": "953296d993132b94795bec054439d763abfdd7ca171da68142fbcff322556e95"
+    },
+    {
+      "path": "阅读/讲解-07-文档可测试化.html",
+      "sha256": "99d8d95aed055bdf6431887e8f316b52250949b6cd0855ec21077f64bfe48984"
+    },
+    {
+      "path": "README.md",
+      "sha256": "b25642e026b22d8a952c7d519972047b7713737bedb947e58cee075d9b98a4cf"
+    },
+    {
+      "path": "阅读/index.html",
+      "sha256": "84130f5d782afd7c87972fe4c3635f4d7b2fd239d6450664f6402dfdcfb716dc"
+    },
+    {
+      "path": "project.json",
+      "sha256": "d3ddcb5d7a416bbbdfbe2f8f588309909b86b670ba8ad1bdb4a715330bf02847"
+    },
+    {
+      "path": "复核/2026-10-28-07-v2.1检查配置.json",
+      "sha256": "223a4afd38b8cabfa28afff61bd427138784c8912480e105623a7add32715f5f"
+    }
+  ]
+}

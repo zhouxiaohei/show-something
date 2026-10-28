@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-28",
+  "viewport": {
+    "width": 1440,
+    "height": 1050
+  },
+  "offline": true,
+  "pageErrors": [],
+  "remoteRequests": [],
+  "svg": [
+    {
+      "id": "fig-sequence",
+      "title": "图 01 · 受理之后，还有后台处理和结果核对",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-planes",
+      "title": "图 02 · 材料来自四个观察面，对应关系需要查证",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-method",
+      "title": "图 03 · 从候选结构到可复查判断的调查闭环",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-config",
+      "title": "图 04 · task_db：从默认 T0 追到最终采用的 T",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-data",
+      "title": "图 05 · 观察到哪一层，结论就限定在哪一层",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-interface",
+      "title": "图 06 · 统一外部入口、内部操作与三份接口材料",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-architecture",
+      "title": "图 07 · 同一笔导出的执行角色、资源与关系",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-relations",
+      "title": "图 08 · 服务调用、任务传递和共享库，画法不同",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-provenance",
+      "title": "图 09 · 两条运行来源链，各自核实版本与配置",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-reconcile",
+      "title": "图 10 · 差异回查：对象、版本、覆盖要对应具体环节",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-ledger",
+      "title": "图 11 · 结论、条件、证据与未知一起进入底账",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    },
+    {
+      "id": "fig-maintain",
+      "title": "图 12 · 当前清单与调查快照之间保留版本关系",
+      "outside": [],
+      "collisions": [],
+      "nodeOverflow": []
+    }
+  ],
+  "interaction": {
+    "exportShown": true,
+    "specHidden": true,
+    "tcpHidden": true,
+    "pressed": "true"
+  },
+  "deep": {
+    "lectureHidden": true,
+    "deepShown": true,
+    "hash": "#repo-map",
+    "targetTop": 199.5625,
+    "headings": 7
+  },
+  "back": true,
+  "badAnchors": [],
+  "duplicateIds": [],
+  "mobileWidths": {
+    "viewport": 430,
+    "document": 430,
+    "body": 430
+  },
+  "nojs": {
+    "deepVisible": true,
+    "mainVisible": true,
+    "evidencePanels": 3
+  },
+  "deep_integrity": {
+    "deepProseMatchesMd": true,
+    "pythonCodeMatches": true,
+    "referenceLinks": 13,
+    "figureCount": 2,
+    "targetVisible": true
+  },
+  "browser_executable": "/Users/jackzhou/Library/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+  "visual_review": "人工查看桌面首屏及12图截图；手机首屏检查为补充。",
+  "sha256": {
+    "原文/读完代码，还不算了解这个系统：陌生后端的事实核验七步法.md": "d2caab60c74e6dd34e55ea31b214de4eae6a4e948cf2426776df9e56447155cf",
+    "阅读/讲解-09-项目事实核验.html": "9652f9608f630ae5e9125461a8619b61c86dbc6c39fdacca6e016d0fa0307e26"
+  }
+}

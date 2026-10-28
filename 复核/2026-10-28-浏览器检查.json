@@ -1,0 +1,61 @@
+{
+  "offline": true,
+  "viewport": "1280x900",
+  "indexCards": 9,
+  "articles": [
+    {
+      "id": "show-07",
+      "figures": 3,
+      "deepAnchors": [
+        "doc-source",
+        "doc-grader",
+        "doc-eval",
+        "doc-ci",
+        "doc-boundary"
+      ],
+      "desktopOverflow": false,
+      "mobileOverflow": false,
+      "svgTextOutOfBounds": [],
+      "pageErrors": [],
+      "requiredRemoteRequests": [],
+      "metrics": null
+    },
+    {
+      "id": "show-08",
+      "figures": 3,
+      "deepAnchors": [
+        "eval-case",
+        "eval-contract",
+        "eval-repeat",
+        "eval-trace",
+        "eval-feedback",
+        "eval-boundary"
+      ],
+      "desktopOverflow": false,
+      "mobileOverflow": false,
+      "svgTextOutOfBounds": [],
+      "pageErrors": [],
+      "requiredRemoteRequests": [],
+      "metrics": {
+        "any": "97.3%",
+        "all": "34.3%"
+      }
+    },
+    {
+      "id": "show-09",
+      "figures": 3,
+      "deepAnchors": [
+        "repo-ledger",
+        "repo-steps",
+        "repo-example",
+        "repo-boundary"
+      ],
+      "desktopOverflow": false,
+      "mobileOverflow": false,
+      "svgTextOutOfBounds": [],
+      "pageErrors": [],
+      "requiredRemoteRequests": [],
+      "metrics": null
+    }
+  ]
+}

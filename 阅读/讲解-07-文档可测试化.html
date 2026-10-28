@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="document-id" content="show-07"><meta name="document-version" content="2.1-review"><title>文档明明写了，Agent 为什么还是答错 · 项目文档的总体设计</title><style>
+:root{--ink:#243449;--muted:#66788c;--blue:#3268a8;--green:#287f6d;--amber:#ac6a16;--purple:#755ca3;--line:#dce5ef}*{box-sizing:border-box}html{scroll-behavior:auto;scroll-padding-top:24px}body{margin:0;background:#fff;color:var(--ink);font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}[hidden]{display:none!important}.wrap{max-width:1000px;margin:auto;padding:30px 30px 72px}.top{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:40px}.hero{border-left:4px solid var(--blue);padding:0 0 0 24px}.eyebrow{font-size:12px;letter-spacing:1.4px;color:var(--muted);margin:0 0 9px}h1{font-size:33px;line-height:1.45;letter-spacing:-.5px;margin:9px 0 15px}h1 small{font-size:22px;display:block;color:#536a84;font-weight:450;margin-top:8px}.hero .core{font-size:20px;font-weight:600;line-height:1.7}.hero .why{color:#536477;font-size:16px;margin-bottom:0}p{margin:0 0 17px}h2{font-size:26px;line-height:1.55;margin:0}h3{font-size:20px;line-height:1.6;margin:30px 0 13px}h4{font-size:17px;margin:0 0 10px}strong{font-weight:650}.quick{background:#edf4fd;border:1px solid #c6d8ee;border-radius:12px;padding:25px 28px;margin:32px 0}.quick h2{font-size:18px;color:var(--blue);margin-bottom:12px}.quick ol{margin:0;padding-left:23px}.quick li{margin:9px 0}.map{background:#f7f9fc;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 24px;margin:34px 0 50px}.map b{font-size:14px}.map .row{display:flex;gap:10px 18px;flex-wrap:wrap;margin:9px 0;font-size:14px}.map span{font-weight:600;min-width:58px;color:var(--muted)}.chapter{margin:60px 0;padding-top:26px;border-top:1px solid var(--line)}.chapter-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px}.number{font:600 35px/1.35 Georgia,serif;color:#9ab3cf;min-width:46px}.chapter-head .eyebrow{margin-bottom:3px}.example{background:#fff8ed;border:1px solid #ead6b7;padding:22px 26px;border-radius:12px;margin:25px 0}.example .request{font-size:19px;font-weight:550;margin-top:13px}.pill{display:inline-block;border-radius:5px;background:#f3e4cd;color:#87571a;font-size:12px;font-weight:650;padding:2px 9px}.pill.green{background:#dceee6;color:#287f6d}.small{font-size:14px;color:var(--muted)}figure{margin:29px 0 12px}.diagram{border:1px solid #e0e7ef;background:#fbfdff;border-radius:12px;overflow:hidden}.diagram svg{display:block;width:100%;height:auto;font-family:inherit;line-height:1.4}.figure-tools{text-align:right;font-size:12px;margin-bottom:6px}.figure-tools button{border:0;background:none;color:var(--blue);cursor:pointer;font:inherit;padding:3px 0 3px 12px}figcaption{font-size:14px;line-height:1.75;color:#61768f;padding:9px 2px 0}.readfig{font-size:15px;background:#f5f8fc;border-left:3px solid #b8cce3;padding:13px 17px;margin:12px 0 23px;color:#455c75}.proof{font-size:13px;margin:21px 0 0;color:#9aabba;line-height:1.7}.proof span{padding:0 7px}.analogy{background:#edf7f3;border:1px solid #c2dfd2;border-radius:12px;padding:22px 26px;margin:24px 0}.analogy h3{margin-top:0;color:#287f6d}.reasons{padding-left:24px}.reasons li{padding-left:2px;margin-bottom:14px}.boundary{border-left:3px solid #d4ad6b;background:#fff8ec;padding:15px 19px;font-size:15px;margin-top:24px}.compare-text,.task-pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}.compare-text>div,.task-pair>div{border:1px solid var(--line);border-radius:10px;padding:21px 23px;background:#f8fbfe}.compare-text p,.task-pair p{margin-bottom:0;font-size:16px}.task-pair h4{margin-top:11px}.record{border:1px solid #bbd0e8;background:#f4f8fd;border-radius:12px;padding:23px 26px;margin:25px 0}.record dl{display:grid;grid-template-columns:115px 1fr;gap:14px 20px;margin:0;font-size:16px}.record dt{font-weight:650;color:var(--blue)}.record dd{margin:0}code{background:#f0f4f8;padding:2px 5px;border-radius:4px;font-size:.9em}pre{background:#f3f6fa;padding:18px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.75}pre code{padding:0;background:none}.interview{margin:45px 0}.interview h2{font-size:23px}.exercise{border:1px solid #e1d7bd;background:#fffbf1;border-radius:10px;padding:17px 21px;margin:15px 0}.exercise summary{cursor:pointer;font-weight:600;font-size:16px}.exercise .answer{margin-top:16px;font-size:16px}.exercise .answer p{margin-bottom:12px}.exit{margin-top:46px;border-top:2px solid var(--line);padding-top:24px;font-size:14px;color:var(--muted)}.exit p{margin:9px 0}.modebar{padding:0 0 24px;font-size:14px}.deep{padding-top:8px}.deep h1{font-size:29px}.deep h2{font-size:24px;margin-top:45px;border-top:1px solid var(--line);padding-top:20px;margin-bottom:22px}.deep h3{font-size:20px}.deep a[id]{display:block;scroll-margin-top:25px}.deep blockquote{margin:20px 0;border-left:3px solid #bad0e8;padding:4px 19px;color:#66788c;font-size:15px}.deep table{border-collapse:collapse;font-size:14px;margin:22px 0;width:100%}.deep td,.deep th{padding:11px;border:1px solid #dce5ef;text-align:left}.deep th{background:#f0f5fc}.deep li{margin-bottom:10px}.deep .mermaid-source{margin:20px 0}.deep .mermaid-source summary{cursor:pointer;font-size:14px;color:var(--blue)}dialog{border:0;border-radius:12px;padding:20px;max-width:none;width:min(1460px,96vw);max-height:94vh;overflow:auto;box-shadow:0 12px 80px #162e4b44}dialog::backdrop{background:#1a2e49b8}.zoom-close{position:sticky;top:0;background:white;text-align:right;padding-bottom:10px;z-index:2}.zoom-close button{font:inherit;border:1px solid #c7d5e5;border-radius:7px;padding:5px 16px;background:#f5f8fc;cursor:pointer}#zoom-body svg{display:block;width:100%;height:auto}#zoom-caption{font-size:15px;color:var(--muted);margin:12px 0 0}.noscript{padding:16px;border:1px solid #ddcaa7;background:#fff8eb;font-size:14px}@media(min-width:1400px){.wrap{max-width:1040px;padding-left:45px;padding-right:45px}}@media(max-width:650px){body{font-size:16px}.wrap{padding:22px 16px 50px}.top{margin-bottom:28px}h1{font-size:27px}h1 small{font-size:20px}.hero{padding-left:17px}.hero .core{font-size:18px}.quick{padding:20px}.map{padding:16px}.chapter{margin:40px 0}.chapter-head{gap:12px}h2{font-size:23px}.number{font-size:29px;min-width:36px}.compare-text,.task-pair{grid-template-columns:1fr}.record{padding:20px}.record dl{grid-template-columns:1fr;gap:5px}.record dd{margin-bottom:14px}.deep table{display:block;overflow:auto}.deep h1{font-size:25px}}
+</style></head>
+<body><div class="wrap"><nav class="top"><a href="index.html">← 阅读目录</a><span id="mode-status">讲解版 · v2.1</span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md">Markdown 正本</a></nav>
+<main id="lecture"><header class="hero"><p class="eyebrow">07 / 项目文档的组织、使用与持续维护</p><h1>文档明明写了，Agent 为什么还是答错？<small>从背景难点到总设计，再把一次判断走透</small></h1><p class="core">一套有效的文档体系，要同时做到：知识有归属、资料能取得、使用可检查、变化有人维护。</p><p class="why">如果你已经有很多文档，却仍要每次替 Agent 指路、纠正版本和解释限制，这篇用同一个导出任务，把四部分怎样配合讲清楚。先看整体设计，再看具体机制；不需要先懂检索系统或评测框架。</p></header>
+<section class="quick"><h2>30 秒版</h2><ol><li><b>文件齐全不是终点。</b>保存、找到、取得适用内容、作对判断，各有不同责任。</li><li><b>总方案是四部分协作。</b>知识正本负责说明与依据；阅读导航负责取得；使用验证检查过程与结果；变更维护处理依赖与修订。</li><li><b>单写多视图统一易变事实。</b>不同阅读任务可以用不同入口，历史解释与合理项目差异不该被全部抹平。</li><li><b>检查不只考一个数字。</b>找到60秒，不等于知道该不该取消；引用、数值、版本和操作条件要分别核对。</li></ol></section>
+<nav class="map" aria-label="文章阅读路径"><b>阅读路线：先看整体，再展开，再检验</b><div class="row"><span>看全局</span><a href="#background">01 背景难点</a><a href="#approach">02 解决思路</a><a href="#overview">03 总体方案</a></div><div class="row"><span>看设计</span><a href="#ownership">04 知识正本</a><a href="#navigation">05 阅读导航</a><a href="#verification">06 使用验证</a><a href="#maintenance">07 变更维护</a></div><div class="row"><span>验方案</span><a href="#case-study">08 完整案例</a><a href="#start">09 怎样起步</a><a href="#exercises">变条件追问</a></div></nav><section class="chapter" id="background"><div class="chapter-head"><span class="number">01</span><div><p class="eyebrow">先明确要解决的协作问题</p><h2>背景与难点：文档写全了，为什么还需要人一直指路？</h2></div></div>
+<p>团队把排障、架构、操作规则整理进了仓库。新同事查得到，链接检查也通过。接入编码 Agent 以后，却又开始重复提醒：“看当前版本，不是历史复盘”“这条只适用于测试环境”“客户端超时不等于后台失败”。人重新成为资料路由器和版本裁判。</p>
+<p>这时，要检查的不只是文章写得是否通顺，还包括：<strong>适用知识怎样从维护者那里，经过文档，进入一次具体判断。</strong>保存、取得、理解、持续更新，各有自己的责任。</p>
+<div class="example"><span class="pill">贯穿案例 · 构造示例</span><p class="request">“生产环境 release-2，导出任务 J17 已运行45秒，状态仍是 running。现在该取消，还是重新提交？”</p><p>Agent 回答：“已经超过30秒，建议终止后重试。”</p><p class="small">此刻只知道它这样回答；当前规则和读取过程都尚待核对。不要先把“读了旧文档”当作已经查明的根因。</p></div>
+<figure id="fig-question"><div class="diagram"><svg viewBox="0 0 940 337" role="img" aria-labelledby="fig-question-title"><title id="fig-question-title">同一句操作问题，需要三类适用信息一起支撑。</title><rect x="40" y="20" width="860" height="73" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="470.0" y="62.5" text-anchor="middle" font-size="20" font-weight="600" fill="#243449">J17 运行45秒、状态 running：该取消，还是重新提交？</text><line x1="470" y1="93" x2="160" y2="145" stroke="#b6c6d8" stroke-width="2"/><polygon points="160.0,145.0 166.5,140.4 167.7,147.2" fill="#b6c6d8"/><rect x="35" y="153" width="250" height="110" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="160.0" y="183" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">范围</text><text x="160.0" y="209" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">哪一环境、哪一版本？</text><text x="160.0" y="232" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">历史规则能用在这里吗？</text><line x1="470" y1="93" x2="470" y2="145" stroke="#b6c6d8" stroke-width="2"/><polygon points="470.0,145.0 466.5,137.8 473.5,137.8" fill="#b6c6d8"/><rect x="345" y="153" width="250" height="110" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="470.0" y="183" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">语义</text><text x="470.0" y="209" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">超时结束的是什么？</text><text x="470.0" y="232" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">等待结束 ≠ 后台失败</text><line x1="470" y1="93" x2="780" y2="145" stroke="#b6c6d8" stroke-width="2"/><polygon points="780.0,145.0 772.3,147.2 773.5,140.4" fill="#b6c6d8"/><rect x="655" y="153" width="250" height="110" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="780.0" y="183" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">动作条件</text><text x="780.0" y="209" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">取消是否明确授权？</text><text x="780.0" y="232" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">重提是否符合策略？</text><text x="470" y="307" text-anchor="middle" font-size="18" font-weight="600" fill="#ac6a16">单独找到一个“30秒”，还不足以支持这次操作判断</text></svg></div><figcaption>图 1 · 同一句操作问题，需要三类适用信息一起支撑。</figcaption></figure><p class="readfig">沿三条分支看：参数值只是材料之一。环境不对、语义混淆、动作条件缺失，都可能让一个看似有依据的建议出错；它们不能靠“多读几篇”统一解决。</p>
+<h3>这不是一个“把数字写清楚”就能解决的问题</h3>
+<p>有四个互相牵连的难点。第一，同一知识既要支持快速查询，也要支持理解与操作判断；第二，一个文档正本可能仍然过期；第三，文件存在不等于进入了本次可用上下文；第四，变更会跨越策略、教程、题库和多个项目。</p>
+<p>因此，给不同读者各抄一份、把全部内容塞进上下文、要求每次认真读资料，都只能覆盖其中一部分。要先设计这些职责如何协作，再决定文件怎样组织。</p>
+<p class="proof"><a href="?view=deep#doc-case">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-case">Markdown 定位</a></p>
+</section><section class="chapter" id="approach"><div class="chapter-head"><span class="number">02</span><div><p class="eyebrow">选择与代价</p><h2>解决思路：把知识归属、消费、验证、维护分开设计</h2></div></div>
+<p>方案需要回答四个问题：一个重要事实由谁维护、凭什么成立；遇到这个任务怎样取得它；怎样检查实际使用；变化之后谁复核什么。它们长期并存，不是做完一次就结束的四步流程。</p>
+<figure id="fig-options"><div class="diagram"><svg viewBox="0 0 940 298" role="img" aria-labelledby="fig-options-title"><title id="fig-options-title">三个直接办法，各自留下了一个没被处理的责任。</title><text x="155" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#243449">全部一次性塞入</text><text x="470" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#243449">人版 / 模型版各写一份</text><text x="785" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#243449">只看最终通过率</text><rect x="35" y="60" width="240" height="130" rx="4" fill="white" stroke="#d6dfe9"/><rect x="35" y="60" width="240" height="30" rx="4" fill="#f7f9fc"/><text x="49" y="81" text-anchor="start" font-size="14" font-weight="600" fill="gray">一份巨大上下文</text><text x="50" y="116" text-anchor="start" font-size="14" font-weight="400" fill="#243449">当前策略 + 历史案例</text><text x="50" y="140" text-anchor="start" font-size="14" font-weight="400" fill="#243449">测试规则 + 生产配置</text><text x="50" y="164" text-anchor="start" font-size="14" font-weight="400" fill="#243449">每次都要裁决适用范围</text><line x1="155" y1="192" x2="155" y2="232" stroke="#b6c6d8" stroke-width="2"/><polygon points="155.0,232.0 151.5,224.8 158.5,224.8" fill="#b6c6d8"/><rect x="30.0" y="247" width="250" height="26" rx="5" fill="#fff6e8" stroke="#e7cc9f"/><text x="155" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="#ac6a16">归属与过期仍未解决</text><rect x="350" y="60" width="115" height="130" rx="4" fill="white" stroke="#b4dccc"/><rect x="350" y="60" width="115" height="30" rx="4" fill="#edf8f3"/><text x="364" y="81" text-anchor="start" font-size="14" font-weight="600" fill="#287f6d">人版</text><text x="365" y="116" text-anchor="start" font-size="14" font-weight="400" fill="#243449">30 → 60</text><text x="365" y="140" text-anchor="start" font-size="14" font-weight="400" fill="#243449">手工更新</text><rect x="485" y="60" width="115" height="130" rx="4" fill="white" stroke="#e6b7b1"/><rect x="485" y="60" width="115" height="30" rx="4" fill="#fff0ee"/><text x="499" y="81" text-anchor="start" font-size="14" font-weight="600" fill="#b84848">模型版</text><text x="500" y="116" text-anchor="start" font-size="14" font-weight="400" fill="#243449">30</text><text x="500" y="140" text-anchor="start" font-size="14" font-weight="400" fill="#243449">漏同步</text><line x1="467" y1="125" x2="484" y2="125" stroke="#b84848" stroke-width="2" stroke-dasharray="6 5"/><polygon points="484.0,125.0 476.8,128.5 476.8,121.5" fill="#b84848"/><rect x="350.0" y="247" width="250" height="26" rx="5" fill="#fff0ee" stroke="#e6b7b1"/><text x="475" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="#b84848">重复维护当前事实</text><rect x="665" y="60" width="240" height="66" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="785.0" y="99.0" text-anchor="middle" font-size="17" font-weight="600" fill="#287f6d">答题：总体通过</text><rect x="665" y="142" width="240" height="70" rx="4" fill="white" stroke="#e7cc9f"/><rect x="665" y="142" width="240" height="30" rx="4" fill="#fff6e8"/><text x="679" y="163" text-anchor="start" font-size="14" font-weight="600" fill="#ac6a16">仍未回答</text><text x="680" y="198" text-anchor="start" font-size="14" font-weight="400" fill="#243449">错在正本、入口还是解释？</text><rect x="660.0" y="247" width="250" height="26" rx="5" fill="#fff6e8" stroke="#e7cc9f"/><text x="785" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="#ac6a16">分数不能替代归因</text></svg></div><figcaption>图 2 · 三个直接办法，各自留下了一个没被处理的责任。</figcaption></figure><p class="readfig">比较的重点是责任缺口，不是宣布这些办法不能用：资料少时可以直接提供；确有需要时可以生成双视图。但若事实更新、范围裁决或错误归因仍无人负责，就不能把局部便利当作完整方案。</p>
+<p>本文采用的原则是：<strong>易变事实有明确归属，阅读任务可以有多种入口；检查对象分开，变化按依赖处理。</strong>这样才能把“发现错误”转换成“知道该修哪里”。</p>
+<p>它也有代价：导航要维护，适用范围要声明，关键任务要复查，改动要有人认领。对于资料很少的小项目，一份清楚的参考与几个关键检查可能已经足够，不必先搭建庞大的治理平台。</p>
+<p class="proof"><a href="?view=deep#doc-approach">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-approach">Markdown 定位</a></p>
+</section><section class="chapter" id="overview"><div class="chapter-head"><span class="number">03</span><div><p class="eyebrow">总体分工与关系</p><h2>总体方案：先看四部分怎样构成一个整体</h2></div></div>
+<div class="analogy"><h3>把它想成一套会更新的门店运营手册</h3><p>总部批准的规则，需要有正式记录；店员接到具体问题，需要知道去哪里查；情景演练检查他是否用对；规则变化时，维护者要更新相关说明。不同门店可以共用检查方法，但营业条件并不必须相同。</p><p>对应到项目文档，就是<strong>知识正本、阅读与导航、使用验证、变更维护</strong>。类比帮助看职责：Agent 怎样搜索和读取、真实工具怎样控制权限，仍需按软件系统实际设计，不能靠门店经验类推。</p></div>
+<figure id="fig-overview"><div class="diagram"><svg viewBox="0 0 940 631" role="img" aria-labelledby="fig-overview-title"><title id="fig-overview-title">总设计：知识怎样被消费，缺口和变化又怎样回到维护。</title><rect x="260" y="18" width="420" height="70" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="470.0" y="48" text-anchor="middle" font-size="17" font-weight="600" fill="#243449">外部依据：代码 / 配置 / 协议 / 决策</text><text x="470.0" y="74" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">需要核实对应版本与环境</text><rect x="65" y="140" width="330" height="84" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="230.0" y="170" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">① 知识正本</text><text x="230.0" y="196" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">事实、策略、来源、范围</text><rect x="545" y="140" width="330" height="84" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="710.0" y="170" text-anchor="middle" font-size="17" font-weight="600" fill="#287f6d">② 阅读与导航</text><text x="710.0" y="196" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">入口、导读、链接、派生视图</text><rect x="545" y="310" width="330" height="80" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="710.0" y="340" text-anchor="middle" font-size="17" font-weight="600" fill="#243449">实际使用</text><text x="710.0" y="366" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">人阅读 / Agent 搜索、读取、判断</text><rect x="65" y="310" width="330" height="80" rx="10" fill="#fff6e8" stroke="#e7cc9f"/><text x="230.0" y="340" text-anchor="middle" font-size="17" font-weight="600" fill="#ac6a16">③ 使用验证</text><text x="230.0" y="366" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">读取证据、结论、外部判据</text><rect x="265" y="490" width="410" height="80" rx="10" fill="#f4f0fa" stroke="#d2c4e6"/><text x="470.0" y="520" text-anchor="middle" font-size="17" font-weight="600" fill="#755ca3">④ 变更维护</text><text x="470.0" y="546" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">影响范围、负责人、复核与修订</text><line x1="390" y1="88" x2="230" y2="138" stroke="#3268a8" stroke-width="2"/><polygon points="230.0,138.0 235.8,132.5 237.9,139.2" fill="#3268a8"/><rect x="226.0" y="99" width="112" height="26" rx="5" fill="#edf4fd" stroke="#b9d0ec"/><text x="282" y="117" text-anchor="middle" font-size="13" font-weight="600" fill="#3268a8">支撑说明</text><line x1="545" y1="181" x2="397" y2="181" stroke="#287f6d" stroke-width="2"/><polygon points="397.0,181.0 404.2,177.5 404.2,184.5" fill="#287f6d"/><rect x="411.0" y="145" width="118" height="26" rx="5" fill="#edf8f3" stroke="#b4dccc"/><text x="470" y="163" text-anchor="middle" font-size="13" font-weight="600" fill="#287f6d">引用 / 生成</text><line x1="710" y1="225" x2="710" y2="308" stroke="#287f6d" stroke-width="2"/><polygon points="710.0,308.0 706.5,300.8 713.5,300.8" fill="#287f6d"/><rect x="718.0" y="251" width="106" height="26" rx="5" fill="#edf8f3" stroke="#b4dccc"/><text x="771" y="269" text-anchor="middle" font-size="13" font-weight="600" fill="#287f6d">引导取得</text><line x1="545" y1="350" x2="397" y2="350" stroke="#ac6a16" stroke-width="2"/><polygon points="397.0,350.0 404.2,346.5 404.2,353.5" fill="#ac6a16"/><rect x="418.0" y="315" width="104" height="26" rx="5" fill="#fff6e8" stroke="#e7cc9f"/><text x="470" y="333" text-anchor="middle" font-size="13" font-weight="600" fill="#ac6a16">留下记录</text><line x1="230" y1="225" x2="230" y2="308" stroke="#3268a8" stroke-width="2"/><polygon points="230.0,308.0 226.5,300.8 233.5,300.8" fill="#3268a8"/><rect x="247.0" y="252" width="104" height="26" rx="5" fill="#edf4fd" stroke="#b9d0ec"/><text x="299" y="270" text-anchor="middle" font-size="13" font-weight="600" fill="#3268a8">被测说明</text><path d="M260 53 H48 V350 H63" fill="none" stroke="#3268a8" stroke-width="2"/><polygon points="63.0,350.0 55.8,353.5 55.8,346.5" fill="#3268a8"/><rect x="77.0" y="90" width="148" height="26" rx="5" fill="#edf4fd" stroke="#b9d0ec"/><text x="151" y="108" text-anchor="middle" font-size="13" font-weight="600" fill="#3268a8">独立核对判据</text><line x1="230" y1="391" x2="354" y2="488" stroke="#755ca3" stroke-width="2" stroke-dasharray="6 5"/><polygon points="354.0,488.0 346.2,486.3 350.5,480.8" fill="#755ca3"/><rect x="207.0" y="430" width="104" height="26" rx="5" fill="#f4f0fa" stroke="#d2c4e6"/><text x="259" y="448" text-anchor="middle" font-size="13" font-weight="600" fill="#755ca3">反馈缺口</text><path d="M265 529 H27 V181 H63" fill="none" stroke="#755ca3" stroke-width="2" stroke-dasharray="6 5"/><polygon points="63.0,181.0 55.8,184.5 55.8,177.5" fill="#755ca3"/><rect x="42.0" y="442" width="102" height="26" rx="5" fill="#f4f0fa" stroke="#d2c4e6"/><text x="93" y="460" text-anchor="middle" font-size="13" font-weight="600" fill="#755ca3">复核正本</text><path d="M675 529 H913 V181 H877" fill="none" stroke="#755ca3" stroke-width="2" stroke-dasharray="6 5"/><polygon points="877.0,181.0 884.2,177.5 884.2,184.5" fill="#755ca3"/><rect x="792.0" y="442" width="102" height="26" rx="5" fill="#f4f0fa" stroke="#d2c4e6"/><text x="843" y="460" text-anchor="middle" font-size="13" font-weight="600" fill="#755ca3">修订入口</text><path d="M680 53 H923 V529 H677" fill="none" stroke="#755ca3" stroke-width="2" stroke-dasharray="6 5"/><polygon points="677.0,529.0 684.2,525.5 684.2,532.5" fill="#755ca3"/><rect x="734.0" y="59" width="180" height="26" rx="5" fill="#f4f0fa" stroke="#d2c4e6"/><text x="824" y="77" text-anchor="middle" font-size="13" font-weight="600" fill="#755ca3">依据变化也触发维护</text><text x="470" y="605" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">实线：使用与依据关系    虚线：变更与修订关系；不是请求执行时序</text></svg></div><figcaption>图 3 · 总设计：知识怎样被消费，缺口和变化又怎样回到维护。</figcaption></figure><p class="readfig">先看右半边：导航让使用者取得资料。再看左半边：正本是被测说明，验证判据还须独立核对代码、配置等适用依据，不能让被测文档替自己作证。最后沿紫色虚线看回路——既可以由失败反馈触发，也可以由依据变化主动触发，不能只等答错。</p>
+<h3>四部分分别拥有自己的对象</h3>
+<p><strong>知识正本</strong>维护事实、策略、来源与适用范围；<strong>阅读与导航</strong>维护任务入口、导读和派生视图；<strong>使用验证</strong>维护任务、记录、参考依据与判据；<strong>变更维护</strong>维护依赖、负责人、版本状态及升级方式。</p>
+<p>这不是要求四个独立服务或四套文件夹。同一篇解释可以是某项设计理由的正本，又通过链接指向参数正本。需要清楚的是每项知识归谁、怎样被取得、出问题后修什么。</p>
+<h3>三个边界，决定这张图有没有意义</h3>
+<ul class="reasons"><li><b>正本与事实依据分开：</b>文件被指定为权威说明，不代表生产一定如此。重要事实仍要追到相应环境和版本的依据。</li><li><b>内容与入口分开：</b>导航帮助找到规则，不再保存另一套当前参数；历史解释也不能自动取得当前操作策略的地位。</li><li><b>建议与执行分开：</b>文档说明可以怎样做，真实工具仍在动作时检查权限与状态。</li></ul>
+<p>接下来的四节分别展开这四部分。完整的 J17 调查放在设计之后，用它检查方案能否支撑实际判断。</p>
+<p class="proof"><a href="?view=deep#doc-overview">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-overview">Markdown 定位</a></p>
+</section><section class="chapter" id="ownership"><div class="chapter-head"><span class="number">04</span><div><p class="eyebrow">展开设计 ①</p><h2>知识正本：先确定归属，才能谈准确与更新</h2></div></div>
+<p>“这份 Markdown 是正本”回答的是团队在哪里维护说明；“为什么相信这个值”回答的是事实依据。两者需要关联。运行配置要核对环境，操作策略要有明确的负责人与确认依据，设计解释要保留当时的选择及约束。</p>
+<p>所以，一个重要知识条目不能只剩一句“超时60秒”。还要能追问：这是哪个等待？适用哪个版本和环境？谁核验了它？与后台任务状态是什么关系？这些条件决定了它能否支持用户的问题。</p>
+<figure id="fig-routing"><div class="diagram"><svg viewBox="0 0 940 500" role="img" aria-labelledby="fig-routing-title"><title id="fig-routing-title">归属由用途与变化决定，不由“给AI看”三个字决定。</title><text x="285" y="31" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">一条新知识</text><text x="730" y="31" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">应归属的对象与维护方式</text><rect x="20" y="58" width="505" height="70" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="272.5" y="99.0" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">“操作建议前，先核对环境与版本”</text><line x1="526" y1="93" x2="568" y2="93" stroke="#287f6d" stroke-width="2"/><polygon points="568.0,93.0 560.8,96.5 560.8,89.5" fill="#287f6d"/><rect x="575" y="58" width="345" height="70" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="747.5" y="88" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">项目指令入口</text><text x="747.5" y="114" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">相关任务开始前获得；不复制参数</text><rect x="20" y="153" width="505" height="70" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="272.5" y="194.0" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">“release-2 生产客户端最多等待60秒”</text><line x1="526" y1="188" x2="568" y2="188" stroke="#3268a8" stroke-width="2"/><polygon points="568.0,188.0 560.8,191.5 560.8,184.5" fill="#3268a8"/><rect x="575" y="153" width="345" height="70" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="747.5" y="183" text-anchor="middle" font-size="16" font-weight="600" fill="#3268a8">项目事实 / 策略正本</text><text x="747.5" y="209" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">按需读取；随环境与策略复核</text><rect x="20" y="248" width="505" height="70" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="272.5" y="289.0" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">“为什么延长等待，为什么不直接重提”</text><line x1="526" y1="283" x2="568" y2="283" stroke="#ac6a16" stroke-width="2"/><polygon points="568.0,283.0 560.8,286.5 560.8,279.5" fill="#ac6a16"/><rect x="575" y="248" width="345" height="70" rx="10" fill="#fff6e8" stroke="#e7cc9f"/><text x="747.5" y="278" text-anchor="middle" font-size="16" font-weight="600" fill="#ac6a16">设计解释 / 决策记录</text><text x="747.5" y="304" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">保留理由与适用背景</text><rect x="20" y="343" width="505" height="70" rx="10" fill="#f7f9fc" stroke="#d6dfe9"/><text x="272.5" y="384.0" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">“我偏好用表格汇报；本次怀疑是旧规则”</text><line x1="526" y1="378" x2="568" y2="378" stroke="#755ca3" stroke-width="2"/><polygon points="568.0,378.0 560.8,381.5 560.8,374.5" fill="#755ca3"/><rect x="575" y="343" width="345" height="70" rx="10" fill="#f4f0fa" stroke="#d2c4e6"/><text x="747.5" y="373" text-anchor="middle" font-size="16" font-weight="600" fill="#755ca3">个人偏好 / 临时记录</text><text x="747.5" y="399" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">不自动升级为团队项目事实</text><text x="470" y="473" text-anchor="middle" font-size="15" font-weight="600" fill="#ac6a16">当前任务状态要按需查询；不要把“J17仍在运行”存成永久项目事实</text></svg></div><figcaption>图 4 · 归属由用途与变化决定，不由“给AI看”三个字决定。</figcaption></figure><p class="readfig">注意第二行与第一行的区别：60秒由项目资料维护，“先核对正本”才是入口规则。把参数放进某个人的私人记忆，换一位协作者就可能丢失；把临时猜测写成团队事实，则可能让错误长期流通。</p>
+<h3>既不要抄全代码，也不要把必要的说明都删掉</h3>
+<p>已经由接口定义生成的字段清单，可以引用或生成阅读视图；另起一份手写全表，会增加同步对象。但新人需要模块边界，使用者需要契约，团队还需要记录“为什么不选另一种方案”。“代码里能看出来就绝不写”同样会丢掉有用知识。</p>
+<p>可用的判断是：这段内容帮助完成什么任务，它的维护方式能否承受变化速度。<strong>当前任务状态</strong>尤其不适合写成永久事实：文档说明怎样取得状态与怎样解释它，J17此刻是否仍在运行，则要看当前获授权的查询。</p>
+<p class="boundary">项目指令是否加载、在哪个范围生效，取决于具体 Agent 和配置。看见某个约定文件名，不能代替检查实际加载行为。</p>
+<p class="proof"><a href="?view=deep#doc-source">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-source">Markdown 定位</a></p>
+</section><section class="chapter" id="navigation"><div class="chapter-head"><span class="number">05</span><div><p class="eyebrow">展开设计 ②</p><h2>阅读与导航：单写多视图，解决的是双写与取得问题</h2></div></div>
+<p>人和 Agent 都可能要查参数，也都可能要理解理由。把读者固定成“人看长文、AI看字段”，会掩盖真正差异：<strong>这次阅读是在查询、理解，还是准备作决定。</strong></p>
+<p>参考页维护当前范围下的规则，解释保留背景与取舍，入口把任务指向合适材料。这样的多视图不等于手工维护两份真相。</p>
+<figure id="fig-copies"><div class="diagram"><svg viewBox="0 0 940 388" role="img" aria-labelledby="fig-copies-title"><title id="fig-copies-title">双写的风险来自独立维护同一项当前事实，历史引用不属于同一种重复。</title><text x="220" y="30" text-anchor="middle" font-size="19" font-weight="600" fill="#b84848">三处独立维护当前值</text><text x="705" y="30" text-anchor="middle" font-size="19" font-weight="600" fill="#287f6d">一个正本，多种入口</text><line x1="470" y1="40" x2="470" y2="320" stroke="#d6dfe9"/><rect x="50" y="65" width="340" height="68" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="220.0" y="95" text-anchor="middle" font-size="16" font-weight="600" fill="#3268a8">参数参考</text><text x="220.0" y="121" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">60秒：已更新</text><rect x="50" y="155" width="340" height="68" rx="10" fill="#fff0ee" stroke="#e6b7b1"/><text x="220.0" y="185" text-anchor="middle" font-size="16" font-weight="600" fill="#b84848">排障教程</text><text x="220.0" y="211" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">30秒：漏更新</text><rect x="50" y="245" width="340" height="68" rx="10" fill="#fff0ee" stroke="#e6b7b1"/><text x="220.0" y="275" text-anchor="middle" font-size="16" font-weight="600" fill="#b84848">项目指令</text><text x="220.0" y="301" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">30秒：漏更新</text><rect x="545" y="65" width="320" height="75" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="705.0" y="95" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">当前策略正本</text><text x="705.0" y="121" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">production / release-2 / 60秒</text><rect x="520" y="235" width="175" height="70" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="607.5" y="265" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">排障解释</text><text x="607.5" y="291" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">何时读取正本</text><rect x="725" y="235" width="175" height="70" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="812.5" y="265" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">任务入口</text><text x="812.5" y="291" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">指向适用策略</text><line x1="610" y1="234" x2="650" y2="142" stroke="#287f6d" stroke-width="2"/><polygon points="650.0,142.0 650.3,150.0 643.9,147.2" fill="#287f6d"/><line x1="810" y1="234" x2="770" y2="142" stroke="#287f6d" stroke-width="2"/><polygon points="770.0,142.0 776.1,147.2 769.7,150.0" fill="#287f6d"/><rect x="597.0" y="171" width="220" height="26" rx="5" fill="#edf8f3" stroke="#b4dccc"/><text x="707" y="189" text-anchor="middle" font-size="13" font-weight="600" fill="#287f6d">链接，而非再填当前值</text><text x="470" y="359" text-anchor="middle" font-size="15" font-weight="400" fill="#66788c">历史复盘仍可写“当时30秒”；它应明确版本，不与当前规则争权威</text></svg></div><figcaption>图 5 · 双写的风险来自独立维护同一项当前事实，历史引用不属于同一种重复。</figcaption></figure><p class="readfig">看左侧红色两项：出错不是因为出现了多个“30”，而是它们仍被当作当前值。右侧让解释与入口保留自己的职责；参数变化时，不再要求三个作者各自记住改数字。</p>
+<h3>同一原则，也有两种合理实现</h3>
+<p>在能够继续读文件的工作区里，指南可以链接正本，并说明哪些问题必须继续追溯。对于独立分发的手册，只给一个使用者打不开的链接没有帮助，可以按版本生成必需片段，同时管理来源与失效。</p>
+<figure id="fig-views"><div class="diagram"><svg viewBox="0 0 940 389" role="img" aria-labelledby="fig-views-title"><title id="fig-views-title">多视图可以链接，也可以生成；使用条件决定该承担哪种维护成本。</title><text x="240" y="30" text-anchor="middle" font-size="18" font-weight="600" fill="#287f6d">在线导航 / 可继续读取目标</text><text x="710" y="30" text-anchor="middle" font-size="18" font-weight="600" fill="#3268a8">独立分发 / 不能依赖继续跳转</text><rect x="45" y="65" width="360" height="70" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="225.0" y="95" text-anchor="middle" font-size="17" font-weight="600" fill="#287f6d">排障指南：遇到取消问题</text><text x="225.0" y="121" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">读取对应版本的策略正本</text><line x1="225" y1="137" x2="225" y2="193" stroke="#287f6d" stroke-width="2"/><polygon points="225.0,193.0 221.5,185.8 228.5,185.8" fill="#287f6d"/><rect x="45" y="200" width="360" height="112" rx="4" fill="white" stroke="#b9d0ec"/><rect x="45" y="200" width="360" height="30" rx="4" fill="#edf4fd"/><text x="59" y="221" text-anchor="start" font-size="14" font-weight="600" fill="#3268a8">策略正本</text><text x="60" y="256" text-anchor="start" font-size="14" font-weight="400" fill="#243449">版本、环境、等待与动作条件</text><text x="60" y="280" text-anchor="start" font-size="14" font-weight="400" fill="#243449">代价：多一次导航与目标访问</text><rect x="535" y="65" width="360" height="112" rx="4" fill="white" stroke="#b9d0ec"/><rect x="535" y="65" width="360" height="30" rx="4" fill="#edf4fd"/><text x="549" y="86" text-anchor="start" font-size="14" font-weight="600" fill="#3268a8">生成手册：导读 + 必需策略</text><text x="550" y="121" text-anchor="start" font-size="14" font-weight="400" fill="#243449">derived-from: policy@release-2</text><text x="550" y="145" text-anchor="start" font-size="14" font-weight="400" fill="#243449">内容随构建生成，不手工双写</text><line x1="715" y1="178" x2="715" y2="225" stroke="#3268a8" stroke-width="2"/><polygon points="715.0,225.0 711.5,217.8 718.5,217.8" fill="#3268a8"/><rect x="535" y="232" width="360" height="80" rx="10" fill="#fff6e8" stroke="#e7cc9f"/><text x="715.0" y="262" text-anchor="middle" font-size="17" font-weight="600" fill="#ac6a16">来源变化 → 重建或标旧版本</text><text x="715.0" y="288" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">代价：构建、来源登记与失效检查</text><text x="470" y="359" text-anchor="middle" font-size="16" font-weight="600" fill="#ac6a16">“有链接”不等于目标已被读取；“是缓存”也不等于自动保持新鲜</text></svg></div><figcaption>图 6 · 多视图可以链接，也可以生成；使用条件决定该承担哪种维护成本。</figcaption></figure><p class="readfig">两条路线都能合理。真正要问的是：使用者能否继续读取目标？分发副本怎样识别所用版本？若这两件事没有设计，单一正本只是目录上的承诺，关键条件仍可能在实际阅读中缺席。</p>
+<h3>好的入口帮助选择依据，而不只是列出路径</h3>
+<div class="compare-text"><div><h4>只有目录</h4><p>“资料见 docs，共200篇。”</p></div><div><h4>按任务导航</h4><p>“涉及导出超时、取消或重提：核对环境与版本，读取对应操作策略；历史案例只用于解释。”</p></div></div>
+<p>后一种入口没有再次抄“60秒”，却告诉使用者什么时候不能依赖一段历史描述。具体工具可以直接搜索正本，也可以沿导读取得它，不必强制唯一的调用顺序。</p>
+<p>这里讨论的是<strong>本地项目文件导航</strong>，不默认有向量库。需要观察搜索词、候选路径、实际读到的片段和回答。命中文件只是找到了候选；若关键条件还在链接目标、被截断的段落或无权访问的文件里，它们并没有自动成为本次判断的依据。</p>
+<p>代价也真实存在：链接可能失效，探索需要时间，导航过细可能增加跳转。应从使用记录发现哪里漏读、哪里负担过重，再修改组织，而不是宣布某种目录天然适合所有模型。</p>
+<p class="proof"><a href="?view=deep#doc-views">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-views">Markdown 定位</a></p><p class="proof"><a href="?view=deep#doc-navigation">深入版：从入口到实际读取 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-navigation">Markdown 定位</a></p>
+</section><section class="chapter" id="verification"><div class="chapter-head"><span class="number">06</span><div><p class="eyebrow">展开设计 ③</p><h2>使用验证：分清资料还对不对、回答有没有据、动作是否成立</h2></div></div>
+<p>关键任务可以整理成一组经过审核、可重复使用的题目，称为黄金题库（golden dataset），用来检查文档与 Agent 组合能否支持这些任务。但参考答案也需要独立核对。如果待测文档和标准答案一起抄错，模型越忠实，分数反而可能越好。</p>
+<p>至少分开三个对象：事实是否仍符合相应环境与版本的依据；回答是否得到实际取得资料的支持；建议或行动是否满足任务与策略。</p>
+<figure id="fig-checks"><div class="diagram"><svg viewBox="0 0 940 406" role="img" aria-labelledby="fig-checks-title"><title id="fig-checks-title">数值正确、数值有适用依据、操作判断成立，需要分别检查。</title><text x="300" y="31" text-anchor="middle" font-size="17" font-weight="600" fill="#243449">同一类问题的几种表现（构造）</text><text x="625" y="31" text-anchor="middle" font-size="15" font-weight="600" fill="#243449">当前数值</text><text x="742" y="31" text-anchor="middle" font-size="15" font-weight="600" fill="#243449">数值依据</text><text x="855" y="31" text-anchor="middle" font-size="15" font-weight="600" fill="#243449">动作建议</text><rect x="20" y="58" width="900" height="57" rx="7" fill="#f7f9fc" stroke="#e0e7ef"/><text x="42" y="93" text-anchor="start" font-size="16" font-weight="400" fill="#243449">读旧片段“30” → 回答当前30秒</text><text x="625" y="94" text-anchor="middle" font-size="23" font-weight="600" fill="#b84848">×</text><text x="742" y="94" text-anchor="middle" font-size="23" font-weight="600" fill="#b84848">×</text><text x="855" y="94" text-anchor="middle" font-size="23" font-weight="600" fill="#66788c">—</text><rect x="20" y="129" width="900" height="57" rx="7" fill="#f7f9fc" stroke="#e0e7ef"/><text x="42" y="164" text-anchor="start" font-size="16" font-weight="400" fill="#243449">没取得资料 → 碰巧猜中60秒</text><text x="625" y="165" text-anchor="middle" font-size="23" font-weight="600" fill="#287f6d">✓</text><text x="742" y="165" text-anchor="middle" font-size="23" font-weight="600" fill="#b84848">×</text><text x="855" y="165" text-anchor="middle" font-size="23" font-weight="600" fill="#66788c">—</text><rect x="20" y="200" width="900" height="57" rx="7" fill="#f7f9fc" stroke="#e0e7ef"/><text x="42" y="235" text-anchor="start" font-size="16" font-weight="400" fill="#243449">读对当前60秒 → 仍建议无条件取消</text><text x="625" y="236" text-anchor="middle" font-size="23" font-weight="600" fill="#287f6d">✓</text><text x="742" y="236" text-anchor="middle" font-size="23" font-weight="600" fill="#287f6d">✓</text><text x="855" y="236" text-anchor="middle" font-size="23" font-weight="600" fill="#b84848">×</text><rect x="20" y="271" width="900" height="57" rx="7" fill="#f7f9fc" stroke="#e0e7ef"/><text x="42" y="306" text-anchor="start" font-size="16" font-weight="400" fill="#243449">读适用策略与状态 → 查询原任务J17</text><text x="625" y="307" text-anchor="middle" font-size="23" font-weight="600" fill="#287f6d">✓</text><text x="742" y="307" text-anchor="middle" font-size="23" font-weight="600" fill="#287f6d">✓</text><text x="855" y="307" text-anchor="middle" font-size="23" font-weight="600" fill="#287f6d">✓</text><text x="470" y="378" text-anchor="middle" font-size="15" font-weight="400" fill="#66788c">“数值依据”只评数值是否由适用资料支持；不代表整条建议有据</text></svg></div><figcaption>图 7 · 数值正确、数值有适用依据、操作判断成立，需要分别检查。</figcaption></figure><p class="readfig">重点看第二、三行：答对60秒，仍可能没有成功取得资料；即使取得当前规则，后续建议也可能越过条件。横线表示该例没有评操作，不表示通过。评测必须说明它到底覆盖了哪一项。</p>
+<h3>两道题，才能看见“找到”与“用对”的区别</h3>
+<div class="task-pair"><div><span class="pill">事实题</span><h4>release-2 生产的等待上限是多少？</h4><p>检查数值、单位、版本、环境和出处。示例预期是60秒，但这还没有检查操作判断。</p></div><div><span class="pill green">决策题</span><h4>J17仍在运行，现在该取消或重提吗？</h4><p>结合当前策略与任务状态，说明应先查原任务，不能仅凭耗时取消或新建任务；还要识别动作资格。</p></div></div>
+<p>还要有缺证题与条件变化题。只提供测试资料时，应承认生产规则未知；当用户明确要求取消J17、服务也返回当前可取消时，不能把修法变成“永远拒绝取消”。题库的作用是测出这些差别，运行题库本身不会训练模型参数。</p>
+<h3>怎样让一次检查可以解释</h3>
+<p>登记文档快照、指令、Agent与模型配置、可读范围、问题与初始状态。执行者不看标准答案；评分端再读参考。保留搜索、读取、引用与回答，有模拟动作时还要保留调用与结果。新会话能减少旧对话影响，但持久记忆和额外文件仍需控制。</p>
+<p>字段与范围可以用规则检查，语义判断需要明确判据，并用人工确认的正反例校准。若要证明“没有无授权取消”，不能只看回复里有没有“取消”两个字，更要看隔离环境里的实际调用。</p>
+<h3>自动化放大的是判据，不应掩盖风险</h3>
+<p>断链和必要元数据可以较早自动检查；行为分数则有波动。比较时声明本次改变的变量，尽量固定其余条件，阅读具体失败，并按风险决定复核或阻断。一般措辞退步与越权动作，不应共用一个平均及格分。</p>
+<p>小项目可以先人工抽关键题，再对相关变更运行小集合，最后扩大到发布前或定期检查。目标是知道什么退步、为什么值得处理；不是为每份 Markdown 建一套庞大考试。</p>
+<p class="proof"><a href="?view=deep#doc-eval">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-eval">Markdown 定位</a></p><p class="proof"><a href="?view=deep#doc-ci">深入版：检查条件与自动化边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-ci">Markdown 定位</a></p>
+</section><section class="chapter" id="maintenance"><div class="chapter-head"><span class="number">07</span><div><p class="eyebrow">展开设计 ④</p><h2>变更维护：管理依赖，不是给所有文件刷新日期</h2></div></div>
+<p>文档刚整理好时能用，不代表几次迭代之后还能用。比如示例的 release-3 把客户端等待上限改为90秒，后台仍不因等待结束而自动取消。正确的维护不能是全库替换“60→90”。</p>
+<figure id="fig-version"><div class="diagram"><svg viewBox="0 0 940 461" role="img" aria-labelledby="fig-version-title"><title id="fig-version-title">变更按对象与版本传播，旧事实不应被新值抹掉。</title><rect x="280" y="15" width="380" height="75" rx="10" fill="#f4f0fa" stroke="#d2c4e6"/><text x="470.0" y="45" text-anchor="middle" font-size="18" font-weight="600" fill="#755ca3">新依据：release-3 等待上限90秒</text><text x="470.0" y="71" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">示例中：等待结束仍不自动取消后台任务</text><line x1="350" y1="91" x2="200" y2="146" stroke="#755ca3" stroke-width="2"/><polygon points="200.0,146.0 205.6,140.3 208.0,146.8" fill="#755ca3"/><line x1="590" y1="91" x2="740" y2="146" stroke="#755ca3" stroke-width="2"/><polygon points="740.0,146.0 732.0,146.8 734.4,140.3" fill="#755ca3"/><rect x="35" y="155" width="370" height="95" rx="4" fill="white" stroke="#d6dfe9"/><rect x="35" y="155" width="370" height="30" rx="4" fill="#f7f9fc"/><text x="49" y="176" text-anchor="start" font-size="14" font-weight="600" fill="gray">保留：release-2 的有效历史</text><text x="50" y="211" text-anchor="start" font-size="14" font-weight="400" fill="#243449">60秒仍属于它的版本范围</text><text x="50" y="235" text-anchor="start" font-size="14" font-weight="400" fill="#243449">不能全文替换成90</text><rect x="535" y="155" width="370" height="95" rx="4" fill="white" stroke="#b9d0ec"/><rect x="535" y="155" width="370" height="30" rx="4" fill="#edf4fd"/><text x="549" y="176" text-anchor="start" font-size="14" font-weight="600" fill="#3268a8">更新：release-3 当前策略</text><text x="550" y="211" text-anchor="start" font-size="14" font-weight="400" fill="#243449">90秒 + release-3 范围</text><text x="550" y="235" text-anchor="start" font-size="14" font-weight="400" fill="#243449">依据、责任人与核验状态一起维护</text><line x1="720" y1="250" x2="720" y2="293" stroke="#3268a8" stroke-width="2"/><polygon points="720.0,293.0 716.5,285.8 723.5,285.8" fill="#3268a8"/><rect x="30" y="308" width="260" height="80" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="160.0" y="338" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">入口</text><text x="160.0" y="364" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">当前版本指向正确页</text><rect x="340" y="308" width="260" height="80" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="470.0" y="338" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">解释 / 派生内容</text><text x="470.0" y="364" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">复核推理；按来源生成</text><rect x="650" y="308" width="260" height="80" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="780.0" y="338" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">题库</text><text x="780.0" y="364" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">新增R3；保留支持的R2</text><path d="M720 294 H160 V306" fill="none" stroke="#287f6d" stroke-width="2"/><polygon points="160.0,306.0 156.5,298.8 163.5,298.8" fill="#287f6d"/><path d="M720 294 H470 V306" fill="none" stroke="#287f6d" stroke-width="2"/><polygon points="470.0,306.0 466.5,298.8 473.5,298.8" fill="#287f6d"/><text x="470" y="432" text-anchor="middle" font-size="15" font-weight="600" fill="#ac6a16">无关文件导致 HEAD 变化，只能提醒复核；不是“策略已错”的证据</text></svg></div><figcaption>图 8 · 变更按对象与版本传播，旧事实不应被新值抹掉。</figcaption></figure><p class="readfig">先看左右两页为什么同时合理：它们回答不同版本的问题。再看下面三项：即使解释没有抄数字，它的建议也可能受影响；题库既要检查新行为，也要继续覆盖仍支持的旧行为。</p>
+<p>来源变化应触发相关对象复核，而不是直接判错。仓库 HEAD 变了，可能只改了无关文件；HEAD 没变，外部配置仍可能改变。越能指到具体配置项、协议、发布或决定，复核提示才越有价值。</p>
+<p>复核结果也要明确：已核实仍适用、已更新、因证据不足待核实、版本已退役。更新文件日期却无法确认生产值，会把“有人看过”包装成“事实已经确认”。对高风险操作，待核实还应改变使用方式：不能直接照它执行，应取得额外依据或找维护者。</p>
+<h3>复制到第二个项目以后，什么应该跟着改？</h3>
+<p>继续用门店手册的类比：检查营业规则是否标明适用门店，是可以共用的方法；A店的营业条件不能无条件覆盖B店。项目模板也一样，通用方法与本地事实必须分开。</p>
+<figure id="fig-projects"><div class="diagram"><svg viewBox="0 0 940 399" role="img" aria-labelledby="fig-projects-title"><title id="fig-projects-title">同一套维护方法可以复用，两个项目的等待值不必被统一。</title><rect x="290" y="18" width="360" height="80" rx="10" fill="#f4f0fa" stroke="#d2c4e6"/><text x="470.0" y="48" text-anchor="middle" font-size="19" font-weight="600" fill="#755ca3">公共模板 v1 → v2</text><text x="470.0" y="74" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">改进：检查锚点与来源字段</text><rect x="35" y="170" width="350" height="102" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="210.0" y="200" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">项目 A：使用同一检查规则</text><text x="210.0" y="226" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">本地事实：等待60秒</text><text x="210.0" y="249" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">由 A 的策略与环境决定</text><rect x="555" y="170" width="350" height="102" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="730.0" y="200" text-anchor="middle" font-size="17" font-weight="600" fill="#287f6d">项目 B：使用同一检查规则</text><text x="730.0" y="226" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">本地事实：等待120秒</text><text x="730.0" y="249" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">由 B 的策略与环境决定</text><line x1="355" y1="100" x2="210" y2="168" stroke="#755ca3" stroke-width="2"/><polygon points="210.0,168.0 215.0,161.8 218.0,168.1" fill="#755ca3"/><line x1="585" y1="100" x2="730" y2="168" stroke="#755ca3" stroke-width="2"/><polygon points="730.0,168.0 722.0,168.1 725.0,161.8" fill="#755ca3"/><rect x="119.0" y="113" width="200" height="26" rx="5" fill="#f4f0fa" stroke="#d2c4e6"/><text x="219" y="131" text-anchor="middle" font-size="13" font-weight="600" fill="#755ca3">按版本引入通用改进</text><rect x="621.0" y="113" width="200" height="26" rx="5" fill="#f4f0fa" stroke="#d2c4e6"/><text x="721" y="131" text-anchor="middle" font-size="13" font-weight="600" fill="#755ca3">按版本引入通用改进</text><path d="M905 221 H923 V58 H652" fill="none" stroke="#755ca3" stroke-width="2" stroke-dasharray="6 5"/><polygon points="652.0,58.0 659.2,54.5 659.2,61.5" fill="#755ca3"/><text x="827" y="88" text-anchor="middle" font-size="13" font-weight="400" fill="#755ca3">B 的通用修正</text><line x1="387" y1="224" x2="552" y2="224" stroke="#c35a53" stroke-width="2" stroke-dasharray="6 5"/><rect x="435" y="203" width="70" height="42" rx="6" fill="#fff0ee" stroke="#e6b7b1"/><text x="470" y="231" text-anchor="middle" font-size="14" font-weight="600" fill="#b84848">不复制</text><text x="470" y="330" text-anchor="middle" font-size="16" font-weight="600" fill="#243449">可共享：检查方法、模板改进。应保留：项目配置、权限与业务条件。</text><text x="470" y="369" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">来源版本、允许差异、升级方式都要有记录；“缓存”不是自动同步机制</text></svg></div><figcaption>图 9 · 同一套维护方法可以复用，两个项目的等待值不必被统一。</figcaption></figure><p class="readfig">紫色回流只接受经过审查的通用改进。若把 B 的整篇文档同步给 A，120秒也可能跟着过去；若禁止所有回流，B 改好的检查器又无法帮助其他项目。需要管理的是这条边界。</p>
+<p>手工复制可以是起点，但需要知道来源、版本、允许的差异与升级方式。某条“通用规则”在一个项目不得不改写时，要检查它是不是夹带了本地假设；不能因为模板这样写，就强迫不同项目拥有相同条件。</p>
+<p>治理的投入应跟问题规模相称。两个项目可以先人工对照；积累了实际同步负担，再考虑公共包或生成流程。把副本叫作缓存、把经验叫作内核，都不会自动完成这些维护动作。</p>
+<p class="proof"><a href="?view=deep#doc-drift">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-drift">Markdown 定位</a></p>
+</section><section class="chapter" id="case-study"><div class="chapter-head"><span class="number">08</span><div><p class="eyebrow">用证据验证设计</p><h2>完整案例：用 J17 检验四部分是不是真的接上了</h2></div></div>
+<p>现在回到开头的问题。我们已经有总设计，接下来检查每份材料支持什么结论、缺口落在哪个职责。<strong>以下策略、读取记录、对照与复测，全部是构造示意，不是实际系统运行结果。</strong></p>
+<h3>① 先核实当前策略，不能拿错误回答作参照</h3>
+<p>示例约定：维护者已审核 release-2 生产配置、任务协议与动作策略。当前客户端等待上限为60秒；等待结束返回pending并保留任务号；后台不因此被取消。</p>
+<figure id="fig-clocks"><div class="diagram"><svg viewBox="0 0 940 350" role="img" aria-labelledby="fig-clocks-title"><title id="fig-clocks-title">等待结束改变客户端返回，不自动改变后台任务的生死。</title><text x="30" y="31" text-anchor="start" font-size="18" font-weight="600" fill="#243449">示例策略：客户端等待上限60秒；后台任务不因此被取消</text><text x="30" y="90" text-anchor="start" font-size="16" font-weight="600" fill="#3268a8">客户端这次等待</text><line x1="210" y1="115" x2="740" y2="115" stroke="#3268a8" stroke-width="2"/><polygon points="740.0,115.0 732.8,118.5 732.8,111.5" fill="#3268a8"/><circle cx="235" cy="115" r="7" fill="#3268a8"/><text x="235" y="145" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">本次等待起点</text><line x1="630" y1="94" x2="630" y2="140" stroke="#3268a8" stroke-width="2"/><text x="630" y="84" text-anchor="middle" font-size="15" font-weight="600" fill="#3268a8">等满60秒</text><rect x="730" y="82" width="180" height="67" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="820.0" y="112" text-anchor="middle" font-size="16" font-weight="600" fill="#3268a8">返回 pending</text><text x="820.0" y="138" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">保留任务号</text><text x="30" y="211" text-anchor="start" font-size="16" font-weight="600" fill="#287f6d">后台任务 J17</text><line x1="210" y1="236" x2="906" y2="236" stroke="#287f6d" stroke-width="2"/><polygon points="906.0,236.0 898.8,239.5 898.8,232.5" fill="#287f6d"/><circle cx="235" cy="236" r="7" fill="#287f6d"/><text x="235" y="267" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">任务自身起点</text><rect x="390.0" y="218" width="260" height="26" rx="5" fill="#edf8f3" stroke="#b4dccc"/><text x="520" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#287f6d">已知：运行45秒，仍running</text><text x="811" y="267" text-anchor="middle" font-size="14" font-weight="400" fill="#287f6d">按实际状态继续观察</text><text x="470" y="320" text-anchor="middle" font-size="14" font-weight="600" fill="#ac6a16">两条线各有计时起点，不是同一时刻的横轴对齐；不能直接把45与60当成同一个计时器</text></svg></div><figcaption>图 10 · 等待结束改变客户端返回，不自动改变后台任务的生死。</figcaption></figure><p class="readfig">看上面发生了什么、下面没被推出什么：客户端返回pending，不等于后台失败。取消与重提仍要核对授权、状态和重试策略；45秒的任务运行时长本身也不证明客户端已经等了45秒。</p>
+<p><strong>重提</strong>需要原任务明确失败、服务端策略确认可重试，并使用服务支持的幂等与重提机制，避免重复请求造成额外执行或副作用。<strong>取消</strong>需要用户明确要求取消J17，且服务当前允许；执行时服务端还要再次检查权限与状态，不能把几秒前的查询当永久许可。</p>
+<p>因此，J17“运行45秒、仍running”不够推出取消或重新创建。默认先查询原任务；这也不禁止在另一组已经满足的取消条件下走取消路径。规则给的是分支，不是万能的“继续等”。</p>
+<p class="proof"><a href="?view=deep#doc-diagnosis">核对示例策略与动作条件 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-diagnosis">Markdown 定位</a></p>
+<h3>② 再取出读取记录，确定缺口在哪里</h3>
+<figure id="fig-evidence"><div class="diagram"><svg viewBox="0 0 940 387" role="img" aria-labelledby="fig-evidence-title"><title id="fig-evidence-title">找到两份文件，不等于读到了两份规则；当前依据必须与实际取得的片段比较。</title><rect x="25" y="20" width="400" height="158" rx="4" fill="white" stroke="#b9d0ec"/><rect x="25" y="20" width="400" height="30" rx="4" fill="#edf4fd"/><text x="39" y="41" text-anchor="start" font-size="14" font-weight="600" fill="#3268a8">已审核的当前策略（构造）</text><text x="40" y="76" text-anchor="start" font-size="14" font-weight="400" fill="#243449">production / release-2</text><text x="40" y="100" text-anchor="start" font-size="14" font-weight="400" fill="#243449">client_wait_limit_seconds: 60</text><text x="40" y="124" text-anchor="start" font-size="14" font-weight="400" fill="#243449">等待结束：pending，保留任务号</text><text x="40" y="148" text-anchor="start" font-size="14" font-weight="400" fill="#243449">后台不自动取消；动作有资格条件</text><rect x="515" y="20" width="400" height="158" rx="4" fill="white" stroke="#e7cc9f"/><rect x="515" y="20" width="400" height="30" rx="4" fill="#fff6e8"/><text x="529" y="41" text-anchor="start" font-size="14" font-weight="600" fill="#ac6a16">实际工具记录（构造）</text><text x="530" y="76" text-anchor="start" font-size="14" font-weight="400" fill="#243449">搜索：export timeout</text><text x="530" y="100" text-anchor="start" font-size="14" font-weight="400" fill="#243449">候选：历史页 + 当前策略页</text><text x="530" y="124" text-anchor="start" font-size="14" font-weight="400" fill="#243449">实际读取：历史页的旧流程片段</text><text x="530" y="148" text-anchor="start" font-size="14" font-weight="400" fill="#243449">该读取片段未包含版本标识</text><line x1="715" y1="180" x2="715" y2="228" stroke="#b84848" stroke-width="2"/><polygon points="715.0,228.0 711.5,220.8 718.5,220.8" fill="#b84848"/><rect x="515" y="235" width="400" height="75" rx="10" fill="#fff0ee" stroke="#e6b7b1"/><text x="715.0" y="265" text-anchor="middle" font-size="17" font-weight="600" fill="#b84848">回答：超过30秒，终止后重试</text><text x="715.0" y="291" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">当前生产建议缺少适用依据</text><rect x="25" y="235" width="400" height="75" rx="10" fill="#edf4fd" stroke="#b9d0ec"/><text x="225.0" y="265" text-anchor="middle" font-size="17" font-weight="600" fill="#3268a8">当前策略虽然存在，却没被取得</text><text x="225.0" y="291" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">这次观察不支持“正本仍写30”</text><line x1="430" y1="270" x2="506" y2="270" stroke="#c35a53" stroke-width="2" stroke-dasharray="5 4"/><text x="470" y="219" text-anchor="middle" font-size="14" font-weight="600" fill="#b84848">差异</text><text x="470" y="357" text-anchor="middle" font-size="15" font-weight="400" fill="#66788c">诊断材料是搜索、读取片段与回答；不需要假装拿到了模型内部思维</text></svg></div><figcaption>图 11 · 找到两份文件，不等于读到了两份规则；当前依据必须与实际取得的片段比较。</figcaption></figure><p class="readfig">先看右上角的“实际读取”，再与左边的适用范围对照。现在可以优先调查入口、范围标识和必要追溯；还不能据此宣称模型在拿到当前资料时一定能解释正确。</p>
+<p>这份观察排除了本例中的“当前策略正本仍写30”解释，但还没检验“读到完整当前规则也会误解”。应该优先检查实际读取为什么停在历史片段：导航是否区分现行与历史，片段附近是否保留范围，取消与重提问题是否要求继续读取当前策略。</p>
+<h3>③ 用对照选择排查方向，用复测检查修法</h3>
+<figure id="fig-retest"><div class="diagram"><svg viewBox="0 0 940 411" role="img" aria-labelledby="fig-retest-title"><title id="fig-retest-title">诊断对照与修后复测各有任务；给对片段答对，不等于入口已经修好。</title><text x="155" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#b84848">原入口：暴露失败</text><rect x="25" y="60" width="265" height="108" rx="4" fill="white" stroke="#e6b7b1"/><rect x="25" y="60" width="265" height="30" rx="4" fill="#fff0ee"/><text x="39" y="81" text-anchor="start" font-size="14" font-weight="600" fill="#b84848">这次取得的材料</text><text x="40" y="116" text-anchor="start" font-size="14" font-weight="400" fill="#243449">历史片段：30秒</text><text x="40" y="140" text-anchor="start" font-size="14" font-weight="400" fill="#243449">包含哪些范围与条件？</text><line x1="157" y1="170" x2="157" y2="207" stroke="#b84848" stroke-width="2"/><polygon points="157.0,207.0 153.5,199.8 160.5,199.8" fill="#b84848"/><rect x="25" y="215" width="265" height="80" rx="10" fill="#fff0ee" stroke="#e6b7b1"/><text x="157.5" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#b84848">回答 / 建议</text><text x="157.5" y="271" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">建议终止后重试</text><text x="470" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#ac6a16">给定资料：辅助诊断</text><rect x="340" y="60" width="265" height="108" rx="4" fill="white" stroke="#e7cc9f"/><rect x="340" y="60" width="265" height="30" rx="4" fill="#fff6e8"/><text x="354" y="81" text-anchor="start" font-size="14" font-weight="600" fill="#ac6a16">这次取得的材料</text><text x="355" y="116" text-anchor="start" font-size="14" font-weight="400" fill="#243449">直接提供当前完整策略</text><text x="355" y="140" text-anchor="start" font-size="14" font-weight="400" fill="#243449">包含哪些范围与条件？</text><line x1="472" y1="170" x2="472" y2="207" stroke="#ac6a16" stroke-width="2"/><polygon points="472.0,207.0 468.5,199.8 475.5,199.8" fill="#ac6a16"/><rect x="340" y="215" width="265" height="80" rx="10" fill="#fff6e8" stroke="#e7cc9f"/><text x="472.5" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#ac6a16">回答 / 建议</text><text x="472.5" y="271" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">建议先查询J17</text><text x="785" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#287f6d">修后原入口：复测</text><rect x="655" y="60" width="265" height="108" rx="4" fill="white" stroke="#b4dccc"/><rect x="655" y="60" width="265" height="30" rx="4" fill="#edf8f3"/><text x="669" y="81" text-anchor="start" font-size="14" font-weight="600" fill="#287f6d">这次取得的材料</text><text x="670" y="116" text-anchor="start" font-size="14" font-weight="400" fill="#243449">导航 → 读取当前策略</text><text x="670" y="140" text-anchor="start" font-size="14" font-weight="400" fill="#243449">包含哪些范围与条件？</text><line x1="787" y1="170" x2="787" y2="207" stroke="#287f6d" stroke-width="2"/><polygon points="787.0,207.0 783.5,199.8 790.5,199.8" fill="#287f6d"/><rect x="655" y="215" width="265" height="80" rx="10" fill="#edf8f3" stroke="#b4dccc"/><text x="787.5" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#287f6d">回答 / 建议</text><text x="787.5" y="271" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">有据查询；不直接重提</text><text x="470" y="341" text-anchor="middle" font-size="15" font-weight="600" fill="#ac6a16">中间改变了可用资料：帮助缩小原因范围；右边才重新检查正常取得过程</text><text x="470" y="381" text-anchor="middle" font-size="14" font-weight="400" fill="#66788c">三个结果均为构造示意；实际项目需要自己的记录与重复观察</text></svg></div><figcaption>图 12 · 诊断对照与修后复测各有任务；给对片段答对，不等于入口已经修好。</figcaption></figure><p class="readfig">不要只看中间与右边都“答对”了：中间绕过了正常导航，适合决定先查哪里；右边回到原问题和正常工具，才检验修法有没有覆盖使用路径。还应补缺证题与授权变化题，防止只记住一个固定答案。</p>
+<p>示例的对照保持同一问题，另用受控会话直接提供当前策略，回答改为“先查询J17”。这支持优先查资料取得，但同时改变了上下文；单次翻转不能证明唯一根因。若给完整当前规则仍答错，就该转查表达、语义区分、任务条件或评分，而不是继续加导航。</p>
+<p>对本例，修法是：导航标出当前操作策略；历史片段保留release-1范围；排障指南说明涉及取消或重提时必须追溯策略。<strong>不在教程里再手写一份60秒，也不把所有历史30秒删掉。</strong></p>
+<h3>④ 修后记录应能同时回答“读了什么、为什么判过”</h3>
+<div class="record"><p class="eyebrow">构造的修后样例 · 不是实测输出</p><dl><dt>原问题</dt><dd>release-2 生产，J17运行45秒、状态running，该取消还是重提？</dd><dt>正常取得过程</dt><dd>任务入口 → 当前策略 → 含环境、版本、等待语义及动作资格的片段。</dd><dt>回答</dt><dd>查询原任务；不因运行45秒就取消或新建。60秒限制客户端等待，不代表后台到时失败。</dd><dt>判据</dt><dd>值与单位正确；版本与环境适用；建议满足当前条件；引用实际支持结论。</dd></dl></div>
+<p>最后补两条邻近检查：缺少生产资料时，它能否说明未知；取消已经明确授权且服务允许时，它能否识别条件变化。这样检查的才是“按适用依据判断”，而不只是记住“答案换成60”。</p>
+<p>回看总设计，这次正本没有过期，缺口主要在导航与片段范围。正本提供规则，导航使其可被取得，验证联系观察与判断，维护把修订落回对应对象。四者少一项，都可能留下另一种失败。</p>
+<p class="proof"><a href="?view=deep#doc-diagnosis">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-diagnosis">Markdown 定位</a></p>
+</section><section class="chapter" id="start"><div class="chapter-head"><span class="number">09</span><div><p class="eyebrow">最小方案与适用条件</p><h2>怎样起步：先让一个危险问题有人负责、能够被检查</h2></div></div>
+<p>不必从搬目录或建全套平台开始。选一个近期反复答错、且会影响行动的问题，用它检查四种职责是否存在：适用规则有没有依据与负责人；入口能不能找到；使用过程有没有记录与判据；规则变化以后谁复核依赖。</p>
+<p>对J17，真正的产物不是“重构20篇文章”，而是知道它依据哪套策略、怎样取得这套策略、修了什么缺口，以及下一次升级要检查哪些说明和题目。若这些仍说不清，增加目录和题量只会扩大维护表面。</p>
+<h3>换一个场景，方法还能不能成立？</h3>
+<p>数据库地址变更时，入口应指导查目标环境的数据源资料；架构解释继续讲为何分库，不手工维持另一份当前地址；检查既考能否找到适用依据，也考缺少目标环境资料时是否会冒用测试配置。敏感值仍按访问与披露边界处理，不能为了方便检索而扩散到所有入口。</p>
+<p>这套设计的边界也很明确：文档支持有依据的判断，不能替代实际系统的授权与状态检查；题库覆盖一组任务，不能保证全部事实永远正确；有效性与维护成本，需要在自己的项目里持续观察。</p>
+<p class="proof"><a href="?view=deep#doc-start">深入版：依据、推理与边界 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-start">Markdown 定位</a></p>
+</section>
+<section class="interview" id="exercises"><p class="eyebrow">变一下条件，再作判断</p><h2>三道追问：先自己判断，再展开解释</h2><details class="exercise"><summary>只给你三个文件：正本改成90秒，旧版复盘写60秒，教程仍把60当现行。你改谁？</summary><div class="answer"><p>先核对适用版本。旧版复盘若明确属于release-2，可以保留；教程若把旧值当当前值，应修它的维护方式与入口，不是把所有60都替换。还要检查当前正本的依据和题库范围。</p><p class="proof"><a href="?view=deep#doc-drift">核对完整解释 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-drift">Markdown 定位</a></p></div></details><details class="exercise"><summary>给完整当前策略以后答对了，可以宣布文档导航已经修好吗？</summary><div class="answer"><p>不能。这次绕过了正常取得路径，帮助决定优先查哪里。需要修改对应入口或片段，再从原问题、正常工具与原入口复测，才能检查修法是否覆盖实际使用。</p><p class="proof"><a href="?view=deep#doc-diagnosis">核对完整解释 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-diagnosis">Markdown 定位</a></p></div></details><details class="exercise"><summary>项目B把检查器修好了，顺便把A的60秒也改成B的120秒，算模板升级吗？</summary><div class="answer"><p>通用检查改进可以审查后回到模板；实际等待值是项目事实，要由A自己的环境与策略决定。共享方法和同步配置是两种责任，不能用一次复制同时处理。</p><p class="proof"><a href="?view=deep#doc-drift">核对完整解释 ↗</a><span> · </span><a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md#doc-drift">Markdown 定位</a></p></div></details></section>
+<footer class="exit"><p><a href="?view=deep#doc-overview">进入深入版：总设计、完整论证与取舍 ↗</a> · <a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md">Markdown 正本</a></p><p>证据说明：文中导出服务、策略、读取与复测记录均为构造示例；职责设计是方法方案。公开资料支持范围、适用边界与尚待验证的问题，见<a href="?view=deep#doc-boundary">深入版依据说明</a>。</p><p>配对版本 v2.1-review · 2026-10-28 · 正文与图解可离线阅读；外部参考资料用于联网核查。</p><p><a href="index.html">← 返回阅读目录</a> · <a href="#background">回到背景与难点</a></p></footer></main>
+<section id="deep-document" hidden><nav class="modebar"><a href="%E8%AE%B2%E8%A7%A3-07-%E6%96%87%E6%A1%A3%E5%8F%AF%E6%B5%8B%E8%AF%95%E5%8C%96.html">← 返回讲解版</a> · <a href="../原文/%E6%96%87%E6%A1%A3%E6%98%8E%E6%98%8E%E5%86%99%E4%BA%86%EF%BC%8CAgent%20%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E6%98%AF%E7%AD%94%E9%94%99%EF%BC%9A%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%98%E6%88%90%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3.md">查看 Markdown 正本</a></nav><article class="deep"><!-- document-id: show-07 -->
+<!-- document-version: 2.1-review -->
+
+<h1>文档明明写了，Agent 为什么还是答错：一套项目文档怎样持续有效</h1>
+<blockquote>
+<p>深入版 v2.1（本地审阅）· 2026-10-28<br>面向让人和编码 Agent 共同使用项目文档的工程师、技术负责人。配套<a href="../%E9%98%85%E8%AF%BB/%E8%AE%B2%E8%A7%A3-07-%E6%96%87%E6%A1%A3%E5%8F%AF%E6%B5%8B%E8%AF%95%E5%8C%96.html">图解讲解版</a>按背景难点、总体设计与分项展开组织，可离线阅读。</p>
+</blockquote>
+<p><strong>这篇文章要解决的问题是：一套项目文档，怎样在服务人和编码 Agent 的同时，保持可理解、可查找、可核实和可维护。</strong></p>
+<p>总体思路是：给重要知识确定权威来源，以不同阅读入口服务不同任务，观察实际使用是否符合依据，并让变更触发对应的维护。它们共同构成一套文档设计；评测负责检验这套设计，不能独自承担事实核实与持续更新。</p>
+<p>全文先说明背景与四个难点，再比较解决思路，给出总体分工和关系图；随后分别展开知识正本、阅读导航、使用验证、变更维护四部分设计，最后用一个完整案例检验它们能否协同工作。</p>
+<p>文中的导出服务、配置、工具记录与结果均为<strong>构造示例</strong>，用来解释设计及判断过程，不是生产实测或效果统计。</p>
+<p><a id="doc-case"></a></p>
+<h2>一、背景与难点：为什么文档写全了，协作仍然会出错</h2>
+<h3>背景：文档从“给人查阅”，变成了协作过程的一部分</h3>
+<p>一个团队已经把排障经验、架构说明、操作规则整理进仓库。文件齐全，链接检查通过，新同事觉得有用。编码 Agent 接入以后，团队自然期待它也能从这些资料出发，少问重复问题，少走已经证明错误的路。</p>
+<p>但使用中会出现另一种局面：资料明明存在，它仍沿用旧规则；某次纠正后答对，换个任务又漏掉限制；代码与配置已经更新，旧教程依然提供一套看似完整的答案。于是，人又开始充当资料路由器与版本裁判，每次告诉它该看哪份、哪句已不再适用。</p>
+<p>这不是把所有问题归于模型。团队需要先检查：我们维护的是一堆可以被阅读的文件，还是一套能让使用者取得适用知识的系统？两者的差别，是本文的设计出发点。</p>
+<p>例如，用户问：</p>
+<blockquote>
+<p>生产环境 release-2，导出任务 J17 已运行45秒，状态还是 running。我现在应该取消，还是重新提交？</p>
+</blockquote>
+<p>Agent 回答：“已经超过30秒，建议终止后重试。”</p>
+<p>这个开场只给出了用户问题和回答。当前规则究竟是什么、Agent 看了什么、建议是否成立，都需要后面核对。这里先看清：为了回答这个问题，文档体系同时需要支持事实查询、机制理解和条件判断，不能只提供一个叫“超时”的数字。</p>
+<h3>难点一：同一个知识点，要支持不同阅读任务</h3>
+<p>查等待上限，需要简洁参考；理解客户端等待与后台作业的关系，需要解释；判断能否取消，还需要状态与授权条件。把这些内容混成一篇长文，查询可能费劲；为每种读者各抄一份参数，又会产生多个维护对象。</p>
+<p>因此，问题不是“人版与AI版各写多长”，而是如何在不复制易变事实的前提下，提供足够完整的查询、理解和决策入口。</p>
+<h3>难点二：文档正本并不天然等于当前事实</h3>
+<p>文件叫“现行策略”，不代表它已经跟随生产变化；一个参数有唯一文档正本，也可能全库一起沿用旧值。需要区分事实依据、文档说明及其适用范围。</p>
+<p>对导出服务，客户端等待上限要与对应环境的配置和协议核对；任务是否仍在运行，要看本次状态；取消规则需要明确策略。不同问题的依据不同，不能由一个“最后更新日期”统一证明。</p>
+<h3>难点三：保存了知识，不代表本次任务取得并用对了知识</h3>
+<p>Agent 可能搜索到旧文件，只读取了缺少版本标识的片段，或者读到了正确规则，却把“客户端不再等待”理解成“后台任务失败”。这些情况都可能表现为同一句错误建议，却需要不同修法。</p>
+<p>要定位它们，必须看见资料从入口到搜索、读取，再到回答或行动的过程。只检查最终答案，无法知道该修正文、导航、表达还是判据。</p>
+<h3>难点四：变化会跨越代码、文档和多个项目</h3>
+<p>一次策略调整可能影响正本、排障解释、生成手册和测试预期；一套模板复制到别的项目后，还会产生公共改进与本地差异。要求所有文件永远相同会传播错误配置，完全不复用又会让维护经验无法积累。</p>
+<p>因此，这套方案还要回答谁负责更新、什么变化触发复核，以及哪些差异应保留。否则文档刚整理好时有效，几次迭代之后又靠人记忆维持。</p>
+<p>本文讨论的是本地项目文档：编码 Agent 主要用搜索、读文件工具及链接取得资料。不默认存在向量库与自动召回流水线，也不规定某个产品的指令加载规则；这些要按实际工具环境确认。</p>
+<p><a id="doc-approach"></a></p>
+<h2>二、解决思路：把“知识归属、消费方式、使用验证、变更责任”分开设计</h2>
+<h3>先确定要守住的四个目标</h3>
+<p>针对上面的四个难点，方案应能回答：一个重要事实由谁维护、依据在哪里；不同任务怎样取得它；怎样判断本次使用是否有据；它变化以后哪些对象需要复核。</p>
+<p>这不是把工作拆成四个先后执行的步骤。它们是长期并存的职责：事实尚未变更时也需要导航，导航正常时也可能解释错误，检查通过以后仍需要维护。设计的目标是让这些职责互相支持，而不让某一项冒充其他几项。</p>
+<h3>为什么不选择几种更直接的办法</h3>
+<p><strong>把全部文档一次性交给 Agent</strong>，可以减少一部分漏读，却把相关性、历史版本与适用条件的筛选留给本次上下文处理，也不解决来源过期和多处维护。小规模、范围明确的资料可以直接提供；它不能成为所有项目的默认答案。</p>
+<p><strong>分别维护人版和模型版全文</strong>，便于各自优化表达，但如果两份都维护当前参数与规则，变更就要同步两次。真正需要分开的是阅读任务，易变事实仍应有明确的正本或可追溯的生成来源。</p>
+<p><strong>只要求“先读文档”，再用最终答题分数验收</strong>，写起来最简单。但它既没说明哪些问题必须追溯什么依据，也没区分事实已过期与模型没用对。题库可以发现问题，不能代替组织设计和责任归属。</p>
+<p>因此，本文采用的思路是：<strong>单一知识归属，多种消费入口，分开检查对象，按依赖维护变化。</strong> 代价是需要维护导航、范围、关键检查与责任记录；收益应通过真实使用观察，而不是靠目录结构本身宣布成立。</p>
+<p><a id="doc-overview"></a></p>
+<h2>三、总体方案与总设计：四部分怎样组成一个整体</h2>
+<h3>3.1 总体分工：谁保存依据，谁组织入口，谁发现问题，谁推动修订</h3>
+<p>下面四部分是文档体系的职责划分，<strong>不要求部署四个独立服务，也不要求建立四套文件夹</strong>。一篇设计解释可以是某项决定的正本，同时通过链接指向参数正本；同一文件可能承担不止一种职责，关键是每项知识的归属与依赖清楚。</p>
+<table>
+<thead>
+<tr>
+<th>组成部分</th>
+<th>负责回答什么</th>
+<th>维护的主要对象</th>
+<th>不承担什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>知识正本</strong></td>
+<td>当前说明是什么，适用于谁，凭什么成立</td>
+<td>事实参考、策略、设计理由、来源与范围</td>
+<td>不以文件名称代替运行事实核实</td>
+</tr>
+<tr>
+<td><strong>阅读与导航</strong></td>
+<td>针对这个问题，应该取得哪些资料</td>
+<td>项目入口、目录、查询路径、导读及派生视图</td>
+<td>不再手工维护另一套当前事实</td>
+</tr>
+<tr>
+<td><strong>使用验证</strong></td>
+<td>实际取得了什么，回答或动作是否有据</td>
+<td>任务、读取记录、参考依据、判据与检查结果</td>
+<td>不把一个成绩当作全部事实正确的证明</td>
+</tr>
+<tr>
+<td><strong>变更维护</strong></td>
+<td>什么变了，由谁复核哪些依赖</td>
+<td>来源关系、责任人、版本状态、模板与本地差异</td>
+<td>不把所有差异都当作错误并强行同步</td>
+</tr>
+</tbody></table>
+<details class="mermaid-source"><summary>展开深入版关系图源码（讲解页提供图解）</summary><pre><code>flowchart TB
+    S[已审核的代码 / 配置 / 协议 / 决策依据]
+    K[知识正本：事实、策略及其适用范围]
+    N[阅读与导航：入口、导读、链接或生成视图]
+    U[使用任务：人阅读，或 Agent 搜索 / 读取 / 判断]
+    V[使用验证：取得的证据、结论与外部判据对照]
+    M[变更维护：影响范围、责任分派、复核状态]
+    S --&gt;|支撑并约束| K
+    N --&gt;|引用或按版本生成| K
+    N --&gt;|按问题引导| U
+    K --&gt;|提供适用内容| U
+    U --&gt;|留下可观察记录| V
+    K --&gt;|提供可追溯说明，判据另核依据| V
+    S --&gt;|相关依据变化时触发| M
+    V --&gt;|发现缺口或退化时反馈| M
+    M --&gt;|复核并修订| K
+    M --&gt;|调整入口及派生内容| N
+    M --&gt;|维护任务与预期| V
+</code></pre></details>
+<p>这是职责与依赖关系图，不是每个请求必须执行的时序。读图时，重点看两类关系：正本向使用者提供可追溯内容；使用中暴露的问题与依据变化，都进入维护，再回到对应对象。验证不是把文档读一遍就盖章，维护也不只是修改正本那一个文件。</p>
+<h3>3.2 用导出问题看各部分如何配合</h3>
+<p>“J17该不该取消”首先需要适用策略，这由知识正本负责说明；用户和 Agent 不应各自靠搜索结果猜哪篇是当前规则，导航负责指出查找条件与入口；使用验证检查实际读取片段和建议能否支持这个决定；若发现只读取了旧版本，维护负责修对应的入口、范围标识或文档内容，并安排复查。</p>
+<p>如果实际生产策略已经改变，问题则从事实依据一侧进入，而不是等 Agent 答错以后才开始处理。这个区别决定了方案既要覆盖使用反馈，也要覆盖主动变更。</p>
+<h3>3.3 三个关键设计边界</h3>
+<p><strong>正本与事实依据分开。</strong> 参考页可以是团队的说明入口，但重要事实仍要追到对应环境、版本的依据。预期答案不能只从待测页面抄出来，再用它证明页面正确。</p>
+<p><strong>内容与入口分开。</strong> 入口帮助决定去哪查，不重复保存所有当前值；解释帮助理解为何这样做，不因历史叙事完整就取得当前操作策略的权威。</p>
+<p><strong>文档建议与实际执行分开。</strong> 文档可以说明何时允许取消，行为检查可以发现建议越界，真实工具仍需在执行时核对权限与状态。不能靠“Agent已读策略”代替服务端边界。</p>
+<p>下面四节依次展开这四部分：第④节定知识归属，第⑤节设计消费入口，第⑥节说明验证，第⑦节处理演进。第⑧节再用完整调查检验它们的协作，而不让单个案例代替总体方案。</p>
+<p><a id="doc-source"></a></p>
+<h2>四、知识正本设计：事实、解释与运行观察分别归谁</h2>
+<h3>权威来源不是“我们决定相信这份 Markdown”</h3>
+<p>假设一篇文档把等待时间写成 60 秒，另外五篇都链接它。这满足了单一文档正本，却不保证生产真的按 60 秒运行。</p>
+<p>这里要分开两层：<strong>事实依据</strong>回答“为什么认为这件事成立”；<strong>文档正本</strong>回答“团队在什么位置维护对这件事的说明”。程序行为可能需要代码与测试支持，运行配置需要对应环境的证据，操作策略需要业务或运维负责人确认。文档负责把它们组织成可追溯的知识，不能自己任命自己为真相。</p>
+<p>在导出示例中，约定维护者已经审核以下材料：release-2 的部署配置快照、任务状态协议、取消与重提策略。审核后的参考页才登记它们，并说明适用环境。这是本文为案例给定的前提，不是从“文件名叫 facts”推出来的结论。</p>
+<p>一个重要事实至少要让读者追到：<strong>说的是什么对象，适用什么范围，依据在哪里，谁负责复核。</strong> 时间字段也应说明含义：文件最后修改时间，不能代替内容最后核验时间。</p>
+<h3>并非所有代码信息都值得再抄一遍</h3>
+<p>例如，几十个接口字段已经由受维护的接口定义生成，再手写一份完整清单，通常只会增加同步对象。可以引用或生成阅读视图，并把精力放在代码不容易回答的问题上：为何否决另一种方案、一次事故如何定位、线上配置为什么与默认值不同、哪些操作存在业务限制。</p>
+<p>不过，“代码里能读出来就绝不写”同样过头。新人需要稳定的模块边界，使用者需要接口契约；从代码生成的参考也有价值。判断标准应是：<strong>它是否帮助完成一个实际任务，维护方式能否承受它的变化速度。</strong></p>
+<p>对易变运行状态，文档还应告诉使用者如何取得当前观察，而不是永远保存一个“现在是 running”的快照。文档可以说明状态字段的语义与读取入口；J17 此刻的状态应来自获授权的查询。</p>
+<h3>同一项目的知识分工：不要把所有内容塞进常驻指令</h3>
+<table>
+<thead>
+<tr>
+<th>知识</th>
+<th>示例</th>
+<th>合适的归属与理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>执行时必须遵守的规则</td>
+<td>回答生产问题前确认环境与版本，证据冲突时不要直接作操作建议</td>
+<td>精简的项目指令入口；需要让 Agent 在相关任务开始前获得</td>
+</tr>
+<tr>
+<td>项目事实与操作策略</td>
+<td>release-2 的等待上限、超时后怎样查询原任务</td>
+<td>有维护者和来源的项目文档；按任务读取</td>
+</tr>
+<tr>
+<td>设计解释与历史经验</td>
+<td>为什么延长等待，为何不建议超时后直接重提</td>
+<td>决策记录、解释或复盘；帮助理解当前规则</td>
+</tr>
+<tr>
+<td>个人偏好与临时工作记录</td>
+<td>个人想要的报告格式、本次调查的中间线索</td>
+<td>适当的个人配置或工作记录；不要自动升级成团队项目事实</td>
+</tr>
+</tbody></table>
+<p>这里区分的是职责，不是强制目录名。指令入口的发现、加载与作用域取决于具体 Agent 及其配置，必须检查实际环境，不能看到 <code>AGENTS.md</code> 或其他文件名就假设全部内容每轮生效。</p>
+<p>一个反例很能说明分流的价值：“生产等待上限改成 60 秒”是项目事实变化，不应该靠某个成员的私人记忆维持；“每次先核对生产策略正本”才是适合放进项目入口的行为规则。两者混在一起，换个工作目录或换个协作者，就可能丢掉规则或带上错误的旧值。</p>
+<p><a id="doc-views"></a></p>
+<h2>五、阅读与导航设计：单写多视图，再把资料送到实际任务中</h2>
+<h3>两类读者，其实是两种阅读任务</h3>
+<p>查等待上限时，人和 Agent 都需要简洁、准确的参考；理解取消风险时，人和 Agent 都可能需要解释。因此不能把人固定成“只看长文”，把模型固定成“只看字段表”。</p>
+<p>Diátaxis 将<a href="https://diataxis.fr/reference/">参考</a>与<a href="https://diataxis.fr/explanation/">解释</a>区分为不同文档任务：前者帮助查询技术描述，后者帮助建立理解。本文借用这种区分，再增加适用范围、导航与验证。它不意味着每个知识点都要手工写两份“人版”和“AI 版”。</p>
+<p>对示例，可以采用下面的职责安排。路径只是示意：</p>
+<pre><code class="language-text">项目指令入口
+  └─ docs/README.md                        按问题找资料
+       ├─ facts/export-policy.md           当前版本的事实与操作策略
+       ├─ guides/export-troubleshooting.md 故障排查方法，链接当前策略
+       ├─ decisions/export-wait-change.md  为什么从旧策略演进
+       └─ archive/release-1-export.md       历史规则，标明非当前版本
+</code></pre>
+<p>正本不一定在 <code>facts/</code>，也不一定全部放进一个文件。需要统一的是某个对象、范围下的权威定义，而不是把仓库压成一份巨型文档。</p>
+<h3>错误的重复，重复的是维护责任</h3>
+<p>假设参数参考、排障教程和项目指令都写着“等待 30 秒”。修改为 60 秒时，需要三个维护者记住一起改。少改一个地方，它就继续向某类读者提供另一套答案。</p>
+<p>修正后，项目入口只指向当前策略；排障教程解释“先查看任务状态，再按当前策略决定下一步”；现行数值留在策略正本。历史复盘仍可以写“当时使用 30 秒”，因为它描述的是明确时点的过去，不和当前生产值争夺权威。</p>
+<p>所以有用的自检不是“这句话在仓库里出现过几次”，而是：<strong>改一个易变事实，需要同步修改几个独立维护的当前值？</strong> 历史描述、生成内容和解释性重述，不能仅因字面重复就一律判错。</p>
+<h3>链接解决双写，却不自动解决可用性</h3>
+<p>给教程放一个链接，不等于使用者已经获得链接目标。人可能没点，Agent 可能只读当前片段，也可能没有目标文件的权限。于是“单一事实源”成立，回答依然缺少关键条件。</p>
+<p>对需要即时作决定的路径，入口应说明<strong>什么时候必须读取目标</strong>。例如：“涉及取消或重提建议，读取当前版本操作策略；不能仅依据本文历史案例。”针对独立分发的手册，若无法依赖链接，可以生成包含当前策略的片段，并登记来源版本、生成方式和更新检查。</p>
+<p>这两种做法各有代价：链接减少复制，却增加一次导航；生成视图改善局部完整性，却增加构建与失效检查。应按使用场景选择，不能把“不复述”变成让读者永远追不完的指针链。</p>
+<p><a id="doc-navigation"></a></p>
+<h3>从入口到上下文：检查实际取得的资料</h3>
+<p><a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents">Anthropic 的上下文工程文章</a>讨论了通过路径与工具按需取得资料的方式，以及探索所需的引导和成本。它支持这里对资料取得过程的关注，不为下面这条具体任务链或目录设计背书。</p>
+<p>一份资料没有进入本次可用上下文，就不能指望它约束本次回答。对本地文件 Agent，这条链可以这样观察：</p>
+<details class="mermaid-source"><summary>展开深入版关系图源码（讲解页提供图解）</summary><pre><code>flowchart LR
+    T[任务：版本 / 环境 / 目标] --&gt; R[入口：按问题定位]
+    R --&gt; S[搜索：得到候选路径]
+    S --&gt; D[读取：取得正文与适用范围]
+    D --&gt; F[追溯：当前策略及事实依据]
+    F --&gt; A[解释：回答或操作建议]
+    A --&gt; V[外部核对：依据与结论是否相称]
+</code></pre></details>
+<p>这是建议的任务链，不是所有 Agent 的强制执行顺序。允许它直接搜索正本，也允许它通过其他合理路径取得足够证据。检查的是过程是否支撑结果，不是是否按作者喜欢的顺序调用工具。</p>
+<h3>入口设计：按任务定位，不只是列出所有文件</h3>
+<p>弱入口写“文档见 docs，共 200 篇”；好一些的入口会把任务与资料联系起来：当前操作规则去策略参考，历史事故去归档，想知道为何改变去设计记录。</p>
+<p>它不需要在入口复制 200 篇摘要，更不应把所有历史限制都塞成常驻指令。以导出问题为例，一个有用的导航条目可以是：</p>
+<pre><code class="language-text">问题涉及导出超时、取消或重复提交：
+先核对任务所属环境与版本，读取对应操作策略。
+历史案例只用于解释，不据此推定当前阈值。
+</code></pre>
+<p>这段指令没有重复 60 秒，却告诉 Agent 哪些问题不能仅靠关键词搜索结果作答。</p>
+<h3>读取边界：命中路径不等于取得适用知识</h3>
+<p>一次搜索返回了 <code>release-1-export.md</code>，只说明路径匹配；它是否被打开、打开了哪段、那段是否包括版本限制，仍是后续问题。即使读到了当前策略，回答时也可能把“等待结束”解释成“任务失败”。</p>
+<p>需要保留的可观察材料是：搜索词与候选路径、实际读取的片段及其文档版本、随后给出的答案或动作。不要求抓取模型不可见或不可提供的内部思维过程；工具输入输出和外部结果足以支持很多诊断。</p>
+<p>本地导航也不是没有维护成本。文件更名可能破坏入口，过长目录可能增加探索，归档缺少明显标识可能让旧文与当前规则并列。反过来，强迫所有问题只走唯一入口，又可能阻止有效的直接查找。应通过真实任务观察哪里容易漏读，再调整组织与指引，而不是先假设某种目录必然更适合模型。</p>
+<p><a id="doc-eval"></a></p>
+<h2>六、使用验证设计：分开核实事实、资料支持与任务判断</h2>
+<h3>检查对象：为什么不能合成一个“知识库准确率”</h3>
+<p>第一，<strong>事实是否仍成立</strong>：文档写的策略是否符合相应版本与环境的审核依据？</p>
+<p>第二，<strong>回答是否得到资料支持</strong>：Agent 的说法能否从它实际取得的资料推出？</p>
+<p>第三，<strong>任务是否被正确处理</strong>：面对用户问题，建议或行动是否满足当前策略与权限边界？</p>
+<p>例如，读旧文回答 30 秒，可以在“忠实于所读材料”这一项表现良好，却不符合当前策略；没有任何来源却猜出 60 秒，数值正确，也不能证明文档导航有效。<a href="https://docs.langchain.com/langsmith/evaluate-rag-tutorial">LangSmith 的评测教程</a>分别比较答案与参考、答案与取得的资料、资料与问题，这提供了区分这些检查对象的方法。 本文将它用于项目文档，但并不把问答评测当作运行事实的来源。</p>
+<p><a id="doc-grader"></a></p>
+<h3>事实题与决策题，验证不同能力</h3>
+<p>Golden 题是经过审核、用于反复检查的任务。它应该从真实使用中的高风险疑问、近期变更和已发生的误用中挑选，而不是为了题量把每页改写成阅读理解。</p>
+<p>围绕导出服务，可以先明确下面几类任务；完整策略与调查记录放在后面的案例中展开：</p>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>允许取得的材料或状态</th>
+<th>通过时必须体现什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>事实题：release-2 生产等待上限是多少</td>
+<td>当前生产策略</td>
+<td>60 秒，并带对版本、环境与出处</td>
+</tr>
+<tr>
+<td>决策题：J17 运行45秒、状态running，该怎么办</td>
+<td>当前策略与给定任务状态</td>
+<td>查询原任务；不能仅凭耗时取消或重提</td>
+</tr>
+<tr>
+<td>缺证题：仅有测试环境说明，生产上限是多少</td>
+<td>不提供生产策略</td>
+<td>明确生产值未知，不套用测试值</td>
+</tr>
+<tr>
+<td>语义题：本次客户端等待等满60秒，后台是否一定失败</td>
+<td>当前策略</td>
+<td>区分等待结束与后台状态；保留任务号并查询</td>
+</tr>
+<tr>
+<td>条件变化题：用户明确要求取消J17，服务返回当前可取消</td>
+<td>明确给出授权与状态</td>
+<td>承认符合条件的取消路径；实际执行仍复核，不能把“不直接取消”绝对化</td>
+</tr>
+</tbody></table>
+<p>题目中的预期结果由相应策略与审核依据产生，不能仅从被测文档抄一遍。如果文档和参考答案一起复制了旧错误，Agent 越忠实，测试就越可能给出漂亮的假成绩。</p>
+<p>如果只评建议，保留答案和证据就能检查一部分能力；如果声称验证真实操作，就要提供隔离的工具环境，并核对调用与结果。比如断言“没有无授权取消”，不能只看它有没有在回复里写“取消”两个字。</p>
+<h3>一次可解释的检查，需要哪些固定条件</h3>
+<p>至少登记被测文档快照、项目指令、Agent 与模型配置、工具及可读范围、问题与初始状态、外部判据。使用新会话可以减少旧对话干扰，但个人记忆、持久状态或额外文件仍需明确控制；“开新窗口”不是自动隔离全部信息的保证。</p>
+<p>测试执行者看问题和许可范围内的资料，不看标准答案；评分端再读取预期。保留搜索、读取、引用、回答；有模拟动作时还要保留动作和结果。检查哪条限制实际被执行，不能只在提示词里写“禁止读答案”就当作隔离已经成立。</p>
+<p>对于字段值、单位、作用域，可以用代码规则；对于解释是否支持动作，需要明确判据，并用人工确认的正反例校准评分。评测不会因为运行了一遍就训练模型；缺少反例的后果是<strong>没有测出相应错误</strong>，或维护者持续按不完整成绩优化，而不是题库本身直接改变了模型参数。</p>
+<p>报告也要保留失败分布：是事实题错，还是读到事实却在决策题上错？是正常题通过，但缺证题仍猜测？这比一个平均数更能指导维护。应允许多条等价正确路径，不以必须读取某个唯一文件替代对正确依据的检查。</p>
+<p><a id="doc-ci"></a></p>
+<h3>自动化是放大已清楚的判据，不是替模糊标准盖章</h3>
+<p>链接与必需元数据检查可以较早自动化；语义冲突、事实新鲜度和操作判断则需要各自的依据。两个页面写着不同数字，若适用版本不同，不是活跃冲突；只靠文本比较无法完成这项裁决。</p>
+<p>行为检查存在波动。比较文档版本时，声明本次改变的变量，尽量固定其余条件；先看具体失败和重复观察，再按风险确定是否阻断。不可接受的越权动作与一般措辞变差，不能靠同一个平均及格分决定。</p>
+<p>小项目可以从人工抽查关键题开始；稳定后对相关改动跑小集合，发布前或定期扩展覆盖。<a href="https://www.writethedocs.org/guide/docs-as-code/">Docs as Code</a>已经将版本控制、审阅和自动测试纳入文档工作流， 本文补充的是在同一流程里观察 Agent 的实际知识使用，而不是声称给 Markdown 接 CI 是新发明。</p>
+<p><a id="doc-drift"></a></p>
+<h2>七、变更维护设计：来源、使用与模板怎样共同演进</h2>
+<h3>一次策略变更会触及什么</h3>
+<p>沿用示例，假设 release-3 将客户端等待上限改为 90 秒，但仍不因等待结束取消后台任务。不是全库搜索“60”全部替换成“90”，而是逐个判断对象：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>应如何处理</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>当前策略正本</td>
+<td>依据已审核新规则更新，并明确 release-3 范围</td>
+<td>对当前使用负责</td>
+</tr>
+<tr>
+<td>release-2 历史说明</td>
+<td>保留60秒与原版本标识</td>
+<td>历史不能随当前配置被重写</td>
+</tr>
+<tr>
+<td>排障解释</td>
+<td>检查理由、建议和例子是否仍成立</td>
+<td>即使未复制数字，推理也可能受变化影响</td>
+</tr>
+<tr>
+<td>生成参考或分发副本</td>
+<td>按声明来源重新生成，或标出仍适用的旧版本</td>
+<td>派生材料需要可识别的状态</td>
+</tr>
+<tr>
+<td>题库</td>
+<td>新增release-3任务；保留仍支持的release-2题；修订已失效预期</td>
+<td>区分新行为、兼容行为与错误答案</td>
+</tr>
+<tr>
+<td>文档入口</td>
+<td>检查“当前版本”是否仍指向正确范围</td>
+<td>正本正确却被入口绕过，仍然不可用</td>
+</tr>
+</tbody></table>
+<p>这才是“来源新鲜度”的实际意义：事实依据变了，哪些说明与使用任务需要复核。仅记录仓库 HEAD 太粗；最好能定位到相关文件、配置项、接口行为或发布记录。依赖变化是复核信号，不是自动判定文档错误。</p>
+<p>同时不要把“有依赖清单”夸成自动理解全部影响。依赖关系可能漏记，外部环境也会变化。关键事实仍需要负责人判断，使用失败与巡检可以帮助发现清单之外的变化。</p>
+<h3>复核动作应该有状态，而不只是一个日期</h3>
+<p>可以记录“已核实仍适用”“已更新”“因缺权限待核实”“该版本已退役”。如果无法确认生产现值，更新日期并写“已检查”反而会制造信任错觉。</p>
+<p>对 J17 一类操作规则，待核实还应影响消费方式：页面提示不能直接据此执行相关动作，入口提供升级到维护者的路径。低风险背景介绍则可以采用较宽松的复核节奏。治理成本应随错误后果分层，而不是要求每篇文章每天重新读一遍代码。</p>
+<h3>多项目复用：共享方法，不共享环境事实</h3>
+<p>项目 A 的等待策略是60秒，项目 B 是120秒，两者不同可能完全正确。把 A 的整份文档当模板同步到 B，会把项目事实当成通用知识传播；反过来，完全禁止复制模板，又会让有价值的维护改进无法复用。</p>
+<p>应把复用内容分成两类：一类是通用方法与工具，例如“每条高风险事实登记适用范围”“给缺证情况配题”；另一类是本项目资料，例如实际配置值、权限、数据源与业务条件。模板可以共享前一类，并登记版本；实例化时由各项目填自己的后一类。</p>
+<p>假设项目 B 改进了链接检查，支持检测一种常见失效锚点，可以审查后回到公共模板；B 的120秒不应随这次改进流入 A。若某条所谓通用规则在 B 需要不同处理，先判断它是不是错放的项目假设，而不是强迫所有项目服从模板。</p>
+<p>手工复制也可以是起点，但需要台账说明来源、版本、允许的本地差异和升级方式。把副本称为缓存不会自动解决同步；只有能识别来源、知道何时重建、保留合理差异，它才真正成为受管理的派生内容。项目少时可以人工维护，规模变大再考虑公共包或生成流程，别先建一套比文档本身更难维护的同步系统。</p>
+<p><a id="doc-diagnosis"></a></p>
+<h2>八、案例验证：用一条错误建议检验总体设计</h2>
+<p>前面的总体设计能否解释一个实际形态的问题，要回到开头的建议来检验。下面全部是<strong>构造的调查材料与结果</strong>，不代表真实运行。</p>
+<p>此时问题不再只是“应该排查哪一步”，还包括“缺口属于总体设计的哪部分、修改由谁承担”。我们从已知的错误建议出发，逐步取得材料，再将判断落回正本、导航、验证与维护。</p>
+<h3>8.1 核实适用规则：检验正本与事实依据的关系</h3>
+<p>在示例给定的审核材料中，release-2 生产策略为：</p>
+<pre><code class="language-yaml">scope:
+  environment: production
+  release: release-2
+client_wait_limit_seconds: 60
+on_wait_limit:
+  response: pending_with_job_id
+  cancel_background_job: false
+while_job_running:
+  default_action: query_existing_job
+resubmit:
+  require: confirmed_retry_eligibility
+cancel:
+  require: explicit_authorization_and_cancellable_state
+</code></pre>
+<p>为了不把参数当成整个系统，这些字段需要翻译成业务含义：客户端最多等待 60 秒；等不到最终结果时返回“仍在处理中”并保留任务号；后台任务不因此被取消。最后两个资格字段，在这个构造服务中具体规定如下：</p>
+<ul>
+<li><strong>重新提交资格</strong>：原任务已明确失败，服务端重试策略确认该任务可重试，并且新请求使用服务支持的幂等标识与重提机制，防止重复请求造成额外执行与副作用。仅“页面没有结果”不满足条件；无法核实这些条件时，不建议直接再建任务。</li>
+<li><strong>取消资格</strong>：用户明确要求取消 J17，且任务服务返回该任务当前可取消。查询得到的资格只支持当时的建议；实际调用时，服务端仍须检查权限、当前状态与取消条件，处理查询后状态已经变化的情况。文档不能代替执行端的检查。</li>
+</ul>
+<p>“运行中优先查询原任务”是未满足其他动作条件时的默认处理，不禁止在用户明确授权且服务允许时取消。这样，操作策略表达的是条件分支，而不是把“等待”写成唯一答案。</p>
+<p>在 J17 已存在、状态仍为 running 的前提下，45 秒的任务运行时长本身不能证明客户端已达到等待上限；两者的计时起点应按协议确认。即使客户端确实等到 60 秒，也不能单凭等待结束宣布后台失败。当前合理建议是继续查询原任务；不能只因用户提出“要不要取消”就认定已获得取消授权，也不能无条件重新创建第二个任务。</p>
+<p><strong>这段操作判断依赖上面明确给定的策略。</strong> 对其他系统，等待超时可能确实表示同步操作失败；文章不能把本例的处理方式变成一条通用超时规则。</p>
+<h3>8.2 查看实际读取：检验导航能否取得适用资料</h3>
+<p>示意工具记录显示：</p>
+<pre><code class="language-text">搜索：&quot;export timeout&quot;
+候选：archive/release-1-export.md，facts/export-policy.md
+读取：archive/release-1-export.md 的历史片段
+回答：超过 30 秒，建议终止后重试
+</code></pre>
+<p>继续检查历史片段，发现它保留了旧流程的处理说明，但被读出的区域没有带上版本标识。当前策略页存在，项目导航却没有区分“现行策略”和“历史复盘”。</p>
+<p>到这里，可以排除“当前策略正本仍写 30 秒”作为本例原因；也没有证据证明模型“读取正确片段仍然解释错”。目前最直接的缺口是：实际读取过程没有取得当前策略及适用范围。</p>
+<p>“模型有依据吗”与“它答对了吗”也在这里分开了：旧片段可以支持它引用的历史数值，却不足以支持当前生产决策。<strong>忠实于一份不适用的材料，仍然会导致错误建议。</strong></p>
+<h3>8.3 比较观察与判据：检验使用验证能否定位缺口</h3>
+<p>保持同一个问题，另开一个受控会话，直接提供已经审核的当前策略。在示意对照中，Agent 改为建议“查询 J17，不直接取消或重提”。</p>
+<p>这个变化支持优先检查导航、片段范围与版本选择。但对照同时改变了可用上下文，单次变化不能证明唯一原因，更不能证明模型在所有相似条件下都能正确解释。它的用途是帮助选择下一项最有价值的调查，而不是给模型发一张永久合格证。</p>
+<p>如果直接给当前策略以后仍建议取消，则继续加路由没有针对性。应检查资料是否真的把客户端与后台任务区分清楚、模型是否混淆字段、题目的环境是否存在歧义，以及判分是否误读了答案。</p>
+<h3>8.4 责任落到对应对象：检验维护能否完成修订与复查</h3>
+<p>本例应做三处不同性质的修改：导航明确当前操作策略的位置；历史页在可被单独读取的关键段附近保留 release-1 范围；排障指南说明涉及取消与重提时需要读取当前策略，而不手工再维护一套阈值。</p>
+<p>然后从原问题、正常工具和原入口重新运行。若只把正确片段直接交给模型再测一遍，就没有检验导航是否修好。</p>
+<p>把修后的读取与判断写出来，才知道复测究竟在检查什么。下面是<strong>构造的修后记录，不是本轮实际运行输出</strong>：</p>
+<pre><code class="language-text">问题：release-2 生产，J17运行45秒、状态running，该取消还是重提？
+入口：导出超时/取消/重提 → 当前版本操作策略
+读取：包含 production、release-2、客户端等待及取消/重提条件的片段
+回答：先查询J17，不因运行45秒就取消或重新创建任务；
+      60秒是客户端等待上限，不代表后台任务到时失败。
+依据：当前生产策略的范围、等待行为、动作资格条款
+检查：事实值与单位正确；环境/版本正确；建议有条件依据；引用支持结论
+</code></pre>
+<p>正常题通过以后，还要补两种邻近情况。<strong>缺证样例</strong>只提供测试环境说明，合格回答应是“尚不能确认生产等待策略，需要取得生产依据”，而不是把测试值套过来。<strong>条件变化样例</strong>给出“用户明确要求取消J17”和“当前可取消”的服务返回，合格处理应承认取消路径已具备相应条件，并说明执行时仍须由服务端复核，而不是永远劝用户等待。</p>
+<p>这些记录让修订目标变得可检查：不是让模型记住“答案改成60”，而是让它取得适用策略、理解两种超时语义，并按当前证据选择相应分支。实际项目需要以自己的真实复测记录替换这里的示意。</p>
+<p>不同观察对应的修订对象，可以归纳为：</p>
+<table>
+<thead>
+<tr>
+<th>观察到的主要缺口</th>
+<th>优先检查或修改的对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>现行文档与已审核运行依据不符</td>
+<td>当前事实说明、来源核验与维护责任</td>
+</tr>
+<tr>
+<td>正本适用，但实际只取得旧页或片段缺范围</td>
+<td>导航、历史标识、读取范围与必要追溯指令</td>
+</tr>
+<tr>
+<td>当前策略已提供，仍把等待结束当后台失败</td>
+<td>策略表达、语义区别、任务条件与模型解释</td>
+</tr>
+<tr>
+<td>答案与策略相符，却被评分标错</td>
+<td>参考答案、判据与评分实现</td>
+</tr>
+</tbody></table>
+<p>这张表是排查优先级，不是互斥分类。一项事故可能同时有多个缺口；只有补齐实际记录，才能知道应改哪些环节。</p>
+<h3>8.5 回看总设计：解决的是哪个缺口，仍需承担什么代价</h3>
+<p>在这个构造案例中，当前策略正本本身没有过期，主要缺口出在导航与被读取片段的范围。因而修订重点是让当前策略可被取得，并防止历史片段脱离版本被使用；不是让所有文档都改写一遍“60秒”。</p>
+<p>对照与复测分别承担不同任务：前者帮助缩小原因范围，后者检查正常入口是否得到改善。缺证题和条件变化题还要验证修订没有制造“逢题答60”或“永远不能取消”的新偏差。</p>
+<p>这也说明总体方案为何需要四部分并存：正本给出可核实规则，导航使规则进入当前任务，验证把错误与缺口联系起来，维护负责对应修订。它的代价是持续记录范围、少量关键任务和变更责任；没有这些投入，关系图本身不会让系统变得可靠。</p>
+<p><a id="doc-start"></a></p>
+<h2>九、怎样起步，以及什么时候不必搭完整体系</h2>
+<p>对已经有文档库的团队，不必一次建齐所有机制。先挑一个近期反复答错、且错误会影响行动的问题，用它检查总体设计中的职责是否已有人承担：</p>
+<p><strong>审核适用规则 → 找到现有文档正本 → 观察一次真实读取与使用 → 判断缺口 → 修正对应对象 → 回到正常入口复测 → 登记后续变更责任。</strong></p>
+<p>在本例中，交付物不是“重构了20篇文档”，而是能回答五个具体问题：J17应按哪套策略处理；谁维护这套策略；Agent实际如何取得它；修订解决了哪个已观察的缺口；下次策略变化时哪些入口、说明和题目会被复核。</p>
+<p>然后再用一个邻近场景检验迁移。例如数据库地址变更：入口应该指导查当前环境的数据源清单；设计文档仍解释为什么分库，不手工保存一份失去同步责任的当前地址；行为检查既考能否找到新依据，也考拿不到目标环境证据时是否会冒用测试配置。地址本身还涉及访问与披露边界，应按实际权限处理，不能为了“提高可检索性”把敏感值放进所有 Agent 都能读的入口。</p>
+<p>如果这条链仍说不清，增加题量与分类通常只会扩大维护表面。相反，小型仓库的一份清楚参考、一段任务导航和几道关键检查，可能已经够用。目录分层、生成视图、自动回归与模板同步，应随实际使用中的问题逐步增加。</p>
+<p>起步时仍应守住总设计中的四项职责：<strong>事实有人负责，资料能被取得，使用过程可以检查，变化会触发维护。</strong> 任一项都不能由其余项代替：结构漂亮不代表事实正确，引用正确不代表决策正确，答题通过不代表文档永不过期，负责人存在也不代表每次变更都已被追踪。</p>
+<p><a id="doc-boundary"></a></p>
+<h2>十、依据、适用边界与待验证之处</h2>
+<p>本文讨论的是项目文档如何支持人和编码 Agent 的协作，不提供一个特定产品的加载规则，也不声称消除模型误读或证明系统整体可靠。文档只能支持有依据的判断；高风险动作仍需要真实系统中的权限、授权和运行约束。</p>
+<p>来源分工如下：</p>
+<ol>
+<li><strong><a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents">Anthropic：Effective context engineering for AI agents</a></strong>，2025-09-29。支撑通过路径与工具按需取得资料、上下文组织及探索取舍。本篇的文档职责划分与导出流程是综合设计，不是官方推荐目录。</li>
+<li><strong><a href="https://diataxis.fr/reference/">Diátaxis：Reference</a></strong>。支撑面向查询的技术参考与其组织任务。</li>
+<li><strong><a href="https://diataxis.fr/explanation/">Diátaxis：Explanation</a></strong>。支撑面向理解的解释任务；不据此推出人和模型必须各维护一份文档。</li>
+<li><strong><a href="https://docs.langchain.com/langsmith/evaluate-rag-tutorial">LangSmith：Evaluate a RAG application</a></strong>。支撑将答案正确性、资料支持程度与检索相关性分开检查。这里借用检查对象的区分，不假设本地 Agent 一定使用 RAG，也不保证参考答案等于实际运行真相。</li>
+<li><strong><a href="https://www.writethedocs.org/guide/docs-as-code/">Write the Docs：Docs as Code</a></strong>。支撑文档进入版本控制、审阅与测试工作流。</li>
+</ol>
+<p>本地素材中的单一事实源、多入口、知识存储分工、手工 golden 检查及多项目模板演进，为本文提供了问题和设计背景。其中自动评估与模板同步包含待实施建议，不能当作已经取得的系统效果。正文用构造案例把这些关系展开，没有把模拟读取记录写成亲历事故，也没有报告命中率或效率提升。</p>
+<p>仍需要在实际项目验证三件事：入口与表达改动是否稳定减少目标失败；关键题的维护成本是否可接受；变化触发机制能覆盖多少真实漂移。这些只能靠对应项目的运行记录与持续观察回答。本文的贡献是把知识归属、取得过程、行为检查和变更维护接成一套可审查的方法，不是另造一种“准确率”或宣布一套普适最优目录。</p>
+</article><footer class="exit"><a href="%E8%AE%B2%E8%A7%A3-07-%E6%96%87%E6%A1%A3%E5%8F%AF%E6%B5%8B%E8%AF%95%E5%8C%96.html">← 返回讲解版</a></footer></section>
+<noscript><p class="noscript">讲解正文、图和折叠追问均可读。图解放大与深入视图切换需要JavaScript；可直接查看相邻Markdown正本。</p></noscript>
+</div><dialog id="zoom" aria-label="放大图解"><div class="zoom-close"><button type="button" id="close-zoom">关闭 ×</button></div><div id="zoom-body"></div><p id="zoom-caption"></p></dialog><script>
+function applyView(){const deep=new URLSearchParams(location.search).get('view')==='deep';document.getElementById('lecture').hidden=deep;document.getElementById('deep-document').hidden=!deep;document.getElementById('mode-status').textContent=deep?'深入版阅读视图':'讲解版 · v2.1';if(deep&&location.hash){requestAnimationFrame(()=>document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView())}}
+applyView();window.addEventListener('hashchange',applyView);
+const zoom=document.getElementById('zoom');
+for(const fig of document.querySelectorAll('#lecture figure')){const tools=document.createElement('div');tools.className='figure-tools';const b=document.createElement('button');b.type='button';b.textContent='放大图解 ↗';b.setAttribute('aria-label','放大：'+fig.querySelector('figcaption').textContent);b.addEventListener('click',()=>{const svg=fig.querySelector('svg').cloneNode(true);for(const el of svg.querySelectorAll('[id]'))el.removeAttribute('id');svg.removeAttribute('aria-labelledby');svg.setAttribute('aria-label',fig.querySelector('figcaption').textContent);document.getElementById('zoom-body').replaceChildren(svg);document.getElementById('zoom-caption').textContent=fig.querySelector('figcaption').textContent;zoom.showModal()});tools.append(b);fig.prepend(tools)}
+document.getElementById('close-zoom').addEventListener('click',()=>zoom.close());zoom.addEventListener('click',e=>{if(e.target===zoom)zoom.close()});
+</script></body></html>

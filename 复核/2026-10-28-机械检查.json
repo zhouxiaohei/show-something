@@ -1,0 +1,13 @@
+{
+  "direction": "show",
+  "stats": {
+    "documents_scanned": 9,
+    "local_links_and_resources": 107,
+    "external_citations_not_fetched": 33,
+    "configured_documents": 3
+  },
+  "counts": {},
+  "findings": [],
+  "scope": "项目配置、文件、链接、源码锚点、直接/嵌套CSS依赖、SVG引用、图注存在、配对及元数据。",
+  "not_checked": "事实、证据充分性、命题保真、图解正确性、学习迁移、脱敏充分性及阅读器/浏览器实际效果；均需内容或视觉复核。"
+}

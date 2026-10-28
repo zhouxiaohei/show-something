@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<!-- 文档类型：速查/目录页，不套八节主干——它只是六篇讲解版的入口索引，正文内容都在各篇里。 -->
-<title>show-something 阅读目录 · AI 工程六讲</title>
+<!-- 文档类型：速查/目录页，不套八节主干——它只是九篇讲解版的入口索引，正文内容都在各篇里。 -->
+<title>show-something 阅读目录 · AI 工程九讲</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:-apple-system,PingFang SC,sans-serif; background:#f8fafc; color:#1f2328; line-height:1.7; }
@@ -27,13 +27,13 @@
 <body>
 <div class="wrap">
   <header class="hero">
-    <h1>AI 工程六讲 · 阅读版</h1>
-    <p class="sub">六篇关于 AI 时代工程问题的文章，每篇 10 分钟读懂：讲清楚是什么、为什么、怎么做。</p>
+    <h1>AI 工程九讲 · 阅读版</h1>
+    <p class="sub">九篇关于 AI 时代工程问题的文章，每篇 10 分钟读懂：讲清楚是什么、为什么、怎么做。</p>
     <p class="meta">每篇都配了图和类比，读完想深挖的，可以从每篇底部进入对应的深入版（Markdown）。</p>
   </header>
 
   <div class="intro">
-    <b>建议阅读顺序：</b>01 → 04 讲"为什么会出问题"（Agent 的行为与可靠性）；02 → 03 讲"怎么防"（证据化工程与需求契约）；05 是一篇基于公开证据的 Codex vs Claude Code 协作对比调研；06 与 01 是姊妹篇——01 讲信息变多变旧，06 讲同一件事出现两个矛盾版本。只看每篇开头的「30 秒版」也能抓住核心。
+    <b>建议阅读顺序：</b>01 → 04 讲"为什么会出问题"（Agent 的行为与可靠性）；02 → 03 讲"怎么防"（证据化工程与需求契约）；05 是一篇基于公开证据的 Codex vs Claude Code 协作对比调研；06 与 01 是姊妹篇——01 讲信息变多变旧，06 讲同一件事出现两个矛盾版本。07 聚焦知识库维护；08 把离线评测与生产观察接起来；09 处理接手后端时的事实核验。只看每篇开头的「30 秒版」也能抓住核心。
   </div>
 
   <a class="card" href="讲解-01-越聊越浅.html">
@@ -78,7 +78,29 @@
     <div class="tags">上下文冲突 · 重开判据 · 交接四件事</div>
   </a>
 
-  <footer>深入版（Markdown）位于仓库「来源」与「原文」目录（GitHub 上可直接渲染） · 本目录与讲解页均为离线可读的本地文件 · 2026-10-23</footer>
+
+  <a class="card" href="讲解-07-文档可测试化.html">
+    <span class="no">07 · 机制与方法</span>
+    <h2>文档明明写了，Agent 为什么还是答错？</h2>
+    <p>先看背景难点与总方案，再展开知识正本、阅读导航、使用验证和变更维护；用12张图和一个完整案例讲清它们怎样配合。</p>
+    <div class="tags">总体设计 · 单写多视图 · 变更维护</div>
+  </a>
+
+  <a class="card" href="讲解-08-Agent评测闭环.html">
+    <span class="no">08 · 工程方法</span>
+    <h2>Agent 上线之后，怎么知道它真的变好了？</h2>
+    <p>离线任务、生产追踪与样本审查相接；失败回归集与代表性质量集各负其责。</p>
+    <div class="tags">质量闭环 · 持续交付</div>
+  </a>
+
+  <a class="card" href="讲解-09-项目事实核验.html">
+    <span class="no">09 · 方法指南</span>
+    <h2>读完代码，还不算了解这个系统</h2>
+    <p>读码建立候选结构，沿导出业务核对行为与运行来源；12 幅图解配完整深入全文，形成能支持当前决策的系统画像。</p>
+    <div class="tags">项目接管 · 事实底账</div>
+  </a>
+
+  <footer>深入版（Markdown）正本位于「原文」目录；新增 07–09 支持内置离线深入阅读与精确定位 · 本目录与讲解页均为离线可读的本地文件 · 2026-10-28</footer>
 </div>
 </body>
 </html>

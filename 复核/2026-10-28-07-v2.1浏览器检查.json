@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-28",
+  "browser": "Installed Chrome via Playwright",
+  "offline": true,
+  "desktopViewport": "1280x920",
+  "figureCount": 12,
+  "visibleLectureCharacters": 9925,
+  "proseCharactersWithoutFigures": 7719,
+  "deepAnchors": [
+    "doc-case",
+    "doc-approach",
+    "doc-overview",
+    "doc-source",
+    "doc-views",
+    "doc-navigation",
+    "doc-eval",
+    "doc-ci",
+    "doc-drift",
+    "doc-diagnosis",
+    "doc-start",
+    "doc-boundary"
+  ],
+  "svgTextOutsideViewBox": [],
+  "zoomTested": 12,
+  "faqTested": 3,
+  "desktopOverflow": false,
+  "mobileOverflow": false,
+  "pageErrors": [],
+  "requiredRemoteRequests": [],
+  "indexCards": 9
+}

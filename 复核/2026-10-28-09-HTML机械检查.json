@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-28",
+  "scope": "仅09 MD/HTML及本篇复核记录、README；同版1.1；未审阅其他文章内容",
+  "checker": "/Users/jackzhou/Documents/ide/相关文档/展示文档规范/check_docs.py",
+  "config": "/Users/jackzhou/Documents/ide/show-something/复核/2026-10-28-09-HTML阶段检查配置.json",
+  "findings": [],
+  "counts": {
+    "documents_scanned": 4,
+    "local_links_and_resources": 153,
+    "external_citations_not_fetched": 26,
+    "configured_documents": 1
+  },
+  "approved_markdown_body_preserved": true,
+  "sha256": {
+    "原文/读完代码，还不算了解这个系统：陌生后端的事实核验七步法.md": "d2caab60c74e6dd34e55ea31b214de4eae6a4e948cf2426776df9e56447155cf",
+    "阅读/讲解-09-项目事实核验.html": "9652f9608f630ae5e9125461a8619b61c86dbc6c39fdacca6e016d0fa0307e26",
+    "project.json": "3a2956c499a8a38ea08018a10b08bc89d62f642cfbd8384497e1a423848681bf",
+    "阅读/index.html": "d4b0ab175f0293c1f6bfd50ae1839371bf689e3fa19da82b33496cb6c230ac08",
+    "README.md": "bc23f4b22c508aacd612aca35fedc08f4ce656bd3a8dd588837b7e17c9a4bce9",
+    "复核/2026-10-28-09-HTML深度图解与复核.md": "2a2cf948c389691d33ce44dab3be88df57f36303084faa00c7862f59b2a6cc52"
+  }
+}
