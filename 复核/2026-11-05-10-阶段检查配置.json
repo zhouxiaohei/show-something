@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "direction": "show",
+  "title": "AI 趋势新闻 2026-11月观察 · 审阅版",
+  "entry": "阅读/AI 趋势新闻 2026-11月观察.html",
+  "metadata_required": true,
+  "readers": {
+    "deep": "希望核对证据、推理与边界的读者",
+    "quick": "无需工程背景、希望理解专业工作变化的读者"
+  },
+  "delivery": {
+    "offline": true,
+    "public": true,
+    "sensitive_constraints": [
+      "仅使用公开材料与明确标注的构造示例",
+      "2026-11-05用户已授权本篇及相关入口、配置、核验记录提交并推送远端"
+    ],
+    "remote": "origin/main"
+  },
+  "documents": [
+    {
+      "id": "show-10",
+      "version": "0.1-review",
+      "status": "review",
+      "markdown": "原文/AI 趋势新闻 2026-11月观察.md",
+      "html": "阅读/AI 趋势新闻 2026-11月观察.html"
+    }
+  ],
+  "markdown_reader": "HTML内置从MD同版生成的完整深入全文，浏览器使用?view=deep#work-…离线定位；MD本身需支持显式HTML id的阅读器",
+  "supporting_documents": [
+    "README.md",
+    "复核/2026-11-05-10-本地审阅与核验.md"
+  ],
+  "specification": "SHOW v3.3（2026-10-29），本轮仅第10篇与相关入口"
+}
