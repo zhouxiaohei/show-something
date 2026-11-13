@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-14"><meta name="document-version" content="1.0-review">
+<meta name="description" content="把“按规范开发”落到可执行检查、违规反例和真实启动。四语言是设计范围，Java Lite V2 是已实现并在本轮重新验证的首个样板。"><meta name="color-scheme" content="dark">
+<title>AI 协作项目底座：从四语言设计到可验证的 Java 样板 · 铁甲依然在</title><link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/article.css"><script src="../assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-14">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">编码实战和复盘</p><h1>AI 协作项目底座：从四语言设计到可验证的 Java 样板</h1><p class="article-summary">把“按规范开发”落到可执行检查、违规反例和真实启动。四语言是设计范围，Java Lite V2 是已实现并在本轮重新验证的首个样板。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/AI%20%E5%8D%8F%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%BA%95%E5%BA%A7%EF%BC%9A%E4%BB%8E%E5%9B%9B%E8%AF%AD%E8%A8%80%E8%AE%BE%E8%AE%A1%E5%88%B0%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%20Java%20%E6%A0%B7%E6%9D%BF.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#verified-sample">让规则通过真实检查产生约束</a><a href="#boundary-example">一个违规反例：编译能过，架构规则仍会拒绝</a><a href="#capacity-example">资源限制，要连到真正的写入行为</a><a href="#shared-contract">四种语言，共享可检查的工程约定</a><a href="#two-tiers">什么时候从 Lite 走向 Modular？</a><a href="#language-boundaries">目录表达意图，工具才能检查越界</a><a href="#real-start">验收要运行交付产物</a><a href="#template-lifecycle">模板还要回答：以后怎么升级？</a><a href="#engineering-takeaway">规则的价值，体现在错误发生时</a></nav></details><p>设计调研：2026-11-03；Java 样板本轮复验：2026-11-13。</p></aside>
+<main id="article-content"><div class="quick-content"><section class="content-section" id="verified-sample"><p class="kicker">先看已经验证的部分</p><h2>让规则通过真实检查产生约束</h2><p>如果一条规范只写“不要跨模块访问内部类”，执行时就需要人或模型每次记住。Java Lite V2 样板把这类要求接到结构脚本、架构测试、行为测试和真实启动验收。</p><p>四语言、Lite／Modular 两档属于总体设计；当前实际实现并在本轮重跑的是 Java Lite 样板。它使用 Spring Boot 3.5.16、Java 17 基线，以 <code>items</code> 功能展示工程契约，没有默认交付订单系统、数据库或生产部署。</p><div class="proof-grid"><div><b>16</b><span>Java 测试通过</span></div><div><b>7 类</b><span>违规反例被预期规则拒绝</span></div><div><b>真实 JAR</b><span>随机端口启动与接口冒烟通过</span></div></div><p class="source-note">作者本地复验：2026-11-13，macOS arm64 / JDK 17.0.19，临时副本。以上结果不代表远端 CI、生产性能或八种模板均已验收。</p><a class="deep" href="?view=deep#deep-java-v2-evidence">查看具体命令、范围与限制 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E5%8D%8F%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%BA%95%E5%BA%A7%EF%BC%9A%E4%BB%8E%E5%9B%9B%E8%AF%AD%E8%A8%80%E8%AE%BE%E8%AE%A1%E5%88%B0%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%20Java%20%E6%A0%B7%E6%9D%BF.md#java-v2-evidence">Markdown 对应段落</a></section>
+<section class="content-section" id="boundary-example"><h2>一个违规反例：编译能过，架构规则仍会拒绝</h2><p>在隔离副本中，让 <code>items</code> 直接引用 <code>platform.internal.RequestIdFilter</code>。类和语法本身存在，但 ArchUnit 按模块依赖规则拒绝了访问。这个负例验证了“由架构边界拦住违规”，不是碰巧遇到编译失败。</p><p>文档缺失、包路径、模块未登记、格式、平台反向依赖和循环也有对应反例。文档检查覆盖必需文件、链接、登记和 <code>.env.example</code> 变量名与登记名单的一致性；解释文字是否仍符合实际，仍需阅读与事实核对。</p><a class="deep" href="?view=deep#deep-java-v2-evidence">核对检查真正覆盖的边界 ↗</a></section>
+<section class="content-section" id="capacity-example"><h2>资源限制，要连到真正的写入行为</h2><p>样板默认容量 1000 条、最大页长 100；创建时将容量准入与写入放在同一同步边界。本轮将容量覆盖为 2，检查满容量后的实际接口响应。</p><figure><div class="figure-top"><span>机制示意</span><b>图 01｜一次真实 JAR 容量冒烟</b></div><img src="%E9%85%8D%E5%9B%BE/14/Java%E6%A0%B7%E6%9D%BF%E5%AE%B9%E9%87%8F%E9%AA%8C%E8%AF%81.svg" alt="两条创建成功，第三条因容量限制返回503"><figcaption>验收直接观察运行产物的行为。条目数量上限验证了准入控制，不等于整个 JVM 的内存上限、无泄漏或生产容量。</figcaption></figure><p>带着这些具体检查，再看下面的四语言设计：哪些约定可以共用，哪些边界要按各语言分别实现，哪些结果还需要真正生成后再验证。</p><a class="deep" href="?view=deep#deep-java-v2-evidence">查看本轮样板的完整验证 ↗</a></section>
+<section class="content-section" id="shared-contract"><p class="kicker">再看总体设计</p><h2>四种语言，共享可检查的工程约定</h2><p>AI 写代码越来越快，维护者仍要回答几个具体问题：新功能放哪里、能依赖谁、怎样启动、改完怎样证明没破坏旧行为。模板的价值，是让这些答案随着项目一起交付，并接到能重复运行的检查上。</p><p>设计采用“四种语言 × Lite／Modular 两档”。Java 建议 Spring Boot + MVC，Python 建议 FastAPI + uv，Go 建议标准 HTTP 接口配 Chi，TypeScript 建议 Node.js + Fastify。它们共享工程目标，各自保留原生目录、构建和运行机制；这些选型属于设计建议，Java Lite 样板之外的生成结果尚需分别实现与验收。</p><figure><div class="figure-top"><span>机制示意</span><b>图 02｜项目模板协作循环</b></div><img src="配图/14/图01.svg" alt="项目模板、规则说明、自动检查和维护者审阅共同形成协作循环" loading="lazy"><figcaption>模板提供起点，规则解释改法，检查暴露已定义的错误。业务正确性、模块划分与规则本身仍需要判断。</figcaption></figure><a class="deep" href="?view=deep#deep-sec-01">查看四语言的选型、代价与官方依据 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E5%8D%8F%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%BA%95%E5%BA%A7%EF%BC%9A%E4%BB%8E%E5%9B%9B%E8%AF%AD%E8%A8%80%E8%AE%BE%E8%AE%A1%E5%88%B0%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%20Java%20%E6%A0%B7%E6%9D%BF.md#sec-01">Markdown 对应段落</a></section>
+<section class="content-section" id="two-tiers"><h2>什么时候从 Lite 走向 Modular？</h2><p>Lite 适合边界较少的小型 API 和工具服务，也要具备配置校验、错误处理、结构化日志、关键行为测试和产物启动验收。Modular 则在这些基础上，增加模块的公开接口、允许依赖和跨模块检查。</p><figure><div class="figure-top"><span>机制示意</span><b>图 03｜Lite 到 Modular 的升级判断</b></div><img src="配图/14/图02.svg" alt="简单单体走向模块化单体，按实际需要引入外部依赖和独立部署" loading="lazy"><figcaption>两档都可以保持一个服务。出现独立部署、故障隔离或组织协作的明确需求后，再评估服务拆分。</figcaption></figure><p>一个有 PostgreSQL 的小 API 仍可以用 Lite；一个不依赖数据库、但存在多个稳定业务边界的应用，也可能需要 Modular。数据库、模块化和微服务分别解决不同问题。</p><a class="deep" href="?view=deep#deep-sec-02">查看两档能力和升级条件 ↗</a></section>
+<section class="content-section" id="language-boundaries"><h2>目录表达意图，工具才能检查越界</h2><p>以订单调用库存为例：订单只依赖库存公开接口，库存内部实现可以调整。下图是总体设计中的业务示例；前面实际复验的 Java 样板使用 <code>items</code>，没有把订单系统作为已完成成果。</p><figure><div class="figure-top"><span>机制示意</span><b>图 04｜订单与库存的模块边界</b></div><img src="配图/14/图03.svg" alt="订单依赖库存公开接口，跨越边界访问库存内部实现应被检查拒绝" loading="lazy"><figcaption>设计示例：公开接口承接协作，内部实现留在模块内。模块依赖与循环需要各语言可执行的检查。</figcaption></figure><p>Java 的 <code>public</code>、Python 的 <code>_internal</code>、TypeScript 的 <code>index.ts</code> 都不足以单独实现整套业务依赖规则。Modular 设计分别使用 Modulith／必要的 ArchUnit、Import Linter、Go 导入规则、dependency-cruiser 等机制检查边界；实际启用哪些规则，需要在生成结果中验证。</p><p>同样，静态类型检查不自动校验网络输入，格式通过不证明业务正确。把不同阶段的责任写清楚，才能避免一种绿色结果覆盖了另一类缺口。</p><a class="deep" href="?view=deep#deep-sec-03">查看四种语言的目录和机制差异 ↗</a> · <a href="?view=deep#deep-sec-04">查看依赖与目录检查</a></section>
+<section class="content-section" id="real-start"><h2>验收要运行交付产物</h2><p>“构建成功”之后还需要检查应用是否真的启动、接口是否返回预期结果、必需配置缺失时能否明确失败、退出后有没有留下进程。下面是设计要求的验收路径；Java 样板已按前文列出的范围实际执行。</p><figure><div class="figure-top"><span>机制示意</span><b>图 05｜运行产物的验收路径</b></div><img src="配图/14/图04.svg" alt="构建产物、随机端口启动、接口冒烟、配置失败检查与退出清理组成验收路径" loading="lazy"><figcaption>从源码检查继续走到运行中的产物。冒烟证明的是已覆盖场景，性能、故障恢复和外部依赖仍需对应证据。</figcaption></figure><p>AI 入口保持简短，指向目录职责、开发命令和完成标准；工具配置调用同一组检查，减少多套规则漂移。文档维护也与代码变更关联：改启动命令要同步运行说明，改配置要同步样例与加载契约，改模块要同步登记和边界说明。</p><p>Java 样板已经检查必需文档、本地链接、模块登记，以及 <code>.env.example</code> 变量名与登记名单的一致性。解释文字是否仍准确、是否遗漏了重要业务行为，需要继续阅读和事实核对。</p><a class="deep" href="?view=deep#deep-sec-06">查看启动与配置契约 ↗</a> · <a href="?view=deep#deep-sec-07">查看机械检查与人工审阅的分工</a></section>
+<section class="content-section" id="template-lifecycle"><h2>模板还要回答：以后怎么升级？</h2><p>模板复制出去以后，修复模板仓库不会自动修复已生成项目。设计需要记录模板版本、使用的能力和升级方式，区分可重复生成的内容与业务代码，再提供差异、迁移说明和生成后的验收。</p><figure><div class="figure-top"><span>机制示意</span><b>图 06｜模板维护与升级方案</b></div><img src="配图/14/图05.svg" alt="从公共基础和语言组件生成不同档位项目，再分别验证并维护版本和升级说明" loading="lazy"><figcaption>八个生成目标来自可组合的模板来源；每种组合都要独立验证。图示描述维护方案，不表示八种结果已经实现。</figcaption></figure><p>合理的下一步是先把一个可运行样板做扎实，再扩展语言和档位。每增加一种组合，都补齐构建、真实启动和违规反例，积累可以复验的结果。</p><a class="deep" href="?view=deep#deep-sec-08">查看模板维护和升级方案 ↗</a></section>
+<section class="content-section" id="engineering-takeaway"><h2>规则的价值，体现在错误发生时</h2><p>这次实践把一句“按工程规范开发”，拆成了看得见的目录、能运行的检查、被拒绝的违规和真实接口响应。Java 样板提供了第一个可复验的落点；四语言总体设计则给出了继续扩展的方向。</p><p>完整深入版保留四语言目录、技术差异、开源方案对照与实施边界，便于工程读者继续核对。</p><a class="deep" href="?view=deep#deep-overview">阅读全文与来源 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E5%8D%8F%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%BA%95%E5%BA%A7%EF%BC%9A%E4%BB%8E%E5%9B%9B%E8%AF%AD%E8%A8%80%E8%AE%BE%E8%AE%A1%E5%88%B0%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%20Java%20%E6%A0%B7%E6%9D%BF.md#overview">Markdown 原文</a></section>
+</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><!-- document-id: show-14 -->
+<!-- document-version: 1.0-review -->
+
+<p><a id="deep-overview"></a></p>
+<h1>AI 协作项目底座：从四语言设计到可验证的 Java 样板</h1>
+<p><a href="%E8%AE%B2%E8%A7%A3-14-AI%E5%8D%8F%E4%BD%9C%E5%B7%A5%E7%A8%8B%E5%BA%95%E5%BA%A7.html">图解讲解</a> · <a href="../index.html">返回首页</a></p>
+<p>文档类型：decision｜版本：1.0｜资料核查：2026-11-03（Asia/Shanghai）<br>读者：架构师、项目维护者，以及参与后续开发的 Coding Agent。<br>原设计稿于 2026-11-03 完成四语言、两档模板调研。本公开副本保留该设计范围，并增加 Java Lite V2 首个实现于 2026-11-13 的重新验证；八种模板并未全部实现。</p>
+<p><a id="deep-sec-01"></a></p>
+<h2>01 先看结论：需要一套可验收的项目底座</h2>
+<p>这个目标可以落成一个模板库：<strong>四种语言 × 两种档位，共八个生成结果，共用一组工程约定。</strong> 每个结果都要能启动、能验证，告诉人和 AI 新功能放在哪里、改完需要检查什么、哪些文档要同步。</p>
+<p>建议从语言原生的框架起点生成项目，再补自己的规则和验收。模板库统一开发体验；源码目录、类型系统、构建工具和模块边界分别按语言实现。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>语言</th>
+<th>简单版 Lite：默认建议</th>
+<th>复杂版 Modular：沿用并增加</th>
+<th>选择原因与主要代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Java</td>
+<td>Spring Boot + Spring MVC；Maven Wrapper</td>
+<td>同一 Boot 应用，增加 Spring Modulith 模块验证；有持久化需求再加迁移与集成测试</td>
+<td>框架已经提供配置、生命周期、校验和测试支持，减少自造基础设施；要控制 starter 数量与自动配置带来的隐含行为</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>FastAPI + uv；Pydantic 做外部输入与配置校验</td>
+<td>业务包边界 + Import Linter；按需加入 SQLAlchemy / Alembic</td>
+<td>适合 API 与 Python 库集成，环境管理清晰；类型检查、同步与异步边界必须主动约束</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>Go module + <code>net/http</code> + Chi</td>
+<td>保留 HTTP 路线，增加业务包与 import 依赖规则、真实依赖测试</td>
+<td>Chi 保留标准 <code>http.Handler</code> 组合方式，便于组织路由；配置、错误、日志与生命周期的约定需要自己补齐</td>
+</tr>
+<tr>
+<td>TypeScript</td>
+<td>Node.js + Fastify；TypeScript strict；npm 锁文件</td>
+<td>按业务组织 Fastify plugins，增加依赖规则与集成测试</td>
+<td>较少框架机制，适合干净 API 底座；模块约定与依赖装配需要模板明确规定</td>
+</tr>
+</tbody></table></div>
+<p>以上是<strong>本报告的技术建议</strong>，并非已完成兼容性验收。Java 起点参考 <a href="https://github.com/spring-io/initializr">Spring Initializr</a>，Python 参考 <a href="https://docs.astral.sh/uv/guides/projects/">uv</a>，Go 路由参考 <a href="https://github.com/go-chi/chi">Chi</a>，TS 起点参考 <a href="https://github.com/fastify/fastify-cli#generate">Fastify CLI</a>。</p>
+<p><strong>GitHub 上确实有人在解决你遇到的问题。</strong> <a href="https://github.com/sivaprasadreddy/agent-skills-demo">SivaLabs 的示范仓库</a>直接以 AI 写出 N+1、内存分页等问题作对照；<a href="https://github.com/fastapi/full-stack-fastapi-template/tree/master/.agents/skills">FastAPI 全栈模板</a>已经加入库 Skills；<a href="https://github.com/nestjs/typescript-starter/blob/master/AGENTS.md">Nest starter</a>已有 Agent 指引；<a href="https://hono.dev/docs/agents">Hono</a>在建设面向 Coding Agent 的开发反馈。它们覆盖的范围各不相同，仍需要检查生成结果与本项目的约定。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/14/%E5%9B%BE01.svg" alt="工程底座的设计机制示意"><figcaption>设计示意。共同规则落实为不同语言的检查与生成物；是否真正运行通过，仍须逐个模板验证。</figcaption></figure>
+
+<p>图 1｜拟议协作方式。模板提供起点，规则解释改法，检查判断可机械验证的结果。Hooks 调用同一组检查；业务正确性、模块划分和规则变更仍由维护者审阅。</p>
+<p>最值得优先投入的部分是：<strong>启动验收、目录依赖约束、一个正确的业务示例、简短的 AI 入口、按变更维护文档。</strong> 这几项比先堆大量中间件和流程工具更直接地解决当前问题。</p>
+<p><a id="deep-sec-02"></a></p>
+<h2>02 两档怎么分：升级工程能力，保留应用骨架</h2>
+<p>档位按维护需求区分。代码多、并发高或语言不同，都不能单独决定是否拆微服务。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>项目能力</th>
+<th>Lite 简单单体</th>
+<th>Modular 模块化单体</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>适用场景</td>
+<td>小型 API、工具服务、业务边界较少的第一版产品</td>
+<td>订单、库存等多个业务模块，需要多人或多个 Agent 持续协作</td>
+</tr>
+<tr>
+<td>部署与构建</td>
+<td>一个服务、一个主要构建单元</td>
+<td>仍是一个服务；默认不增加 Maven 多模块、Python workspace 或 Go 多 module</td>
+</tr>
+<tr>
+<td>源码组织</td>
+<td>按功能放代码；给出一个小而完整的示例</td>
+<td>显式声明模块公开接口、内部实现与允许依赖</td>
+</tr>
+<tr>
+<td>基础运行</td>
+<td>配置校验、健康检查、错误处理、结构化日志、优雅退出</td>
+<td>继续保留；外部依赖影响 readiness，有恢复与故障说明</td>
+</tr>
+<tr>
+<td>数据与迁移</td>
+<td>无状态默认不要求数据库；业务需要时可添加持久化能力</td>
+<td>同样按需；一旦使用 DB，迁移、事务边界和真实 DB 测试一起加入</td>
+</tr>
+<tr>
+<td>测试与检查</td>
+<td>格式、静态检查、关键行为测试、构建及产物启动验收</td>
+<td>增加模块边界检查、跨模块行为与已启用依赖的集成测试</td>
+</tr>
+<tr>
+<td>本地环境与运维</td>
+<td>不强制 Docker；README 有明确启动与排错说明</td>
+<td>使用外部依赖时提供 Compose 等本地配置；补 runbook、备份恢复或迁移说明</td>
+</tr>
+<tr>
+<td>文档</td>
+<td>启动入口、目录职责、代码约定、变更完成标准</td>
+<td>增加模块图、依赖规则、重要 ADR、数据与运维约定</td>
+</tr>
+</tbody></table></div>
+<figure><img src="%E9%85%8D%E5%9B%BE/14/%E5%9B%BE02.svg" alt="工程底座的设计机制示意"><figcaption>设计示意。共同规则落实为不同语言的检查与生成物；是否真正运行通过，仍须逐个模板验证。</figcaption></figure>
+
+<p>图 2｜拟议演进路径。简单版已有基本质量要求；复杂版增加可检查的边界。外部依赖和服务拆分各自有触发条件，不能由“复杂版”三个字自动推导出来。</p>
+<p>例如，只有一个订单 API 时，可以使用 Lite 并加 PostgreSQL；出现订单、库存、结算等独立职责时，再使用 Modular。<strong>有数据库不等于复杂版，无数据库也可能需要模块化。</strong></p>
+<p>消息队列、Redis、注册中心、分布式网关、服务网格、Kubernetes、完整后台管理系统均按需求引入。身份认证也需明确：本地无敏感数据的示例可不带登录；一旦承载受保护业务，必须选择认证与授权方案，不能把缺省示例视为可公开部署的产品。</p>
+<p><a id="deep-sec-03"></a></p>
+<h2>03 四种语言的目录：共同规则，分别实现</h2>
+<p>下面是<strong>拟议目录</strong>。省略构建细节与部分测试文件，只展示维护边界。模板中保留有职责的文件，避免生成四层空目录。</p>
+<h3>Java：业务包是第一层边界</h3>
+<pre><code class="language-text">src/main/java/com/example/app/
+  App.java
+  orders/                      # 模块公开 API / facade
+    OrderFacade.java
+    internal/                  # HTTP、业务实现、持久化按需要再细分
+  inventory/
+    InventoryFacade.java
+    internal/
+src/main/resources/
+  application.yml
+src/test/java/com/example/app/
+  ArchitectureTest.java         # Modular 执行模块验证
+pom.xml
+mvnw / mvnw.cmd / .mvn/
+</code></pre>
+<p>Lite 可以只保留一个 <code>orders</code> 功能包。Modular 默认遵循 Spring Modulith 的识别方式：应用根包下的直接子包是模块；模块根包公开类型是 API，子包是内部实现。不要擅自插入一层 <code>modules/</code> 后仍声称默认识别方式相同。Java 的 <code>public</code> 不会阻止其他模块 import 内部类，需执行 <code>ApplicationModules.of(App.class).verify()</code>，并按需要声明允许依赖。<a href="https://docs.spring.io/spring-boot/reference/using/structuring-your-code.html">Boot 代码组织</a>、<a href="https://docs.spring.io/spring-modulith/reference/fundamentals.html">Modulith 模块模型</a>、<a href="https://docs.spring.io/spring-modulith/reference/verification.html">验证机制</a>。</p>
+<p>Modulith 会把符合默认结构的新顶层包识别为模块，不会因为名字叫 <code>utils</code> 就自动拒绝。因此模板还需维护允许的根包 / 模块清单，以独立目录检查发现未经说明的新模块；新增合理模块通过更新清单与设计记录完成。</p>
+<p>构建默认选 Maven：固定常见生命周期和插件配置，减少模板自身的构建逻辑。团队已有 Gradle 约定或确有复杂构建需求时可以改选；首版不同时维护两套。Wrapper 固定 Maven，不负责安装 JDK，也不锁定全部依赖。<a href="https://maven.apache.org/tools/wrapper/">Maven Wrapper</a>。</p>
+<p>持久化能力建议首版选 Spring JDBC 一条路线并配 Flyway；团队明确需要聚合映射、ORM 或 SQL 映射框架时，再分别评估 Spring Data JDBC、JPA 或 MyBatis。模板首版只维护一种实现。MVC 是普通 API 的默认；端到端响应式需求明确且团队能维护响应式调用链时，才另开 WebFlux 变体。</p>
+<h3>Python：环境、类型与运行时校验分别负责</h3>
+<pre><code class="language-text">src/my_app/
+  main.py                      # app factory / ASGI 入口
+  config.py
+  platform/                    # 仅放配置、日志等技术设施
+  orders/
+    api.py                     # 模块对外 Python 接口
+    routes.py
+    models.py
+    _internal/                 # Modular 的内部实现约定
+tests/
+  unit/
+  integration/                 # 启用真实外部依赖时生成
+pyproject.toml / uv.lock / .python-version
+</code></pre>
+<p><code>_internal</code>、<code>__all__</code> 和类型注解表达意图，不形成 Java package-private 那样的编译约束。Modular 用 Import Linter 检查禁止导入、允许的依赖方向与循环。Mypy 检查 Python 类型使用；Pydantic 检查 HTTP、配置等运行时外部数据。两者解决不同阶段的问题。<a href="https://import-linter.readthedocs.io/en/stable/contract_types/">Import Linter 契约</a>、<a href="https://mypy.readthedocs.io/en/stable/">Mypy</a>、<a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic</a>。</p>
+<p>默认先选一致的同步 DB 调用路线。只有使用异步库的链路才写成相应异步处理；禁止在 <code>async</code> 路由中直接塞入会阻塞事件循环的同步 I/O。CPU 密集任务另行决定进程或任务执行方式，不能靠把函数改成 <code>async</code> 获得计算并行。<a href="https://fastapi.tiangolo.com/async/">FastAPI 并发说明</a>。</p>
+<p>在 FastAPI 中，同步阻塞处理可放在普通 <code>def</code> 路由 / 依赖中，由框架在线程池执行；从 <code>async</code> 函数直接调用普通辅助函数不会自动卸载到线程池，必要时应显式使用受控线程执行。</p>
+<h3>Go：包、小接口与显式装配</h3>
+<pre><code class="language-text">cmd/api/main.go                 # 入口与依赖装配
+internal/
+  orders/
+    handler.go
+    service.go
+    service_test.go             # 测试保留 Go 原生位置
+  inventory/
+  platform/
+    config/
+    logging/
+go.mod / go.sum
+</code></pre>
+<p>同包内优先用未导出标识符隐藏实现；跨包只暴露必要类型。<code>internal/</code> 有工具链导入限制，但顶层 <code>internal/orders</code> 与 <code>internal/inventory</code> 仍可以互相依赖，业务规则需额外检查。建议在确有依赖抽象时由调用方声明窄接口，避免为每个 struct 预先生成 interface / impl。<a href="https://go.dev/doc/modules/layout">Go 官方目录指南</a>、<a href="https://go.dev/doc/effective_go">Effective Go</a>。</p>
+<p><code>golang-standards/project-layout</code> 的名字容易造成误解，它的 README 明说不是 Go 核心团队官方标准，简单项目无需照搬整棵目录树。<code>pkg/</code> 也没有 <code>internal/</code> 的访问限制。<a href="https://github.com/golang-standards/project-layout#overview">该项目的自我说明</a>。</p>
+<h3>TypeScript：编译类型不替代外部数据校验</h3>
+<pre><code class="language-text">src/
+  app.ts                       # 构造应用，供测试注入
+  server.ts                    # 进程启动与退出
+  modules/
+    orders/
+      index.ts                 # 公开入口
+      routes.ts
+      service.ts
+      internal/
+    inventory/
+  platform/
+test/
+package.json / package-lock.json / tsconfig.json
+</code></pre>
+<p>同一框架下，Lite 少量路由、Modular 按业务组织插件。用 dependency-cruiser 检查越过 <code>index.ts</code> 的内部引用与循环；导出入口约定本身不能阻止同仓库相对路径 import。<code>strict</code>、运行时请求 schema、API 行为测试分别保留。<a href="https://www.typescriptlang.org/tsconfig/strict.html">TypeScript strict</a>、<a href="https://github.com/sverweij/dependency-cruiser/blob/main/doc/rules-reference.md">dependency-cruiser 规则</a>、<a href="https://fastify.dev/docs/latest/Reference/Validation-and-Serialization/">Fastify 校验</a>。</p>
+<p>如果团队明确需要统一 DI、decorator 和 controller/provider 组织方式，<strong>可以从第一天就选 Nest，并为它做 Lite / Modular 两档</strong>。首版推荐 Fastify，是为了少维护一种框架机制；不代表 Nest 只适合复杂项目。也不应把“项目变大”定义成必须从 Fastify 迁移 Nest。</p>
+<h3>用 Java 组件类别对齐四种语言</h3>
+<p>这张表描述设计建议，便于按常见 Java 工程类别比较其他语言。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Java 中熟悉的类别</th>
+<th>Java</th>
+<th>Python</th>
+<th>Go</th>
+<th>TypeScript</th>
+<th>差别与检查重点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Web 框架与启动容器</td>
+<td>Boot + MVC</td>
+<td>FastAPI + ASGI server</td>
+<td><code>net/http</code> + Chi</td>
+<td>Fastify + Node.js</td>
+<td>Go/TS 需要补足自己的装配与生命周期约定；不是把 Spring 的所有机制逐项复制过去</td>
+</tr>
+<tr>
+<td>构建与依赖</td>
+<td>Maven Wrapper、BOM、固定插件版本</td>
+<td>uv、pyproject、uv.lock</td>
+<td>Go toolchain、go.mod、go.sum</td>
+<td>npm、package-lock、tsc</td>
+<td>各自可复现机制不同；go.sum 是校验记录，不能统称为 lockfile</td>
+</tr>
+<tr>
+<td>Bean Validation / 配置绑定</td>
+<td>Jakarta Validation、配置绑定与启动校验</td>
+<td>Pydantic</td>
+<td>显式解析校验，必要时选一个库</td>
+<td>Fastify JSON Schema + 配置 schema</td>
+<td>Python/TS 的静态类型不会自动校验网络输入</td>
+</tr>
+<tr>
+<td>统一代码风格</td>
+<td>Spotless</td>
+<td>Ruff format / check</td>
+<td>gofmt、go vet</td>
+<td>Prettier、ESLint、tsc</td>
+<td>格式、常见错误与类型检查分工，控制规则数量</td>
+</tr>
+<tr>
+<td>架构依赖测试</td>
+<td>Modulith；特殊规则再用 ArchUnit</td>
+<td>Import Linter</td>
+<td>编译可见性 + depguard 等导入规则</td>
+<td>dependency-cruiser</td>
+<td>都需要项目自己定义允许依赖，不能自动推断合理业务边界</td>
+</tr>
+<tr>
+<td>单元 / HTTP 测试</td>
+<td>JUnit、Spring 测试</td>
+<td>pytest、HTTP client</td>
+<td>testing、httptest</td>
+<td>Node test runner、Fastify inject</td>
+<td>再补构建产物启动；框架内请求测试不等于进程真实启动</td>
+</tr>
+<tr>
+<td>持久化与迁移能力包</td>
+<td>Spring JDBC + Flyway</td>
+<td>SQLAlchemy + Alembic</td>
+<td>pgx + 固定迁移工具</td>
+<td>pg + 固定迁移工具</td>
+<td>仅在启用 PostgreSQL 时接入；首版避免 ORM/driver 多路线组合</td>
+</tr>
+</tbody></table></div>
+<p>依赖与检查工具的事实来源：<a href="https://docs.astral.sh/uv/concepts/projects/sync/">uv 锁定与同步</a>、<a href="https://go.dev/wiki/Modules">Go modules</a>、<a href="https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md">Spotless</a>、<a href="https://docs.astral.sh/ruff/">Ruff</a>、<a href="https://golangci-lint.run/docs/linters/configuration/#depguard">depguard</a>、<a href="https://fastify.dev/docs/latest/Guides/Testing/">Fastify 测试</a>。持久化一行是拟议能力组合，尚未完成库版本配套验证。</p>
+<p><a id="deep-sec-04"></a></p>
+<h2>04 规范怎么写：明确放置位置，也能阻止越界</h2>
+<p>编码规范应回答一次真实改动怎样完成。仅列“遵守 SOLID、保持高内聚”不足以指导 AI 放文件。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>规范内容</th>
+<th>模板需要交付的具体约定</th>
+<th>可执行约束 / 审阅边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目录与命名</td>
+<td>每个目录负责什么；入口在哪里；新增功能、测试、迁移、文档各放哪里</td>
+<td>路径与命名检查；新增顶层目录或业务模块出现在 diff 摘要中</td>
+</tr>
+<tr>
+<td>模块依赖</td>
+<td>模块 API、内部实现、允许调用方向；技术基础设施不能反向依赖业务</td>
+<td>各语言依赖工具；不能把 formatter 当作边界检查</td>
+</tr>
+<tr>
+<td>接口与错误</td>
+<td>输入校验位置、错误分类、HTTP 映射、稳定错误码；不返回堆栈和内部凭据</td>
+<td>非法输入、业务拒绝、未知异常各有代表性行为测试</td>
+</tr>
+<tr>
+<td>配置与日志</td>
+<td>配置唯一入口、优先级、缺省值、缺失时行为；请求关联信息和敏感字段处理</td>
+<td>启动配置验证、配置样例检查；日志语义仍需审阅</td>
+</tr>
+<tr>
+<td>数据访问</td>
+<td>谁拥有表和事务；查询边界；迁移新增规则；禁止从别的模块绕过 API 直接改表</td>
+<td>依赖检查只能拦截部分绕过；事务、SQL 和性能需测试与 review</td>
+</tr>
+<tr>
+<td>外部调用</td>
+<td>超时、取消、失败返回；重试须说明幂等性与预算</td>
+<td>使用故障 stub 验证超时与取消；不默认给所有方法加重试</td>
+</tr>
+<tr>
+<td>依赖引入</td>
+<td>先用已有能力；新增库说明用途、版本与维护成本；不得手工改生成锁文件</td>
+<td>构建与锁文件一致性；维护者审阅依赖变化</td>
+</tr>
+<tr>
+<td>注释与抽象</td>
+<td>解释约束、业务原因、非直观取舍；避免给每个简单函数加复述注释</td>
+<td>语义审阅；不拿注释行数或接口数量衡量质量</td>
+</tr>
+<tr>
+<td>完成标准</td>
+<td>修改代码、验证行为、检查受影响文档、说明未验证部分</td>
+<td>同一验收入口 + 变更摘要；“已完成”必须有执行证据</td>
+</tr>
+</tbody></table></div>
+<h3>具体例子：订单调用库存</h3>
+<p>拟议任务：新增“下单前检查库存”。订单可以调用库存的公开 API，不能为了少写一个接口直接读取库存内部 DAO。Java 示例中 <code>InventoryFacade</code> 放在模块根包，DAO 放在 <code>inventory.internal</code>。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/14/%E5%9B%BE03.svg" alt="工程底座的设计机制示意"><figcaption>设计示意。共同规则落实为不同语言的检查与生成物；是否真正运行通过，仍须逐个模板验证。</figcaption></figure>
+
+<p>图 3｜拟议模块依赖规则。实线是允许的代码依赖，红色虚线是应失败的越界引用，检查线表示测试分析依赖图；这张图不表示数据库事务或运行时调用时序。</p>
+<p>对应四种实现：Java 用 Modulith；Python 用受保护模块 / 禁止导入契约；Go 用导出 API 与导入限制；TS 用公开入口与路径依赖规则。默认检查只约束静态可见的关系，反射、动态导入、直接 SQL 或跨模块共享可变对象仍可能破坏边界，必须结合具体代码审阅。</p>
+<p>AI 的正确改法应是：先找到模块公开 API → 按现有接口新增最小能力 → 业务行为测试 → 执行边界检查。<strong>检查失败后修正依赖，不能为通过任务把模块全部设成开放、添加宽泛忽略规则或删除边界测试。</strong> 确需改变边界时，作为明确设计变更交维护者审阅。</p>
+<p><a id="deep-sec-05"></a></p>
+<h2>05 AI 入口、项目文档与工具配置各放什么</h2>
+<p>建议生成后的仓库拥有如下共同资料。原生构建文件继续留在语言约定的位置；共同目录只承载跨语言工程要求。</p>
+<pre><code class="language-text">README.md                      # 人：如何安装、启动、验证、排错
+AGENTS.md                      # AI：位置、边界、命令、完成条件
+CLAUDE.md                      # 仅在需要兼容/专属配置时提供薄入口
+docs/
+  architecture.md              # 当前模块职责、依赖与重要运行链路
+  standards.md                 # 编码、API、配置、数据与测试约定
+  runbook.md                   # 运行与故障处理，按真实依赖展开
+  adr/                         # 重大决定时才创建记录
+scripts/                       # 项目自己的启动与验证实现
+.editorconfig / .gitattributes / .gitignore
+.env.example                   # 非敏感配置样例，按加载契约使用
+dev                            # 拟议统一任务入口
+.github/workflows/             # 若使用 GitHub Actions
+</code></pre>
+<p>不要生成一整套空的 ADR、需求和运维章节。Lite 的若干说明可以合并为少量文件；从 README 和 AGENTS 能找到有效内容即可。</p>
+<h3>AGENTS.md 要短，而且指向真实入口</h3>
+<p>以下是拟议片段，命令在模板实现后必须可执行，不能先放进项目再让 AI 猜实现：</p>
+<pre><code class="language-text">项目：单体 Web API。源码布局见 docs/architecture.md。
+新增订单能力放 orders；跨模块只调用文档列出的公开 API。
+不要新建通用 utils/common 存放尚未确定归属的业务逻辑。
+
+启动：./dev doctor → ./dev setup → ./dev run
+提交前：./dev verify；命令职责见 README。
+改配置：同步配置 schema、.env.example 与运行说明。
+改 API：同步接口契约、示例和受影响测试。
+新增业务模块或放宽质量规则：单独说明理由，交维护者审阅。
+
+完成时报告：改了什么；执行了哪些检查及结果；哪些没有验证。
+不得把未执行、跳过或环境缺失报告为通过。
+</code></pre>
+<p><a href="https://agents.md/">AGENTS.md</a>是指令约定，不能强制模型遵守；具体工具的查找、作用域、大小和优先级也不同。Codex 官方说明了它自己的项目指令发现机制，不能反推所有 Agent 都相同。<a href="https://learn.chatgpt.com/docs/agent-configuration/agents-md">Codex 官方指引</a>。</p>
+<p>Claude Code 当前文档已列出原生 AGENTS.md 支持，起于 <strong>v2.1.277</strong>；是否存在 CLAUDE.md / CLAUDE.local.md 会影响默认加载选择。因此不应照旧资料断言“Claude 一定不读 AGENTS”。需要兼容旧版本时，可用 <code>CLAUDE.md</code> 的 <code>@AGENTS.md</code> 导入；不要复制两套相同规则正文。实际制作时列出目标客户端与最低版本，并验证加载结果。<a href="https://code.claude.com/docs/en/memory#agentsmd">Claude memory 与 AGENTS</a>。</p>
+<h3>Skills、Hooks、规格流程如何选</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>机制</th>
+<th>适合承担的内容</th>
+<th>本次建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>项目常驻指令</td>
+<td>放置位置、关键边界、检查入口、完成定义</td>
+<td>默认提供，保持短小；细则按需读取</td>
+</tr>
+<tr>
+<td>Skills</td>
+<td>新增 API、改数据库、排错等任务步骤；依赖库的正确用法</td>
+<td>有重复任务后添加；保持步骤与仓库真实命令同步</td>
+</tr>
+<tr>
+<td>Hooks</td>
+<td>工具事件触发的快速检查与反馈</td>
+<td>可选；调用已有脚本，避免在 hook 内另写一套检查逻辑</td>
+</tr>
+<tr>
+<td>Spec Kit / OpenSpec</td>
+<td>多步功能的需求、设计、任务与规格变更追踪</td>
+<td>按变更规模选一个；首版模板不同时默认引入两套</td>
+</tr>
+<tr>
+<td>多角色工作流</td>
+<td>复杂产品需求、研究、开发与评审分工</td>
+<td>等实际协作收益明确后选择，不作为每个 API 项目的前置条件</td>
+</tr>
+</tbody></table></div>
+<p>PreToolUse hook 可在其支持的事件上拒绝操作；PostToolUse 发生在操作之后。只监听 Edit / Write 也覆盖不了 shell 等所有写入路径。它们提供及时反馈，最终仓库结果仍需本地验证和 CI。<a href="https://code.claude.com/docs/en/hooks">Claude Hooks</a>。</p>
+<p><a id="deep-sec-06"></a></p>
+<h2>06 基础启动：用一次真实运行证明项目能用</h2>
+<p>建议提供一个很薄的 <code>./dev</code> 入口，内部调用各语言原生命令。它不要求 Go 项目为了启动先装 Node，也不把全部构建重写成一套自造系统。首版拟覆盖 macOS / Linux；Windows 若通过 WSL2 使用，应另列验证结果，不能由 POSIX 脚本推断原生 Windows 可用。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>拟议命令</th>
+<th>必须做到什么</th>
+<th>成功 / 失败如何区分</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>./dev doctor</code></td>
+<td>检查工具链、所需执行器；报告配置和端口条件及下一步</td>
+<td>区分阻断前置条件与 setup 可创建的本地文件，避免互相卡住；不改全局配置</td>
+</tr>
+<tr>
+<td><code>./dev setup</code></td>
+<td>按固定版本安装项目依赖，创建项目本地环境；给出缺配置说明</td>
+<td>不重置用户已有配置；失败保持非零状态，保留可定位错误</td>
+</tr>
+<tr>
+<td><code>./dev run</code></td>
+<td>使用文档定义的本地配置启动；Ctrl-C 能停止自己的进程与资源</td>
+<td>启动失败清楚报因；不静默退回未说明的内存存储</td>
+</tr>
+<tr>
+<td><code>./dev check</code></td>
+<td>格式检查、lint、类型或编译检查、已启用的目录边界和文档结构检查</td>
+<td>默认检查不自动改文件；修复格式另给命令</td>
+</tr>
+<tr>
+<td><code>./dev test</code></td>
+<td>关键业务、HTTP 与错误行为；范围写清</td>
+<td>无外部依赖的测试可单独运行；不把缺 Docker 导致的跳过视为集成验证通过</td>
+</tr>
+<tr>
+<td><code>./dev build</code></td>
+<td>构建部署产物或可安装应用包，并验证入口</td>
+<td>能找到明确产物；Python 也需明确从干净项目环境运行哪一个安装包 / 入口</td>
+</tr>
+<tr>
+<td><code>./dev smoke</code></td>
+<td>启动构建产物，探测 readiness 与一条真实 API，再停止本次进程</td>
+<td>有超时、失败日志、退出码和清理；不误杀占用端口的其他进程</td>
+</tr>
+<tr>
+<td><code>./dev verify</code></td>
+<td>组合该档位必需的 check、test、build、smoke；启用依赖时加入集成检查</td>
+<td>缺少必需环境就失败；允许局部命令，但不得冒充完整验收</td>
+</tr>
+</tbody></table></div>
+<p>这些是<strong>未来模板的命令契约</strong>，不代表八种模板均已实现的脚本；Java V2 的实际入口与执行结果见第 11 节。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/14/%E5%9B%BE04.svg" alt="工程底座的设计机制示意"><figcaption>设计示意。共同规则落实为不同语言的检查与生成物；是否真正运行通过，仍须逐个模板验证。</figcaption></figure>
+
+<p>图 4｜拟议启动验收。检查覆盖实际产物、运行配置和 HTTP 路径；启动或请求失败都进入清理与错误汇总。框架中的 <code>contextLoads</code>、TestClient、inject 或 httptest 各有价值，但不能代替这里的进程启动。</p>
+<h3>配置加载必须说清楚</h3>
+<p>建议将“环境变量优先，项目配置给出非敏感默认值，必需项在启动时校验”作为共同约定。<code>.env.example</code> 提供已知字段；本地如何把文件传成环境变量，由明确的启动器或框架配置完成。不能让 Java 依赖一个没人实现的 <code>.env</code> 自动加载假设。</p>
+<p>若支持 <code>.env</code>，需要定义解析器、优先级、引号与特殊字符规则，并让开发启动、测试和产物启动使用同一约定；不要用任意 shell <code>source</code> 执行用户配置。端口、数据库 DSN、运行模式等字段从配置模型生成或校验示例，减少手工维护的重复真相。</p>
+<p>Lite 默认完成结构化日志和最小健康检查；跨服务追踪、指标导出等作为可选可观测能力包。没有跨服务调用时，不为展示完整性先安装 Collector、Prometheus、Grafana 全套。加入时再落实采集端、后端、上下文传播与告警责任。</p>
+<p><a id="deep-sec-07"></a></p>
+<h2>07 验收和文档维护：哪些能自动化，哪些必须审阅</h2>
+<h3>检查分层，但本地和 CI 使用同一实现</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层次</th>
+<th>建议内容</th>
+<th>要防止的假通过</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>快速检查</td>
+<td>格式、lint、类型 / 编译、路径和依赖约束</td>
+<td>只有 formatter，通过了却仍能乱 import</td>
+</tr>
+<tr>
+<td>行为测试</td>
+<td>真实业务成功与失败、输入校验、错误映射</td>
+<td>测试只断言 mock 被调用，未验证外部行为</td>
+</tr>
+<tr>
+<td>集成检查</td>
+<td>已启用 DB 的迁移、事务、查询与连接配置；其他真实依赖按需</td>
+<td>用 H2 或内存对象完全替代 PostgreSQL 行为；必需测试被默认跳过</td>
+</tr>
+<tr>
+<td>启动验收</td>
+<td>在干净环境安装、构建、启动、请求、停止</td>
+<td>只在开发者已配置的机器里成功；仅返回静态健康字符串</td>
+</tr>
+<tr>
+<td>交付审阅</td>
+<td>需求满足、边界合理、依赖与规则变化、文档语义</td>
+<td>AI 为让检查通过而放宽规则；README 随意加一句就算同步</td>
+</tr>
+</tbody></table></div>
+<p>无需用覆盖率百分比作为首版唯一目标。底座重点验证一条完整业务路径、重要错误与运行条件；对每个 getter 或目录名生成测试只会增加维护噪声。</p>
+<h3>文档按变更触发更新</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>发生的变更</th>
+<th>应同步的资料</th>
+<th>自动化边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>新增或更改配置</td>
+<td>配置模型、样例、必需项 / 默认值 / 优先级说明</td>
+<td>校验字段与样例可解析性；用途解释仍需 review</td>
+</tr>
+<tr>
+<td>修改 API</td>
+<td>OpenAPI 或对应接口契约、调用示例、行为测试</td>
+<td>导出并比较契约差异；兼容性语义需要判断</td>
+</tr>
+<tr>
+<td>改目录或模块边界</td>
+<td>目录职责图、依赖规则、Agent 放置指引</td>
+<td>检查引用与依赖图；模块职责正确性由人判断</td>
+</tr>
+<tr>
+<td>改启动、构建、测试命令</td>
+<td>README、CI 与 AGENTS 中的入口</td>
+<td>从干净检出执行命令；避免三份不同启动说明</td>
+</tr>
+<tr>
+<td>加 DB、队列等外部依赖</td>
+<td>本地环境、迁移 / 故障 / 恢复说明</td>
+<td>实际运行配置与集成测试；真实灾难恢复不能凭文档宣称</td>
+</tr>
+<tr>
+<td>作重大架构取舍</td>
+<td>ADR：条件、选择、代价、何时重评</td>
+<td>校验文件可达；理由本身不是机器能证明的</td>
+</tr>
+</tbody></table></div>
+<p>不规定“每次提交都改 README”。需要的是变更影响到了哪个契约，那个契约有可追溯更新。</p>
+<h3>保护检查本身</h3>
+<p>托管到 GitHub 后，建议给主要分支配置必需检查；CI、边界规则、AI 指令与 CODEOWNERS 的变更由维护者复核。CODEOWNERS 要配合必需审阅规则才会形成合并约束，且其自身也应保护；Agent 身份不授予绕过与规则管理权限。单人本地项目可以先做同一组检查与 diff 审阅，再接入托管保护。<a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets">GitHub 必需检查</a>、<a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository">Ruleset 绕过权限</a>、<a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners">CODEOWNERS</a>。</p>
+<p>本地 hooks 可关闭，项目 CI 也可被有权限者修改。因此“检查已配置”与“合并确实受到约束”要分别验收。</p>
+<p><a id="deep-sec-08"></a></p>
+<h2>08 模板库怎么维护：八个结果，一套来源</h2>
+<p>建议维护一个模板源仓库。业务项目生成后各自独立，不要求四种语言最终住在同一个大仓库。</p>
+<pre><code class="language-text">template-library/
+  shared/                      # README/AGENTS 结构、共同任务契约
+  languages/
+    java/
+    python/
+    go/
+    typescript/
+  profiles/
+    lite/
+    modular/
+  capabilities/                # 后续按需；首版先控制数量
+    postgres/
+  tests/
+    generation/                # 八个结果的安装、验证、启动
+    violations/                # 故意写错，证明规则能拦截
+  docs/                        # 版本、支持矩阵、升级说明
+</code></pre>
+<p>这是逻辑设计，具体渲染组织可随生成器调整。共享的是可复用约定和文本，语言实现允许不同；不要抽象出充满语言判断分支的巨大万能脚本。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/14/%E5%9B%BE05.svg" alt="工程底座的设计机制示意"><figcaption>设计示意。共同规则落实为不同语言的检查与生成物；是否真正运行通过，仍须逐个模板验证。</figcaption></figure>
+
+<p>图 5｜拟议模板发布与升级。验收对象是生成出来的应用，不能只测生成器自身。业务仓库已有修改时，升级经过独立分支、冲突审阅与重新验证。</p>
+<h3>分发建议：先评估 Copier，再决定是否采用</h3>
+<p><a href="https://github.com/copier-org/copier">Copier</a>可以参数化生成不同语言项目，并记录原模板与回答信息，支持后续 update；更新仍可能冲突。<a href="https://copier.readthedocs.io/en/stable/updating/">官方更新文档</a>。这与“长期维护多个派生项目”的需求较契合，因此建议把它列为第一候选。</p>
+<p>代价是生成环节需要 Python 工具环境。它不应成为生成后 Java / Go / TS 应用启动与构建的前置依赖。若不想承担模板合并维护，可先发布固定版本的仓库模板与迁移补丁。Cookiecutter 也能跨语言生成，但其 Replay 复用的是输入参数，不等于合并升级已有项目。<a href="https://cookiecutter.readthedocs.io/en/stable/advanced/replay.html">Cookiecutter Replay</a>。</p>
+<p>生成记录建议包含模板版本、档位、已启用能力、所用规则版本。若采用 Copier，优先使用它已有的答案与来源文件，不再复制第二份相同元数据。运行时版本、依赖和构建插件则保留在原生配置中，避免一处更新四处失配。</p>
+<h3>模板发布前的验收重点</h3>
+<ol>
+<li>八种基础结果都生成到空目录，验证项目名、Java package / Python import / Go module / npm 名称等替换一致，无旧示例名残留。</li>
+<li>每个结果按相应支持环境执行完整验证。DB 能力启用时增加对应组合，不能用八个无 DB 结果代表所有可选能力已验收。</li>
+<li>故意加入跨模块内部引用、不允许的顶层目录、循环依赖、缺失配置等反例，确认相应检查确实失败。</li>
+<li>对已经改过业务代码的样例项目演练升级，保存冲突处理与迁移说明。Lite → Modular 是可审阅迁移，不能承诺一个参数切换就无风险完成。</li>
+<li>生成器、依赖、镜像和工具来自固定版本；首次下载所需网络与镜像源明确说明。国内网络适配作为配置能力提供，不在业务源码中硬编码镜像或代理。</li>
+</ol>
+<h3>版本基线：按当前日期重新选择</h3>
+<p>本轮只提出待实现验证的基线，<strong>不把版本“被框架支持”写成整个模板已验证</strong>。精确补丁、JDK 发行商、插件和镜像 digest 应在首个模板版本验收时固定。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>语言</th>
+<th>本次建议基线</th>
+<th>原因与回退条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Java</td>
+<td>新项目优先评估 JDK 25 LTS + Boot 4.1 稳定线</td>
+<td>当前 Boot 官方要求页列出 4.1.2，支持 Java 17–27；25 是 LTS。若关键库或组织运行环境仍约束旧线，再选经验证的 21 兼容路线，不能沿用旧上下文把 21 永久设为最佳答案</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>先验证 CPython 3.14 的普通构建</td>
+<td>官方仍处于 bugfix 阶段；3.15 刚进入发布周期，本模板先给依赖生态留兼容窗口。实际所需库有约束时再调整，不默认 free-threaded 构建</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>先验证 1.27 支持线，固定补丁</td>
+<td>官方当前列出 1.27；Go 没有 Java 式 LTS 分档，支持窗口需持续跟进。<code>go</code> / <code>toolchain</code> 行也不能单独保证所有机器运行完全相同的补丁</td>
+</tr>
+<tr>
+<td>TypeScript / Node</td>
+<td>Node 24 LTS 作为首版保守候选，固定 npm 与依赖</td>
+<td>Node 26 已进入 LTS，但时间较近；首版先验证 24。需要 26 的能力或兼容验证成熟后可前移；不继续以已 EOL 的 Node 20 作默认</td>
+</tr>
+</tbody></table></div>
+<p>事实快照来源：<a href="https://docs.spring.io/spring-boot/system-requirements.html">Boot 当前要求</a>、<a href="https://www.oracle.com/java/technologies/java-se-support-roadmap.html">Java LTS 路线</a>、<a href="https://devguide.python.org/versions/">Python 支持状态</a>、<a href="https://go.dev/doc/devel/release">Go 发布与支持政策</a>、<a href="https://go.dev/doc/toolchain">Go toolchain 选择</a>、<a href="https://nodejs.org/en/about/previous-releases">Node 发布状态</a>。Oracle 路线中的商业支持期限不代表全部 OpenJDK 发行商政策；本报告不据此作许可选择。</p>
+<p>CI 不能隐式刷新依赖锁。Python 可用 <code>uv sync --locked</code> 在锁不一致时失败；npm 使用 <code>npm ci</code>。Go 提交 go.mod / go.sum 并检查构建前后无意外修改；Maven 固定受支持依赖管理和插件版本，禁止无理由使用动态版本。可复现不意味着四种语言都有同一种锁文件。<a href="https://docs.astral.sh/uv/concepts/projects/sync/">uv locked</a>、<a href="https://docs.npmjs.com/cli/commands/npm-ci">npm ci</a>、<a href="https://go.dev/blog/supply-chain">Go 依赖机制</a>。</p>
+<p><a id="deep-sec-09"></a></p>
+<h2>09 GitHub 方案对照：按解决的问题选择</h2>
+<p>核查日期：2026-11-03。下表根据官方文档与源码只读观察；没有对这些模板执行生成、构建、生产压测或团队采用率审计。Stars 不作为稳定性与正确性的证据。</p>
+<h3>能生成应用起点的项目</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>解决什么</th>
+<th>与本次需求的差距</th>
+<th>本次定位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://github.com/spring-io/initializr">Spring Initializr</a></td>
+<td>官方 Boot 项目、构建文件、入口与所选依赖</td>
+<td>不替你定义业务包、AI 完成标准和文档更新责任</td>
+<td>Java 生成起点</td>
+</tr>
+<tr>
+<td><a href="https://github.com/sivaprasadreddy/progen">progen</a></td>
+<td>社区 Java 生成器；支持格式、迁移、测试容器、Modulith 等选项</td>
+<td>应核验最小组合能否保持干净；离线生成不等于依赖离线</td>
+<td>后续实测能否减少自建工作</td>
+</tr>
+<tr>
+<td><a href="https://github.com/jhipster/generator-jhipster">JHipster</a></td>
+<td>完整应用生成，含认证、数据、可选前端与部署组合</td>
+<td>接受其总体约定能省事，但维护面比干净 API 大</td>
+<td>需要完整业务应用时选；不默认套用</td>
+</tr>
+<tr>
+<td><a href="https://github.com/fastapi/full-stack-fastapi-template">Full Stack FastAPI Template</a></td>
+<td>前后端、PostgreSQL、认证、迁移、Compose、测试与运行说明</td>
+<td>不是最小 FastAPI API 模板，直接采用会带入额外能力</td>
+<td>借鉴启动、迁移、测试和文档的配套方式</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Melkeydev/go-blueprint">Go Blueprint</a></td>
+<td>可选择 HTTP 框架、DB 等能力，生成 cmd / internal 等结构</td>
+<td>社区生成器，非 Go 官方；选项组合和规则约束仍要验收</td>
+<td>借鉴生成方式，候选最小配置待实测</td>
+</tr>
+<tr>
+<td><a href="https://github.com/fastify/fastify-cli">Fastify CLI</a></td>
+<td>官方生成入口、TS 模板与 build / test 等脚本</td>
+<td>团队 lint、模块边界、配置和 CI 需补</td>
+<td>TS 生成起点</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nestjs/typescript-starter">Nest starter</a></td>
+<td>模块、DI、controller/provider、测试与格式工具</td>
+<td>框架模块不是自动业务隔离；当前 Agent 文件也不涵盖全部规范</td>
+<td>明确需要 Nest 约定时的替代路线</td>
+</tr>
+<tr>
+<td><a href="https://github.com/honojs/starter">Hono starter</a></td>
+<td>按运行环境生成很小的 API 起点</td>
+<td>agent 专页示例使用 <code>@next</code>，不能把全部预览能力写成稳定默认</td>
+<td>边缘 / 多运行时需求出现后评估</td>
+</tr>
+</tbody></table></div>
+<p>当前 Nest starter 已使用 ESM、Vitest、Oxlint 等配置，不宜照旧教程把 Jest / ESLint 写成它唯一的官方默认。本报告给 Fastify 选择 ESLint 是自家规则建议，不是描述 Nest 模板。<a href="https://github.com/nestjs/typescript-starter/blob/master/package.json">Nest package.json</a>。</p>
+<h3>让 AI 找到规则、按流程改动的项目</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>具体价值</th>
+<th>使用边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://github.com/agentsmd/agents.md">AGENTS.md</a></td>
+<td>约定 Agent 可查找的项目说明入口，承载安装、测试、编码等导航</td>
+<td>文本指令，不是强制机制；客户端支持需单独核验</td>
+</tr>
+<tr>
+<td><a href="https://code.claude.com/docs/en/memory">Claude Code 配置与 Hooks</a></td>
+<td>项目上下文、路径规则、工具事件反馈</td>
+<td>只覆盖相应客户端及事件；配置存在不等于不可绕过</td>
+</tr>
+<tr>
+<td><a href="https://github.com/sivaprasadreddy/sivalabs-agent-skills">SivaLabs Agent Skills</a></td>
+<td>Spring Boot 包结构、JPA、测试、模块化与评审经验按需提供</td>
+<td>作者工程偏好需筛选；安装 Skills 不等于应用通过测试</td>
+</tr>
+<tr>
+<td><a href="https://github.com/github/spec-kit">GitHub Spec Kit</a></td>
+<td>规格、计划、任务、项目原则与可扩展工程流程</td>
+<td>不替代语言底座、编译、启动与架构测试</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Fission-AI/OpenSpec">OpenSpec</a></td>
+<td>持续维护当前规格与单次变更的提案、设计、任务</td>
+<td><code>validate</code> 主要验证规格结构与一致性，不证明代码行为正确</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bmad-code-org/BMAD-METHOD">BMad Method</a></td>
+<td>多角色产品与工程工作流</td>
+<td>当前 main 为 V7 alpha，稳定线为 V6.12；不要把预览功能当稳定能力，也不必为小 API 全量引入</td>
+</tr>
+</tbody></table></div>
+<p>更准确地说，业界正在分别补齐<strong>项目入口、库知识、变更规格、自动检查和生成物维护</strong>。你的模板库可以把与当前问题直接相关的部分组合起来，保持每一层责任清楚。</p>
+<h3>维护快照与证据边界</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>本次观察点</th>
+<th>可以证明什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Spec Kit / OpenSpec</td>
+<td>发布条目分别为 v1.2.6 / v1.16.0</td>
+<td>有可定位版本，不证明本项目适配成功</td>
+</tr>
+<tr>
+<td>BMad</td>
+<td>发布 v6.12.4；main 属 V7 preview</td>
+<td>稳定与预览需要分开比较</td>
+</tr>
+<tr>
+<td>FastAPI 模板</td>
+<td>默认分支 <code>f4bcfaba7c85</code></td>
+<td>本次读取的 AI 技能与项目配置快照</td>
+</tr>
+<tr>
+<td>Nest starter</td>
+<td>默认分支 <code>da4aab8ea68d</code></td>
+<td>本次读取的工具链与 Agent 指引快照</td>
+</tr>
+<tr>
+<td>Fastify CLI</td>
+<td>默认分支 <code>2aa1d5f76af6</code></td>
+<td>本次读取的 TS 模板与生成脚本快照</td>
+</tr>
+<tr>
+<td>Go Blueprint / Hono starter</td>
+<td><code>81f56f8c2463</code> / <code>c59d199151b2</code></td>
+<td>本次读取的生成结构与最小模板快照</td>
+</tr>
+</tbody></table></div>
+<p>发布定位：<a href="https://github.com/github/spec-kit/releases/tag/v1.2.6">Spec Kit v1.2.6</a>、<a href="https://github.com/Fission-AI/OpenSpec/releases/tag/v1.16.0">OpenSpec v1.16.0</a>、<a href="https://github.com/bmad-code-org/BMAD-METHOD/releases/tag/v6.12.4">BMad v6.12.4</a>。分支快照用于定位观察，具体生成时仍应锁定发布版本或 commit 并验证。</p>
+<p><a id="deep-sec-10"></a></p>
+<h2>10 最终建议与后续实施边界</h2>
+<p>建议把它做成一个你能长期维护的“小型工程底座库”：默认框架少、能力包少，生成物有版本；人和 AI 使用同一套命令与边界规则。每种语言都有 Lite 和 Modular，但不默认扩展成八个不同技术栈。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>决策</th>
+<th>当前结论</th>
+<th>代价与重新评估条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本轮交付</td>
+<td>已确认：设计与调研</td>
+<td>原设计阶段未运行模板；本公开副本新增的 Java V2 实测见第 11 节，不能外推到八种模板</td>
+</tr>
+<tr>
+<td>覆盖范围</td>
+<td>已确认：Java、Python、Go、TypeScript 的 Web/API</td>
+<td>CLI、前端、Agent harness、模型训练 / 推理服务另开 profile，避免挤进同一个 Web 底座</td>
+</tr>
+<tr>
+<td>两档边界</td>
+<td>已确认：简单单体、模块化单体；外部能力按需</td>
+<td>多服务确有独立发布、扩缩容或故障隔离收益时另作决策</td>
+</tr>
+<tr>
+<td>默认框架</td>
+<td>建议：Boot MVC、FastAPI、Chi、Fastify</td>
+<td>需要组织特有能力时可改变；不要仅因项目“复杂”换框架</td>
+</tr>
+<tr>
+<td>约束方式</td>
+<td>建议：共同规则入口 + 语言原生检查 + 运行验收</td>
+<td>工具升级会带来规则维护；先保证少量规则真的运行</td>
+</tr>
+<tr>
+<td>模板分发</td>
+<td>建议：Copier 第一候选，固定版本生成</td>
+<td>需演练升级冲突；如维护成本偏高，可改为仓库模板 + 迁移补丁</td>
+</tr>
+<tr>
+<td>规格流程</td>
+<td>建议：先轻量任务与设计记录；复杂变更再选一种工具</td>
+<td>引入工具后要明确规格真相与归档位置，避免平行文档漂移</td>
+</tr>
+</tbody></table></div>
+<p>实施时建议先做 Java Lite 的完整样板，验证“空目录 → 启动 → 新增一个 API → 故意违反目录放置规则并确认失败 → 更新配置与文档”这条路径；再做 Java Modular，加入跨模块内部引用的失败反例，并把共同契约迁移到其他三种语言。这里的先后是为了先验明底座设计，不表示其他语言只能做特定业务。</p>
+<p>首版能够交付的标准应很具体：<strong>八种生成结果能通过对应验收；AI 能找到正确示例；错误依赖被检查拦住；启动缺条件能明确失败；文档更新有触发规则；模板升级有可审阅路径。</strong></p>
+<p>原设计阶段已完成范围与方案设计、官方资料及源码只读比对；未审计所有候选的生产采用率，未执行生成物兼容性、许可证适配、CI 权限和真实部署验证。其他模板实现前应将选定组合变成锁定版本的支持矩阵，逐项验证后再标为可用模板。</p>
+<p><a id="deep-java-v2-evidence"></a></p>
+<h2>11 Java Lite V2：从设计到一次真实验证</h2>
+<p>四语言、两档模板是总体设计；当前已经实现并验证的是 Java Lite 样板。它使用 Maven 单体、Spring Boot 3.5.16 和 Java 17 基线，以 <code>items</code> 示例说明统一响应、类型化配置、日志、OpenAPI、结构检查与架构检查。这里没有默认交付订单系统、数据库、权限模型或生产部署。</p>
+<h3>11.1 规则失败要由正确的检查拒绝</h3>
+<p>在隔离的临时副本中，让 <code>items</code> 模块直接引用 <code>platform.internal.RequestIdFilter</code>，ArchUnit 的架构规则拒绝了这个依赖。测试并非因为类不存在或语法编译错误而偶然失败。其他负例包括缺文档、包路径错误、模块未登记、格式、平台反向依赖和模块循环。</p>
+<p>这说明静态类依赖的若干边界已经可执行；它不证明反射、直接 SQL 或运行时业务交互都正确。</p>
+<h3>11.2 资源边界要连接到实际写入</h3>
+<p>示例默认容量 1000 条、最大页长 100；配置允许容量 1–10000、页长 1–1000。创建记录时，输入与重名检查、容量准入和写入有明确控制；容量检查与写入在同一同步临界区完成。满时返回 503，已有数据仍可读取。</p>
+<p>本轮真实 JAR 冒烟将容量覆盖为 2：前两条创建得到 201，第三条被 503 拒绝。它验证的是条目准入边界，不是整个 JVM 的内存上限、内存无泄漏或生产容量。</p>
+<h3>11.3 文档检查不等于文档语义正确</h3>
+<p>结构脚本检查必需文件、Markdown 本地链接、模块登记，以及 <code>.env.example</code> 的变量名与 <code>project-policy.json</code> 登记名单是否一致；不据此证明配置模型的语义始终对应。新增模块需要登记规则并在架构说明中出现；链接指向不存在文件会失败。这些检查让具体遗漏暴露，不能证明每句解释都仍然符合运行事实。</p>
+<h3>11.4 本轮实际运行与没有运行的内容</h3>
+<p>[作者本地实测] 2026-11-13，macOS arm64 / JDK 17.0.19，在临时副本中执行：</p>
+<pre><code class="language-bash">./dev structure
+python3 -m unittest discover -s scripts/tests -v
+./dev verify
+./dev negative
+</code></pre>
+<p>结果为 4 项 Python 自测、16 项 Java 测试通过；Java 测试失败、错误、跳过均为 0；7 类违规反例被预期规则拒绝。真实 JAR 以随机端口启动，检查增查与分页、400/404/409/503、精确容量、OpenAPI/Swagger、请求 ID 与 JSON 日志、进程退出及非法配置启动失败。</p>
+<p>原源码与历史记录未修改。本轮没有重跑旧性能记录，没有核对远端 CI 实际执行，也没有验证 Python、Go、TypeScript 模板或 Java Modular。测试记录在作者本地保存；公开正文提供了机制、命令与验证范围，不把不可公开的路径包装成公开证据。</p>
+<p>CI 文件调用与本地相同的检查命令，只说明入口一致；云端环境、权限和实际运行结果仍需另验。下一步应先判断样板的边界是否覆盖目标任务，再将共同契约迁移到其他语言。</p>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 1.0-review · 2026-11-13</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>

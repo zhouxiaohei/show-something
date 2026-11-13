@@ -1,0 +1,2805 @@
+{
+  "report_date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "method": "Stars captured directly from official GitHub repository embedded JSON. No growth rate, install base, uptime or maintenance quality inferred from totals.",
+  "warning": "Stars represent a candidate-set snapshot, not active users, reliability or a global market ranking. Release feed entries are not necessarily stable versions. Execution-language notes describe reviewed source boundaries, not cloud internals.",
+  "groups": {
+    "framework": [
+      "langchain-ai/langgraph",
+      "openai/openai-agents-python",
+      "google/adk-python",
+      "microsoft/agent-framework",
+      "pydantic/pydantic-ai",
+      "crewAIInc/crewAI",
+      "agno-agi/agno",
+      "mastra-ai/mastra",
+      "strands-agents/harness-sdk",
+      "langchain-ai/deepagents",
+      "langchain-ai/langchain"
+    ],
+    "workflow": [
+      "n8n-io/n8n",
+      "langgenius/dify",
+      "langflow-ai/langflow",
+      "simstudioai/sim",
+      "coze-dev/coze-studio",
+      "FlowiseAI/Flowise"
+    ],
+    "coding": [
+      "openai/codex",
+      "anomalyco/opencode",
+      "OpenHands/OpenHands",
+      "OpenHands/software-agent-sdk",
+      "cline/cline",
+      "aaif-goose/goose",
+      "aider-ai/aider",
+      "anthropics/claude-code",
+      "google-gemini/gemini-cli",
+      "RooCodeInc/Roo-Code"
+    ],
+    "browser": [
+      "browser-use/browser-use",
+      "Skyvern-AI/skyvern",
+      "browserbase/stagehand",
+      "simular-ai/Agent-S",
+      "alibaba/page-agent",
+      "magnitudedev/browser-agent"
+    ],
+    "assistant": [
+      "openclaw/openclaw",
+      "HKUDS/nanobot",
+      "nanocoai/nanoclaw",
+      "zeroclaw-labs/zeroclaw",
+      "sipeed/picoclaw",
+      "nearai/ironclaw"
+    ],
+    "knowledge": [
+      "infiniflow/ragflow",
+      "onyx-dot-app/onyx",
+      "Mintplex-Labs/anything-llm",
+      "bytedance/deer-flow",
+      "khoj-ai/khoj",
+      "langchain-ai/open_deep_research"
+    ],
+    "java": [
+      "spring-projects/spring-ai",
+      "langchain4j/langchain4j",
+      "alibaba/spring-ai-alibaba",
+      "google/adk-java",
+      "agentscope-ai/agentscope-java",
+      "embabel/embabel-agent",
+      "JetBrains/koog"
+    ]
+  },
+  "repositories": [
+    {
+      "repository": "openclaw/openclaw",
+      "url": "https://github.com/openclaw/openclaw",
+      "requested_repository": "openclaw/openclaw",
+      "group": "assistant",
+      "stars": 393785,
+      "forks": 82765,
+      "watchers": 1698,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "TypeScript 主 runtime",
+      "captured_at_utc": "2026-11-03T06:22:39+00:00",
+      "branch": "main",
+      "commit_sha": "9346376806641d94ffd3954d2b2e4eacb2c8ee0a",
+      "source_html_sha256": "932ad31645a970285319253730d3fb8275ba1d2a1934470d78eca39756f12e94",
+      "recent_release_entries": [
+        {
+          "title": "openclaw 2026.10.10",
+          "updated": "2026-11-03T04:00:40Z",
+          "url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.10"
+        },
+        {
+          "title": "release-publish/669193e3c42e-1793667494",
+          "updated": "2026-11-02T19:30:06Z",
+          "url": "https://github.com/openclaw/openclaw/releases/tag/release-publish%2F669193e3c42e-1793667494"
+        },
+        {
+          "title": "release-publish/b1615fd4432c-1793505057",
+          "updated": "2026-11-01T03:47:30Z",
+          "url": "https://github.com/openclaw/openclaw/releases/tag/release-publish%2Fb1615fd4432c-1793505057"
+        }
+      ],
+      "release_feed": "https://github.com/openclaw/openclaw/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(update): report the finalize worker's exit instead of a missing r…",
+          "updated": "2026-11-03T06:24:47Z",
+          "url": "https://github.com/openclaw/openclaw/commit/23d251e0aa5edbb167122e0085368c0f928baa07"
+        },
+        {
+          "title": "fix: subagent turns fail after session metadata changes (#183501)",
+          "updated": "2026-11-03T06:24:26Z",
+          "url": "https://github.com/openclaw/openclaw/commit/32305db41a6e5672a1815c8cd54d8d50e4bd5dd5"
+        },
+        {
+          "title": "fix: reasoning-only retry is refused by Anthropic as reasoning_extrac…",
+          "updated": "2026-11-03T06:20:46Z",
+          "url": "https://github.com/openclaw/openclaw/commit/9346376806641d94ffd3954d2b2e4eacb2c8ee0a"
+        }
+      ]
+    },
+    {
+      "repository": "anomalyco/opencode",
+      "url": "https://github.com/anomalyco/opencode",
+      "requested_repository": "anomalyco/opencode",
+      "group": "coding",
+      "stars": 224172,
+      "forks": 30151,
+      "watchers": 863,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "TypeScript / Bun",
+      "captured_at_utc": "2026-11-03T06:22:34+00:00",
+      "branch": "dev",
+      "commit_sha": "3ba597f7769e19cc3b5f67e3d6667e7b6318f6a3",
+      "source_html_sha256": "3b1bf64e15bd10626f20293cf5df2cd477d083563ee4f78558bb5da7b1fc196f",
+      "recent_release_entries": [
+        {
+          "title": "v2.2.5",
+          "updated": "2026-10-30T23:17:23Z",
+          "url": "https://github.com/anomalyco/opencode/releases/tag/v2.2.5"
+        },
+        {
+          "title": "v2.2.4",
+          "updated": "2026-10-30T16:59:08Z",
+          "url": "https://github.com/anomalyco/opencode/releases/tag/v2.2.4"
+        },
+        {
+          "title": "v2.2.3",
+          "updated": "2026-10-30T14:48:05Z",
+          "url": "https://github.com/anomalyco/opencode/releases/tag/v2.2.3"
+        }
+      ],
+      "release_feed": "https://github.com/anomalyco/opencode/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix: link new Console workspaces to their Go page and show monthly Go…",
+          "updated": "2026-11-03T05:39:25Z",
+          "url": "https://github.com/anomalyco/opencode/commit/3ba597f7769e19cc3b5f67e3d6667e7b6318f6a3"
+        },
+        {
+          "title": "feat(app): tweak the left sidebar and align window controls with its …",
+          "updated": "2026-11-02T20:59:03Z",
+          "url": "https://github.com/anomalyco/opencode/commit/1bf08ae46a91f7793c756e4ee521e37b6b554064"
+        },
+        {
+          "title": "docs(console): add Pulse Alpha Free (#61285)",
+          "updated": "2026-11-02T20:23:28Z",
+          "url": "https://github.com/anomalyco/opencode/commit/d9184f2d38e4680b266525bc4e7618245bbcef49"
+        }
+      ]
+    },
+    {
+      "repository": "n8n-io/n8n",
+      "url": "https://github.com/n8n-io/n8n",
+      "requested_repository": "n8n-io/n8n",
+      "group": "workflow",
+      "stars": 209415,
+      "forks": 61357,
+      "watchers": 1180,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "NOASSERTION",
+        "name": "Other"
+      },
+      "license_editorial_note": "Sustainable Use / Enterprise",
+      "execution_language_note": "TypeScript / Node.js",
+      "captured_at_utc": "2026-11-03T06:22:32+00:00",
+      "branch": "master",
+      "commit_sha": "ed550ca2efac28ba39a8a04e7692236588b7519d",
+      "source_html_sha256": "2d731a36f2b0451beff6b90113269028a4dd932b0a31ab1edf953d28bb669902",
+      "recent_release_entries": [
+        {
+          "title": "v1: :rocket: Release 1.123.92 (#42872)",
+          "updated": "2026-11-02T08:19:47Z",
+          "url": "https://github.com/n8n-io/n8n/releases/tag/v1"
+        },
+        {
+          "title": "n8n@2.46.4",
+          "updated": "2026-11-02T08:30:14Z",
+          "url": "https://github.com/n8n-io/n8n/releases/tag/n8n%402.46.4"
+        },
+        {
+          "title": "n8n@2.45.7-exp.g86c6a0b7",
+          "updated": "2026-11-02T13:21:04Z",
+          "url": "https://github.com/n8n-io/n8n/releases/tag/n8n%402.45.7-exp.g86c6a0b7"
+        }
+      ],
+      "release_feed": "https://github.com/n8n-io/n8n/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "perf(editor): Store execution data in a shallowRef (no-changelog) (#4…",
+          "updated": "2026-11-03T04:52:27Z",
+          "url": "https://github.com/n8n-io/n8n/commit/ed550ca2efac28ba39a8a04e7692236588b7519d"
+        },
+        {
+          "title": "chore: Flaky test: insights-by-period.repository.integration.test.ts …",
+          "updated": "2026-11-03T04:40:43Z",
+          "url": "https://github.com/n8n-io/n8n/commit/2393e7ea6bcde6ca11b8670a879bbfbbf934fcf3"
+        },
+        {
+          "title": "chore: Flaky test: insights-compaction.service.integration.test.ts (2…",
+          "updated": "2026-11-03T03:32:19Z",
+          "url": "https://github.com/n8n-io/n8n/commit/9da5b5db9ba50a630689a434e27b297d6e52772d"
+        }
+      ]
+    },
+    {
+      "repository": "langgenius/dify",
+      "url": "https://github.com/langgenius/dify",
+      "requested_repository": "langgenius/dify",
+      "group": "workflow",
+      "stars": 160288,
+      "forks": 25344,
+      "watchers": 837,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "NOASSERTION",
+        "name": "Other"
+      },
+      "license_editorial_note": "Dify（Apache 基础 + 附加条件）",
+      "execution_language_note": "Python + TS；插件 daemon Go",
+      "captured_at_utc": "2026-11-03T06:22:33+00:00",
+      "branch": "main",
+      "commit_sha": "4b23482dd30b3f7bbc366714caea424c3b920bc3",
+      "source_html_sha256": "dda66e618cbf19bc451ecb2b426b28ae04fe32f52d3e97b781145f1fe810989f",
+      "recent_release_entries": [
+        {
+          "title": "v1.18.0 — Smarter Agent Routing, Portable Apps, Deeper Workflow Visibility",
+          "updated": "2026-10-23T06:35:41Z",
+          "url": "https://github.com/langgenius/dify/releases/tag/1.18.0"
+        },
+        {
+          "title": "v1.17.1 - Bug Fixes and Improvements",
+          "updated": "2026-09-10T10:17:09Z",
+          "url": "https://github.com/langgenius/dify/releases/tag/1.17.1"
+        },
+        {
+          "title": "v1.17.0",
+          "updated": "2026-09-01T15:49:46Z",
+          "url": "https://github.com/langgenius/dify/releases/tag/1.17.0"
+        }
+      ],
+      "release_feed": "https://github.com/langgenius/dify/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(dify-agent): validate plugin-declared blob size before allocating…",
+          "updated": "2026-11-03T06:11:24Z",
+          "url": "https://github.com/langgenius/dify/commit/4b23482dd30b3f7bbc366714caea424c3b920bc3"
+        },
+        {
+          "title": "refactor(api): annotate KnowledgeFS Service API return types (#45295)",
+          "updated": "2026-11-03T06:05:40Z",
+          "url": "https://github.com/langgenius/dify/commit/074e9e0b92a0d19278640d09fa90c6f09982354f"
+        },
+        {
+          "title": "docs(readme): update docker quick start requirements (#45394)",
+          "updated": "2026-11-03T06:04:49Z",
+          "url": "https://github.com/langgenius/dify/commit/eef50ad25952436dec3f5b4d9e3d14eb5866c773"
+        }
+      ]
+    },
+    {
+      "repository": "langflow-ai/langflow",
+      "url": "https://github.com/langflow-ai/langflow",
+      "requested_repository": "langflow-ai/langflow",
+      "group": "workflow",
+      "stars": 156276,
+      "forks": 10314,
+      "watchers": 526,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python + TS",
+      "captured_at_utc": "2026-11-03T06:22:33+00:00",
+      "branch": "main",
+      "commit_sha": "e63907b0f05304f2de2dab3e19add7e2b6393fb2",
+      "source_html_sha256": "0fc81af896acc8add4fca2ae7096c152d5eec57e0bd27918c1f0d5e89cbb410e",
+      "recent_release_entries": [
+        {
+          "title": "v1.14.0.dev14",
+          "updated": "2026-11-03T03:33:20Z",
+          "url": "https://github.com/langflow-ai/langflow/releases/tag/v1.14.0.dev14"
+        },
+        {
+          "title": "v1.14.0.dev13",
+          "updated": "2026-11-02T00:26:41Z",
+          "url": "https://github.com/langflow-ai/langflow/releases/tag/v1.14.0.dev13"
+        },
+        {
+          "title": "v1.14.0.dev12",
+          "updated": "2026-11-01T00:29:33Z",
+          "url": "https://github.com/langflow-ai/langflow/releases/tag/v1.14.0.dev12"
+        }
+      ],
+      "release_feed": "https://github.com/langflow-ai/langflow/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(tests): settle API requests discarded by navigation",
+          "updated": "2026-11-03T03:16:28Z",
+          "url": "https://github.com/langflow-ai/langflow/commit/e63907b0f05304f2de2dab3e19add7e2b6393fb2"
+        },
+        {
+          "title": "ci: upgrade Playwright to 1.64.1",
+          "updated": "2026-11-03T01:57:37Z",
+          "url": "https://github.com/langflow-ai/langflow/commit/600fcef39ee46335844607840ee8250fbc015aba"
+        },
+        {
+          "title": "ci: align nightly and release Python workflows",
+          "updated": "2026-10-30T01:56:07Z",
+          "url": "https://github.com/langflow-ai/langflow/commit/b5c54a64e685b7e50fd3bc76e965ad718fc2dea3"
+        }
+      ]
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "url": "https://github.com/anthropics/claude-code",
+      "requested_repository": "anthropics/claude-code",
+      "group": "coding",
+      "stars": 154331,
+      "forks": 25538,
+      "watchers": 902,
+      "archived": false,
+      "license_github_detected": null,
+      "license_editorial_note": "商业许可；非完整开源核心",
+      "execution_language_note": "完整商业核心语言未公开",
+      "captured_at_utc": "2026-11-03T06:22:36+00:00",
+      "branch": "main",
+      "commit_sha": "964d69565952a176ac1975ed218362991db71433",
+      "source_html_sha256": "98deec342f52f518f5fd911c69b6b51c7285d5ea2d1289fd15d4dbc7cae9d9b2",
+      "recent_release_entries": [
+        {
+          "title": "v2.1.317",
+          "updated": "2026-11-03T01:25:46Z",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.317"
+        },
+        {
+          "title": "v2.1.316",
+          "updated": "2026-10-31T01:01:35Z",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.316"
+        },
+        {
+          "title": "v2.1.314",
+          "updated": "2026-10-30T01:06:26Z",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.314"
+        }
+      ],
+      "release_feed": "https://github.com/anthropics/claude-code/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "chore: Update CHANGELOG.md and feed.xml",
+          "updated": "2026-11-03T01:25:28Z",
+          "url": "https://github.com/anthropics/claude-code/commit/964d69565952a176ac1975ed218362991db71433"
+        },
+        {
+          "title": "Merge pull request #106583 from anthropics/claude/gh-triage-workflows…",
+          "updated": "2026-11-02T19:19:52Z",
+          "url": "https://github.com/anthropics/claude-code/commit/1a0f9a9d18e1272d3fbaa817d192b6b057bba623"
+        },
+        {
+          "title": "chore: Update mods/",
+          "updated": "2026-11-02T07:12:56Z",
+          "url": "https://github.com/anthropics/claude-code/commit/f0b737f94f3b09bafd851ce47414f9877e06922e"
+        }
+      ]
+    },
+    {
+      "repository": "langchain-ai/langchain",
+      "url": "https://github.com/langchain-ai/langchain",
+      "requested_repository": "langchain-ai/langchain",
+      "group": "framework",
+      "stars": 148924,
+      "forks": 25038,
+      "watchers": 922,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python；另有 JS 路线",
+      "captured_at_utc": "2026-11-03T06:22:32+00:00",
+      "branch": "master",
+      "commit_sha": "2775506076baf2cba8126b21b9e63424fcd97ab9",
+      "source_html_sha256": "2c705092c4b4d357b2f37e7db250aaf5dc99d0fa1f1d25fb7e9e8aa2b5a7273b",
+      "recent_release_entries": [
+        {
+          "title": "langchain-core==1.7.4",
+          "updated": "2026-11-02T15:31:49Z",
+          "url": "https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.7.4"
+        },
+        {
+          "title": "langchain-anthropic==1.7.9",
+          "updated": "2026-11-02T20:14:21Z",
+          "url": "https://github.com/langchain-ai/langchain/releases/tag/langchain-anthropic%3D%3D1.7.9"
+        },
+        {
+          "title": "langchain-anthropic==1.7.8",
+          "updated": "2026-11-02T15:23:33Z",
+          "url": "https://github.com/langchain-ai/langchain/releases/tag/langchain-anthropic%3D%3D1.7.8"
+        }
+      ],
+      "release_feed": "https://github.com/langchain-ai/langchain/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "release(anthropic): 1.7.9 (#41644)",
+          "updated": "2026-11-02T20:10:17Z",
+          "url": "https://github.com/langchain-ai/langchain/commit/2775506076baf2cba8126b21b9e63424fcd97ab9"
+        },
+        {
+          "title": "fix(anthropic): report streamed content-block tokens to callbacks (#4…",
+          "updated": "2026-11-02T20:05:35Z",
+          "url": "https://github.com/langchain-ai/langchain/commit/c0e0487c2acaab5aad7a1471a3af2020b91e6527"
+        },
+        {
+          "title": "fix(core): load RemoveMessage serialized by LangChain.js (#41642)",
+          "updated": "2026-11-02T16:21:09Z",
+          "url": "https://github.com/langchain-ai/langchain/commit/efebcf50fb72d2502415f67297bc183633e378db"
+        }
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex",
+      "requested_repository": "openai/codex",
+      "group": "coding",
+      "stars": 132924,
+      "forks": 21023,
+      "watchers": 660,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Rust 核心",
+      "captured_at_utc": "2026-11-03T06:22:34+00:00",
+      "branch": "main",
+      "commit_sha": "29eed280828d498fead76c3c5dedd9642836b571",
+      "source_html_sha256": "3a2afdd38ec326573b4bdd4ea4c5924398e15b2803596110edb0272e2ded260e",
+      "recent_release_entries": [
+        {
+          "title": "0.167.0-alpha.4",
+          "updated": "2026-11-03T02:29:10Z",
+          "url": "https://github.com/openai/codex/releases/tag/rust-v0.167.0-alpha.4"
+        },
+        {
+          "title": "0.167.0-alpha.3",
+          "updated": "2026-11-01T22:30:00Z",
+          "url": "https://github.com/openai/codex/releases/tag/rust-v0.167.0-alpha.3"
+        },
+        {
+          "title": "0.167.0-alpha.2",
+          "updated": "2026-11-01T19:05:03Z",
+          "url": "https://github.com/openai/codex/releases/tag/rust-v0.167.0-alpha.2"
+        }
+      ],
+      "release_feed": "https://github.com/openai/codex/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Add optional animated GIF output to image generation (#59073)",
+          "updated": "2026-11-03T06:24:24Z",
+          "url": "https://github.com/openai/codex/commit/f9e7b19df8aa75490fc1d90f98d3d95ad716d08e"
+        },
+        {
+          "title": "Enforce strict third-party tool deferral in Code Mode Only (#59071)",
+          "updated": "2026-11-03T06:05:55Z",
+          "url": "https://github.com/openai/codex/commit/29eed280828d498fead76c3c5dedd9642836b571"
+        },
+        {
+          "title": "Enable Bedrock onboarding through the local daemon (#59068)",
+          "updated": "2026-11-03T05:55:13Z",
+          "url": "https://github.com/openai/codex/commit/9e23a4708a769e7a4ad0b0ffef933950277e05fe"
+        }
+      ]
+    },
+    {
+      "repository": "browser-use/browser-use",
+      "url": "https://github.com/browser-use/browser-use",
+      "requested_repository": "browser-use/browser-use",
+      "group": "browser",
+      "stars": 119889,
+      "forks": 13371,
+      "watchers": 473,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python；另有 TS 路线",
+      "captured_at_utc": "2026-11-03T06:22:37+00:00",
+      "branch": "main",
+      "commit_sha": "b49a68e4060acb226da8f784194fef301c53a6d7",
+      "source_html_sha256": "abcb67bf677409cefb033d01ba284d359352abedf9514bf8fe3e4308d9586c57",
+      "recent_release_entries": [
+        {
+          "title": "0.13.14: Python agent and integration updates",
+          "updated": "2026-10-26T22:00:34Z",
+          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.14"
+        },
+        {
+          "title": "0.13.13: OpenAI browser tools and Cloud fixes",
+          "updated": "2026-10-15T23:50:45Z",
+          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.13"
+        },
+        {
+          "title": "0.13.12: OpenAI browser tools",
+          "updated": "2026-10-15T23:37:58Z",
+          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.12"
+        }
+      ],
+      "release_feed": "https://github.com/browser-use/browser-use/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Add Fireworks model example (#6238)",
+          "updated": "2026-10-30T04:28:48Z",
+          "url": "https://github.com/browser-use/browser-use/commit/b49a68e4060acb226da8f784194fef301c53a6d7"
+        },
+        {
+          "title": "Add Fireworks model example",
+          "updated": "2026-10-30T03:01:47Z",
+          "url": "https://github.com/browser-use/browser-use/commit/857de1fb41623a033a519f0276db61151ca9f91c"
+        },
+        {
+          "title": "Release browser-use 0.13.14 before the Pi migration (#6220)",
+          "updated": "2026-10-26T22:00:16Z",
+          "url": "https://github.com/browser-use/browser-use/commit/2cc71890e65056b67fdb29d98bb407749c15bb08"
+        }
+      ]
+    },
+    {
+      "repository": "google-gemini/gemini-cli",
+      "url": "https://github.com/google-gemini/gemini-cli",
+      "requested_repository": "google-gemini/gemini-cli",
+      "group": "coding",
+      "stars": 108690,
+      "forks": 14915,
+      "watchers": 586,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:36+00:00",
+      "branch": "main",
+      "commit_sha": "0ac57c029b848d109eef940afe0db4b5a0c3dad0",
+      "source_html_sha256": "9051f9852e7b350bfa8db75941a4a82a2018c72520c22b69dd95760829a019e1",
+      "recent_release_entries": [
+        {
+          "title": "Release v0.67.0-nightly.20261103.g0ac57c029",
+          "updated": "2026-11-03T01:18:35Z",
+          "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.67.0-nightly.20261103.g0ac57c029"
+        },
+        {
+          "title": "Release v0.67.0-nightly.20261102.g6814e00d6",
+          "updated": "2026-11-02T01:22:38Z",
+          "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.67.0-nightly.20261102.g6814e00d6"
+        },
+        {
+          "title": "Release v0.67.0-nightly.20261101.g6814e00d6",
+          "updated": "2026-11-01T01:14:56Z",
+          "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.67.0-nightly.20261101.g6814e00d6"
+        }
+      ],
+      "release_feed": "https://github.com/google-gemini/gemini-cli/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(core): prevent interrupted Whisper model downloads from being tre…",
+          "updated": "2026-11-02T19:18:51Z",
+          "url": "https://github.com/google-gemini/gemini-cli/commit/0ac57c029b848d109eef940afe0db4b5a0c3dad0"
+        },
+        {
+          "title": "fix(core,cli): preserve selected model across transient fallback, can…",
+          "updated": "2026-10-30T21:38:47Z",
+          "url": "https://github.com/google-gemini/gemini-cli/commit/6814e00d6b148c3a1d57244d5d7040f7c541009d"
+        },
+        {
+          "title": "fix(cli): add missing active and focus keys to custom theme ui schema…",
+          "updated": "2026-10-30T20:53:41Z",
+          "url": "https://github.com/google-gemini/gemini-cli/commit/4c2d6f2355ef4257c6b7c1a0ca1f923e13e45bb9"
+        }
+      ]
+    },
+    {
+      "repository": "infiniflow/ragflow",
+      "url": "https://github.com/infiniflow/ragflow",
+      "requested_repository": "infiniflow/ragflow",
+      "group": "knowledge",
+      "stars": 93395,
+      "forks": 11209,
+      "watchers": 359,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Go 当前核心 + TS；含 Python",
+      "captured_at_utc": "2026-11-03T06:22:41+00:00",
+      "branch": "main",
+      "commit_sha": "a916ee577684a2475321d78b0e7e17ac18c63300",
+      "source_html_sha256": "e9345100e07177aba5f7707e5ac4e4e88de33fb1c467b74c82e60f4db4953cd9",
+      "recent_release_entries": [
+        {
+          "title": "dev-20261103",
+          "updated": "2026-11-03T01:36:56Z",
+          "url": "https://github.com/infiniflow/ragflow/releases/tag/dev-20261103"
+        },
+        {
+          "title": "dev-20261103-2",
+          "updated": "2026-11-03T03:24:58Z",
+          "url": "https://github.com/infiniflow/ragflow/releases/tag/dev-20261103-2"
+        },
+        {
+          "title": "nightly",
+          "updated": "2026-11-02T13:14:30Z",
+          "url": "https://github.com/infiniflow/ragflow/releases/tag/nightly"
+        }
+      ],
+      "release_feed": "https://github.com/infiniflow/ragflow/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(agent): pass scalar thresholds to memory retrieval (#21889)",
+          "updated": "2026-11-03T06:16:28Z",
+          "url": "https://github.com/infiniflow/ragflow/commit/a916ee577684a2475321d78b0e7e17ac18c63300"
+        },
+        {
+          "title": "fix(agent): use stored log titles in tables and exports (#21890)",
+          "updated": "2026-11-03T06:14:49Z",
+          "url": "https://github.com/infiniflow/ragflow/commit/53599f3f4d4cfa71e3bb0a0b15d11a0348bc83e1"
+        },
+        {
+          "title": "Revert \"fix(ingestion): add process_end_at column and keep OSS ingest…",
+          "updated": "2026-11-03T06:10:21Z",
+          "url": "https://github.com/infiniflow/ragflow/commit/f06c4481a6ee75e447d227eacd885bbffdc225d2"
+        }
+      ]
+    },
+    {
+      "repository": "OpenHands/OpenHands",
+      "url": "https://github.com/OpenHands/OpenHands",
+      "requested_repository": "OpenHands/OpenHands",
+      "group": "coding",
+      "stars": 92536,
+      "forks": 12338,
+      "watchers": 494,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "TS Canvas；引擎另仓 Python",
+      "captured_at_utc": "2026-11-03T06:22:34+00:00",
+      "branch": "main",
+      "commit_sha": "dce9d017abe9ed3d362bc77e0cd3fff2e4931f22",
+      "source_html_sha256": "8a77b75968db806e0d3808d7f289eb80a6a0819482fde86b1faff3f280079eb1",
+      "recent_release_entries": [
+        {
+          "title": "v1.23.0-r3",
+          "updated": "2026-10-29T21:17:05Z",
+          "url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.23.0-r3"
+        },
+        {
+          "title": "v1.23.0-r2",
+          "updated": "2026-10-29T21:17:05Z",
+          "url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.23.0-r2"
+        },
+        {
+          "title": "v1.34.0",
+          "updated": "2026-10-27T14:45:59Z",
+          "url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.34.0"
+        }
+      ],
+      "release_feed": "https://github.com/OpenHands/OpenHands/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "chore(deps): bump the i18next group across 1 directory with 4 updates…",
+          "updated": "2026-11-03T04:09:36Z",
+          "url": "https://github.com/OpenHands/OpenHands/commit/dce9d017abe9ed3d362bc77e0cd3fff2e4931f22"
+        },
+        {
+          "title": "ci(deps): bump docker/login-action from 4.6.0 to 4.7.0 in the actions…",
+          "updated": "2026-11-03T04:09:30Z",
+          "url": "https://github.com/OpenHands/OpenHands/commit/ce56bd503ef475b6fdb948854f414363b12787b3"
+        },
+        {
+          "title": "chore(deps): bump the react group across 1 directory with 2 updates (…",
+          "updated": "2026-11-03T04:09:23Z",
+          "url": "https://github.com/OpenHands/OpenHands/commit/1ed8be12378125e7b5fa64d72596e0110ff88dc3"
+        }
+      ]
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "url": "https://github.com/bytedance/deer-flow",
+      "requested_repository": "bytedance/deer-flow",
+      "group": "knowledge",
+      "stars": 84909,
+      "forks": 11936,
+      "watchers": 331,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python / LangGraph + TS",
+      "captured_at_utc": "2026-11-03T06:22:41+00:00",
+      "branch": "main",
+      "commit_sha": "14abd9a28eb035f277aa56098caab1b0600c6e8d",
+      "source_html_sha256": "26bfdcfa73f26a52b20d82b1867b300fb54830a8245beac97844e6102029e9db",
+      "recent_release_entries": [
+        {
+          "title": "v2.2.0-rc0",
+          "updated": "2026-10-29T12:53:45Z",
+          "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.2.0-rc0"
+        },
+        {
+          "title": "v2.1.0 Release",
+          "updated": "2026-09-24T10:40:44Z",
+          "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0"
+        },
+        {
+          "title": "v2.1.0-rc0",
+          "updated": "2026-09-17T14:40:08Z",
+          "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0-rc0"
+        }
+      ],
+      "release_feed": "https://github.com/bytedance/deer-flow/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(subagents): terminalize a background cancel that beat the loop (#…",
+          "updated": "2026-11-02T13:36:59Z",
+          "url": "https://github.com/bytedance/deer-flow/commit/14abd9a28eb035f277aa56098caab1b0600c6e8d"
+        },
+        {
+          "title": "chore(deps): bump pyasn1 from 0.6.4 to 0.6.5 in /backend (#7796)",
+          "updated": "2026-11-02T07:56:14Z",
+          "url": "https://github.com/bytedance/deer-flow/commit/12c304f12ce5c0bf66d8927386e5dd18ea84f685"
+        },
+        {
+          "title": "fix(frontend): release rejected run-input attempts before retrying (#…",
+          "updated": "2026-11-02T07:31:05Z",
+          "url": "https://github.com/bytedance/deer-flow/commit/3b627af8e736d5574daba4e5bb0cbde02d386559"
+        }
+      ]
+    },
+    {
+      "repository": "cline/cline",
+      "url": "https://github.com/cline/cline",
+      "requested_repository": "cline/cline",
+      "group": "coding",
+      "stars": 71242,
+      "forks": 7838,
+      "watchers": 291,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:35+00:00",
+      "branch": "main",
+      "commit_sha": "5b454165353ac1edc9a7db0ff416739044985908",
+      "source_html_sha256": "315d52487a707ffa754c477f2bc303638ac1caf9b6dd78c06e5383feb486880e",
+      "recent_release_entries": [
+        {
+          "title": "desktop-nightly-20261030214224",
+          "updated": "2026-10-30T21:21:13Z",
+          "url": "https://github.com/cline/cline/releases/tag/desktop-nightly-20261030214224"
+        },
+        {
+          "title": "v4.1.26",
+          "updated": "2026-10-26T09:06:51Z",
+          "url": "https://github.com/cline/cline/releases/tag/v4.1.26"
+        },
+        {
+          "title": "sdk/ui/v0.2.0",
+          "updated": "2026-10-26T03:33:55Z",
+          "url": "https://github.com/cline/cline/releases/tag/sdk%2Fui%2Fv0.2.0"
+        }
+      ],
+      "release_feed": "https://github.com/cline/cline/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(core): add structured visual verification reports (#15466)",
+          "updated": "2026-11-02T22:43:52Z",
+          "url": "https://github.com/cline/cline/commit/5b454165353ac1edc9a7db0ff416739044985908"
+        },
+        {
+          "title": "chore(llms): remove provider request capture (#15459)",
+          "updated": "2026-11-02T20:30:04Z",
+          "url": "https://github.com/cline/cline/commit/d19f176b6e4eab8f8f44f5f4649b085479b47b94"
+        },
+        {
+          "title": "fix(core): use filenames as default artifact IDs (#15462)",
+          "updated": "2026-11-02T20:12:10Z",
+          "url": "https://github.com/cline/cline/commit/7c8ed827fe68fde5e600a15d996914ca7b053e25"
+        }
+      ]
+    },
+    {
+      "repository": "Mintplex-Labs/anything-llm",
+      "url": "https://github.com/Mintplex-Labs/anything-llm",
+      "requested_repository": "Mintplex-Labs/anything-llm",
+      "group": "knowledge",
+      "stars": 67879,
+      "forks": 7658,
+      "watchers": 412,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "JavaScript / Node + React",
+      "captured_at_utc": "2026-11-03T06:22:41+00:00",
+      "branch": "master",
+      "commit_sha": "f31b5adfddb16f28071aa20e4e898079a524761b",
+      "source_html_sha256": "d3c7a948abc48db264d305cddf7442e70f4ad5e5bdeeabd0f8f53f2815dfa86e",
+      "recent_release_entries": [
+        {
+          "title": "AnythingLLM v1.19.0",
+          "updated": "2026-10-26T16:14:51Z",
+          "url": "https://github.com/Mintplex-Labs/anything-llm/releases/tag/v1.19.0"
+        },
+        {
+          "title": "AnythingLLM v1.18.0",
+          "updated": "2026-10-13T16:15:52Z",
+          "url": "https://github.com/Mintplex-Labs/anything-llm/releases/tag/v1.18.0"
+        },
+        {
+          "title": "AnythingLLM v1.17.0",
+          "updated": "2026-10-01T22:17:40Z",
+          "url": "https://github.com/Mintplex-Labs/anything-llm/releases/tag/v1.17.0"
+        }
+      ],
+      "release_feed": "https://github.com/Mintplex-Labs/anything-llm/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Keep workspace chats when deleting a user (#6913)",
+          "updated": "2026-11-03T00:40:14Z",
+          "url": "https://github.com/Mintplex-Labs/anything-llm/commit/f31b5adfddb16f28071aa20e4e898079a524761b"
+        },
+        {
+          "title": "fix: decode characters split across chunks in filesystem head/tail re…",
+          "updated": "2026-11-03T00:26:24Z",
+          "url": "https://github.com/Mintplex-Labs/anything-llm/commit/a357f31c486a87d60561c363217d662c43120268"
+        },
+        {
+          "title": "Fix contextual save bar colors in light mode (#6955)",
+          "updated": "2026-11-03T00:20:00Z",
+          "url": "https://github.com/Mintplex-Labs/anything-llm/commit/6ce0bdef647b734527c1fa2e0b4d755d687e9a36"
+        }
+      ]
+    },
+    {
+      "repository": "crewAIInc/crewAI",
+      "url": "https://github.com/crewAIInc/crewAI",
+      "requested_repository": "crewAIInc/crewAI",
+      "group": "framework",
+      "stars": 60435,
+      "forks": 9009,
+      "watchers": 388,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:30+00:00",
+      "branch": "main",
+      "commit_sha": "86dca29b536d700b69a97a3592857d5f9d4a8873",
+      "source_html_sha256": "bea63fc6ff08d72975c1454212ee2cbed68395ee0ac77f5933c8ef36be060f25",
+      "recent_release_entries": [
+        {
+          "title": "1.15.34",
+          "updated": "2026-11-01T21:21:56Z",
+          "url": "https://github.com/crewAIInc/crewAI/releases/tag/1.15.34"
+        },
+        {
+          "title": "1.15.33",
+          "updated": "2026-10-29T07:36:24Z",
+          "url": "https://github.com/crewAIInc/crewAI/releases/tag/1.15.33"
+        },
+        {
+          "title": "1.15.32",
+          "updated": "2026-10-27T23:04:05Z",
+          "url": "https://github.com/crewAIInc/crewAI/releases/tag/1.15.32"
+        }
+      ],
+      "release_feed": "https://github.com/crewAIInc/crewAI/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "test(cli): keep the unlisted-model example out of the model catalog (…",
+          "updated": "2026-11-01T22:32:38Z",
+          "url": "https://github.com/crewAIInc/crewAI/commit/86dca29b536d700b69a97a3592857d5f9d4a8873"
+        },
+        {
+          "title": "[docs-freeze] docs: snapshot and changelog for v1.15.34 (#8924)",
+          "updated": "2026-11-01T21:21:47Z",
+          "url": "https://github.com/crewAIInc/crewAI/commit/596f546cb17d930cfaa803e33479b04f88ec86fa"
+        },
+        {
+          "title": "feat: bump versions to 1.15.34 (#8923)",
+          "updated": "2026-11-01T21:17:58Z",
+          "url": "https://github.com/crewAIInc/crewAI/commit/4128d34ee4dea285045d25e6e25050f7c8fbbd40"
+        }
+      ]
+    },
+    {
+      "repository": "aaif-goose/goose",
+      "url": "https://github.com/aaif-goose/goose",
+      "requested_repository": "aaif-goose/goose",
+      "group": "coding",
+      "stars": 56159,
+      "forks": 6551,
+      "watchers": 285,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Rust 核心 + TS 界面",
+      "captured_at_utc": "2026-11-03T06:22:35+00:00",
+      "branch": "main",
+      "commit_sha": "cfb67d72f6129ba3c9f68d4c225d8dfcaba18a87",
+      "source_html_sha256": "c155316457eb87329b7b565c1c05ab80a6bd927988d8ad74c3c621922bb14409",
+      "recent_release_entries": [
+        {
+          "title": "v1.57.0",
+          "updated": "2026-10-28T19:42:57Z",
+          "url": "https://github.com/aaif-goose/goose/releases/tag/v1.57.0"
+        },
+        {
+          "title": "gdk-v0.1.0-alpha.13: chore(GDK): release v0.1.0-alpha.13 (#12876)",
+          "updated": "2026-10-24T17:41:22Z",
+          "url": "https://github.com/aaif-goose/goose/releases/tag/gdk-v0.1.0-alpha.13"
+        },
+        {
+          "title": "v1.56.0",
+          "updated": "2026-10-23T15:57:25Z",
+          "url": "https://github.com/aaif-goose/goose/releases/tag/v1.56.0"
+        }
+      ],
+      "release_feed": "https://github.com/aaif-goose/goose/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "refactor(desktop): drop tool-specific tool call titles (#13107)",
+          "updated": "2026-11-02T19:09:10Z",
+          "url": "https://github.com/aaif-goose/goose/commit/cfb67d72f6129ba3c9f68d4c225d8dfcaba18a87"
+        },
+        {
+          "title": "fix(computercontroller): stop telling the model a screenshot tool exi…",
+          "updated": "2026-11-02T19:03:54Z",
+          "url": "https://github.com/aaif-goose/goose/commit/16829596e90232c0eb6b498abe950755c6d880d5"
+        },
+        {
+          "title": "feat(desktop): collapse thinking by default and add a setting for it …",
+          "updated": "2026-11-02T04:27:38Z",
+          "url": "https://github.com/aaif-goose/goose/commit/0909288ed4a2053b10540bfcf6dbee3b0de66126"
+        }
+      ]
+    },
+    {
+      "repository": "FlowiseAI/Flowise",
+      "url": "https://github.com/FlowiseAI/Flowise",
+      "requested_repository": "FlowiseAI/Flowise",
+      "group": "workflow",
+      "stars": 55545,
+      "forks": 25088,
+      "watchers": 383,
+      "archived": true,
+      "license_github_detected": {
+        "spdxId": "NOASSERTION",
+        "name": "Other"
+      },
+      "license_editorial_note": "NOASSERTION",
+      "execution_language_note": "TypeScript / Node.js",
+      "captured_at_utc": "2026-11-03T06:22:34+00:00",
+      "branch": "main",
+      "commit_sha": "9291856d1ea4a4ceea9f8fef8ce14f4f6c81e8eb",
+      "source_html_sha256": "a694559765459873aabaa04649d76091c27fc7c7b9b7d0577d78cfbce529a421",
+      "recent_release_entries": [],
+      "release_feed": null,
+      "recent_commit_entries": []
+    },
+    {
+      "repository": "Aider-AI/aider",
+      "url": "https://github.com/aider-ai/aider",
+      "requested_repository": "aider-ai/aider",
+      "group": "coding",
+      "stars": 49916,
+      "forks": 5128,
+      "watchers": 267,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:35+00:00",
+      "branch": "main",
+      "commit_sha": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+      "source_html_sha256": "5a92097cb5522e27a8813cb087b79095d98196f91c7af32bd078b689bc299f00",
+      "recent_release_entries": [
+        {
+          "title": "v0.86.3.dev",
+          "updated": "2026-02-12T00:42:25Z",
+          "url": "https://github.com/Aider-AI/aider/releases/tag/v0.86.3.dev"
+        },
+        {
+          "title": "v0.86.2",
+          "updated": "2026-02-12T00:42:24Z",
+          "url": "https://github.com/Aider-AI/aider/releases/tag/v0.86.2"
+        },
+        {
+          "title": "v0.86.2.dev",
+          "updated": "2025-08-13T15:46:02Z",
+          "url": "https://github.com/Aider-AI/aider/releases/tag/v0.86.2.dev"
+        }
+      ],
+      "release_feed": "https://github.com/Aider-AI/aider/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Merge pull request #5173 from Cyberfilo/feat/anthropic_models-list-ad…",
+          "updated": "2026-05-22T14:02:20Z",
+          "url": "https://github.com/Aider-AI/aider/commit/5dc9490bb35f9729ef2c95d00a19ccd30c26339c"
+        },
+        {
+          "title": "Apply ANTHROPIC_MODELS expansion",
+          "updated": "2026-05-22T10:16:44Z",
+          "url": "https://github.com/Aider-AI/aider/commit/a7a54a9367fefb46fa576840e97f4479c46c7771"
+        },
+        {
+          "title": "Expand ANTHROPIC_MODELS list with recent Claude model names",
+          "updated": "2026-05-22T10:16:21Z",
+          "url": "https://github.com/Aider-AI/aider/commit/2ec3550e71c174efe84fe87d7fa669b66903fa41"
+        }
+      ]
+    },
+    {
+      "repository": "HKUDS/nanobot",
+      "url": "https://github.com/HKUDS/nanobot",
+      "requested_repository": "HKUDS/nanobot",
+      "group": "assistant",
+      "stars": 49775,
+      "forks": 8712,
+      "watchers": 209,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:39+00:00",
+      "branch": "main",
+      "commit_sha": "cc4dd1cebfa96aadd44bc090db02c0a75a79fdb6",
+      "source_html_sha256": "686d992da2b618b2572a9ce8799000de33de9dbb3f4bd35e16fed0a970be50c9",
+      "recent_release_entries": [
+        {
+          "title": "v0.4.0",
+          "updated": "2026-10-28T11:12:42Z",
+          "url": "https://github.com/HKUDS/nanobot/releases/tag/v0.4.0"
+        },
+        {
+          "title": "v0.3.5",
+          "updated": "2026-09-15T19:05:37Z",
+          "url": "https://github.com/HKUDS/nanobot/releases/tag/v0.3.5"
+        },
+        {
+          "title": "v0.3.0",
+          "updated": "2026-07-25T08:08:47Z",
+          "url": "https://github.com/HKUDS/nanobot/releases/tag/v0.3.0"
+        }
+      ],
+      "release_feed": "https://github.com/HKUDS/nanobot/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(whatsapp): report libmagic dependency failures",
+          "updated": "2026-11-03T06:17:51Z",
+          "url": "https://github.com/HKUDS/nanobot/commit/cc4dd1cebfa96aadd44bc090db02c0a75a79fdb6"
+        },
+        {
+          "title": "fix(whatsapp): update Neonize for current clients (#6545)",
+          "updated": "2026-11-03T05:51:49Z",
+          "url": "https://github.com/HKUDS/nanobot/commit/36094bcf2cc315594c4720169f852cf23d41414a"
+        },
+        {
+          "title": "fix(runtime): preserve recovery history and prevent unsafe MCP replay…",
+          "updated": "2026-11-02T09:55:14Z",
+          "url": "https://github.com/HKUDS/nanobot/commit/384b7638307e5c9279286df78ace5759311ea603"
+        }
+      ]
+    },
+    {
+      "repository": "langchain-ai/langgraph",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "requested_repository": "langchain-ai/langgraph",
+      "group": "framework",
+      "stars": 44364,
+      "forks": 7627,
+      "watchers": 186,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python / TS（独立实现）",
+      "captured_at_utc": "2026-11-03T06:22:28+00:00",
+      "branch": "main",
+      "commit_sha": "3c916d750575b22c464790e9774494d810ccd322",
+      "source_html_sha256": "89a5f907562c016bd59f4c5f37fd4e7e058599f01597effa9e196ed2522ae883",
+      "recent_release_entries": [
+        {
+          "title": "langgraph==1.2.19",
+          "updated": "2026-10-30T22:23:43Z",
+          "url": "https://github.com/langchain-ai/langgraph/releases/tag/1.2.19"
+        },
+        {
+          "title": "langgraph-sdk==0.4.11",
+          "updated": "2026-10-30T22:17:59Z",
+          "url": "https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.11"
+        },
+        {
+          "title": "langgraph-checkpoint-sqlite==3.1.3",
+          "updated": "2026-10-30T22:18:54Z",
+          "url": "https://github.com/langchain-ai/langgraph/releases/tag/checkpointsqlite%3D%3D3.1.3"
+        }
+      ],
+      "release_feed": "https://github.com/langchain-ai/langgraph/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(sdk-py): remove fairness_weight from PrioritySettings (#9441)",
+          "updated": "2026-11-03T01:03:26Z",
+          "url": "https://github.com/langchain-ai/langgraph/commit/3c916d750575b22c464790e9774494d810ccd322"
+        },
+        {
+          "title": "fix(sdk-py): rejoin a run stream that closes before the run ends (#9554)",
+          "updated": "2026-11-02T19:57:22Z",
+          "url": "https://github.com/langchain-ai/langgraph/commit/9791c686eeb263e3eda8c13062036a8b071531e6"
+        },
+        {
+          "title": "chore(deps): bump langgraph from 1.2.3 to 1.2.14 in /libs/cli (#9512)",
+          "updated": "2026-11-02T04:33:29Z",
+          "url": "https://github.com/langchain-ai/langgraph/commit/ee3c043bddcc514012885167dd5916b15d6e4731"
+        }
+      ]
+    },
+    {
+      "repository": "agno-agi/agno",
+      "url": "https://github.com/agno-agi/agno",
+      "requested_repository": "agno-agi/agno",
+      "group": "framework",
+      "stars": 43025,
+      "forks": 6231,
+      "watchers": 234,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:30+00:00",
+      "branch": "main",
+      "commit_sha": "b21807bb6d86d2a62efeb42d492c04e566ee7f90",
+      "source_html_sha256": "9d6608f299181cdefaf38e88397f81fa0bcc260a183d876027314ed576bd8698",
+      "recent_release_entries": [
+        {
+          "title": "v3.1.12",
+          "updated": "2026-10-29T14:00:55Z",
+          "url": "https://github.com/agno-agi/agno/releases/tag/v3.1.12"
+        },
+        {
+          "title": "v3.1.11",
+          "updated": "2026-10-27T19:33:41Z",
+          "url": "https://github.com/agno-agi/agno/releases/tag/v3.1.11"
+        },
+        {
+          "title": "v3.1.10",
+          "updated": "2026-10-23T13:10:30Z",
+          "url": "https://github.com/agno-agi/agno/releases/tag/v3.1.10"
+        }
+      ],
+      "release_feed": "https://github.com/agno-agi/agno/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix: send the output schema on Mistral streaming calls (#11273)",
+          "updated": "2026-11-02T18:54:25Z",
+          "url": "https://github.com/agno-agi/agno/commit/b21807bb6d86d2a62efeb42d492c04e566ee7f90"
+        },
+        {
+          "title": "[fix] Handle non-string and None stream names in FieldLabeledCSVReade…",
+          "updated": "2026-11-02T06:42:34Z",
+          "url": "https://github.com/agno-agi/agno/commit/df501779b4fc566f040a033105c01af909e8c3b5"
+        },
+        {
+          "title": "fix: accept the name argument in YouTubeReader.async_read (#11417)",
+          "updated": "2026-11-01T14:28:25Z",
+          "url": "https://github.com/agno-agi/agno/commit/0939e4735232ecb880d753c9d48ac8bed1e9fb10"
+        }
+      ]
+    },
+    {
+      "repository": "khoj-ai/khoj",
+      "url": "https://github.com/khoj-ai/khoj",
+      "requested_repository": "khoj-ai/khoj",
+      "group": "knowledge",
+      "stars": 37955,
+      "forks": 2529,
+      "watchers": 178,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "AGPL-3.0",
+        "name": "GNU Affero General Public License v3.0"
+      },
+      "license_editorial_note": "AGPL-3.0-or-later",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:42+00:00",
+      "branch": "master",
+      "commit_sha": "ae229ca894c0b80ad84664afcfdde523b5e87057",
+      "source_html_sha256": "193f8b35fb6fee474a2cbfa5d336ce85c051e900c1191cdaa701c5ff20b74a06",
+      "recent_release_entries": [
+        {
+          "title": "2.0.0-beta.28",
+          "updated": "2026-03-26T03:41:03Z",
+          "url": "https://github.com/khoj-ai/khoj/releases/tag/2.0.0-beta.28"
+        },
+        {
+          "title": "2.0.0-beta.27",
+          "updated": "2026-03-25T20:14:04Z",
+          "url": "https://github.com/khoj-ai/khoj/releases/tag/2.0.0-beta.27"
+        },
+        {
+          "title": "2.0.0-beta.26",
+          "updated": "2026-03-25T15:25:41Z",
+          "url": "https://github.com/khoj-ai/khoj/releases/tag/2.0.0-beta.26"
+        }
+      ],
+      "release_feed": "https://github.com/khoj-ai/khoj/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Make chat export robust and fix export truncation (#1314)",
+          "updated": "2026-08-02T01:55:40Z",
+          "url": "https://github.com/khoj-ai/khoj/commit/ae229ca894c0b80ad84664afcfdde523b5e87057"
+        },
+        {
+          "title": "Stop sending client IP in telemetry so it matches the privacy docs (#…",
+          "updated": "2026-08-02T00:21:56Z",
+          "url": "https://github.com/khoj-ai/khoj/commit/4d7ac85a3f99b05f2d17f311679cff046d70d614"
+        },
+        {
+          "title": "Do not log unnecessary details when connect to Notion",
+          "updated": "2026-06-24T21:13:59Z",
+          "url": "https://github.com/khoj-ai/khoj/commit/1e30154d1070c7b132f389638c008b490be1481b"
+        }
+      ]
+    },
+    {
+      "repository": "onyx-dot-app/onyx",
+      "url": "https://github.com/onyx-dot-app/onyx",
+      "requested_repository": "onyx-dot-app/onyx",
+      "group": "knowledge",
+      "stars": 33171,
+      "forks": 4695,
+      "watchers": 153,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "NOASSERTION",
+        "name": "Other"
+      },
+      "license_editorial_note": "CE MIT；EE 另许可",
+      "execution_language_note": "Python + TS",
+      "captured_at_utc": "2026-11-03T06:22:41+00:00",
+      "branch": "main",
+      "commit_sha": "332b908f4a05090882ffaf7219d904c467bb7ce1",
+      "source_html_sha256": "1d7d7a93cc6df908a9d8288edf9bb642d58faf955b3345790a6b6bd96a022edb",
+      "recent_release_entries": [
+        {
+          "title": "v4.9.7",
+          "updated": "2026-11-02T18:50:59Z",
+          "url": "https://github.com/onyx-dot-app/onyx/releases/tag/v4.9.7"
+        },
+        {
+          "title": "nightly-latest-20261102",
+          "updated": "2026-11-02T06:19:00Z",
+          "url": "https://github.com/onyx-dot-app/onyx/releases/tag/nightly-latest-20261102"
+        },
+        {
+          "title": "nightly-latest-20261101: fix(chat): don't re-add a dropped chat when an older page fails (#17036)",
+          "updated": "2026-11-01T03:27:52Z",
+          "url": "https://github.com/onyx-dot-app/onyx/releases/tag/nightly-latest-20261101"
+        }
+      ],
+      "release_feed": "https://github.com/onyx-dot-app/onyx/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(web): list decision models above language models in Search Decis…",
+          "updated": "2026-11-02T22:37:35Z",
+          "url": "https://github.com/onyx-dot-app/onyx/commit/332b908f4a05090882ffaf7219d904c467bb7ce1"
+        },
+        {
+          "title": "fix(sharing): use Can use / Can edit role labels in every share picke…",
+          "updated": "2026-11-02T22:23:32Z",
+          "url": "https://github.com/onyx-dot-app/onyx/commit/9a96fc74701ec5312b4dab470933df910c0ecb47"
+        },
+        {
+          "title": "feat(opensearch): default AWS to 3.7 and disable quantization levels …",
+          "updated": "2026-11-02T22:11:14Z",
+          "url": "https://github.com/onyx-dot-app/onyx/commit/e1f1ca827b365ed9dcfc9e4b022c9c612b21dba2"
+        }
+      ]
+    },
+    {
+      "repository": "zeroclaw-labs/zeroclaw",
+      "url": "https://github.com/zeroclaw-labs/zeroclaw",
+      "requested_repository": "zeroclaw-labs/zeroclaw",
+      "group": "assistant",
+      "stars": 33109,
+      "forks": 4996,
+      "watchers": 81,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "MIT OR Apache-2.0",
+      "execution_language_note": "Rust",
+      "captured_at_utc": "2026-11-03T06:22:39+00:00",
+      "branch": "master",
+      "commit_sha": "71e68a0d632c2b75814d960115e8aafcd8369259",
+      "source_html_sha256": "91c3e569d7faa13fb83e3dac2a08db2a6bbfafc1b286ccd2467b7a5ac1c32f91",
+      "recent_release_entries": [
+        {
+          "title": "v0.8.7",
+          "updated": "2026-11-03T02:29:59Z",
+          "url": "https://github.com/zeroclaw-labs/zeroclaw/releases/tag/v0.8.7"
+        },
+        {
+          "title": "v0.8.6",
+          "updated": "2026-10-18T06:15:47Z",
+          "url": "https://github.com/zeroclaw-labs/zeroclaw/releases/tag/v0.8.6"
+        },
+        {
+          "title": "v0.8.5",
+          "updated": "2026-09-05T07:31:19Z",
+          "url": "https://github.com/zeroclaw-labs/zeroclaw/releases/tag/v0.8.5"
+        }
+      ],
+      "release_feed": "https://github.com/zeroclaw-labs/zeroclaw/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(channels): allow inbound-only email channels without SMTP (#12003)",
+          "updated": "2026-11-03T03:28:57Z",
+          "url": "https://github.com/zeroclaw-labs/zeroclaw/commit/71e68a0d632c2b75814d960115e8aafcd8369259"
+        },
+        {
+          "title": "fix(runtime): honour keep_tool_context_turns when building provider r…",
+          "updated": "2026-11-02T21:57:33Z",
+          "url": "https://github.com/zeroclaw-labs/zeroclaw/commit/03b29bcc68eadf8bd03905b93d6867d3af9d7b87"
+        },
+        {
+          "title": "feat(runtime): add capability-taking constructors for turn entry poin…",
+          "updated": "2026-11-02T20:20:31Z",
+          "url": "https://github.com/zeroclaw-labs/zeroclaw/commit/6ac37f60f142bca5e1e629f59e809a5cee6aaf3e"
+        }
+      ]
+    },
+    {
+      "repository": "nanocoai/nanoclaw",
+      "url": "https://github.com/nanocoai/nanoclaw",
+      "requested_repository": "nanocoai/nanoclaw",
+      "group": "assistant",
+      "stars": 31075,
+      "forks": 12680,
+      "watchers": 128,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "TypeScript + 容器",
+      "captured_at_utc": "2026-11-03T06:22:39+00:00",
+      "branch": "main",
+      "commit_sha": "acc2b1c8f52a954368cfaf04b61c32f9a1efc280",
+      "source_html_sha256": "d610907bc0b3d777cf22526f3fd3779ffc455546fbe0f431928db0363fb7f2cc",
+      "recent_release_entries": [
+        {
+          "title": "v2026.10.1-rc.2",
+          "updated": "2026-10-22T15:48:44Z",
+          "url": "https://github.com/nanocoai/nanoclaw/releases/tag/v2026.10.1-rc.2"
+        },
+        {
+          "title": "v2026.10.1-rc.1",
+          "updated": "2026-10-20T16:50:09Z",
+          "url": "https://github.com/nanocoai/nanoclaw/releases/tag/v2026.10.1-rc.1"
+        },
+        {
+          "title": "v2026.10.0",
+          "updated": "2026-10-09T11:26:13Z",
+          "url": "https://github.com/nanocoai/nanoclaw/releases/tag/v2026.10.0"
+        }
+      ],
+      "release_feed": "https://github.com/nanocoai/nanoclaw/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "agent-images: v2026.10.0 -> v2026.10.0-20261026T0306 (#4226)",
+          "updated": "2026-10-26T07:00:31Z",
+          "url": "https://github.com/nanocoai/nanoclaw/commit/acc2b1c8f52a954368cfaf04b61c32f9a1efc280"
+        },
+        {
+          "title": "fix(setup): name the signed-in account and let setup switch it (#4225)",
+          "updated": "2026-10-25T23:55:18Z",
+          "url": "https://github.com/nanocoai/nanoclaw/commit/4d7bd0ad7f63bf2d3563fd448b2413c09a0f907e"
+        },
+        {
+          "title": "fix(setup): print the device code beside the portal link (#4224)",
+          "updated": "2026-10-25T23:55:11Z",
+          "url": "https://github.com/nanocoai/nanoclaw/commit/818632ddbbe4894655746a607cd8283b0d8be386"
+        }
+      ]
+    },
+    {
+      "repository": "langchain-ai/deepagents",
+      "url": "https://github.com/langchain-ai/deepagents",
+      "requested_repository": "langchain-ai/deepagents",
+      "group": "framework",
+      "stars": 30927,
+      "forks": 4347,
+      "watchers": 139,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python 主仓；另有独立 TS 实现",
+      "captured_at_utc": "2026-11-03T06:22:31+00:00",
+      "branch": "main",
+      "commit_sha": "5829691de8f43d201f9534fb731643223c0bbccc",
+      "source_html_sha256": "0fe9ecc7038616e0a91bb711845467380411c8003554f6d2d8700cbf1881d3de",
+      "recent_release_entries": [
+        {
+          "title": "deepagents-code==0.2.4",
+          "updated": "2026-11-02T23:13:57Z",
+          "url": "https://github.com/langchain-ai/deepagents/releases/tag/deepagents-code%3D%3D0.2.4"
+        },
+        {
+          "title": "deepagents-code==0.2.3",
+          "updated": "2026-11-02T17:12:57Z",
+          "url": "https://github.com/langchain-ai/deepagents/releases/tag/deepagents-code%3D%3D0.2.3"
+        },
+        {
+          "title": "langchain-quickjs==0.3.11",
+          "updated": "2026-10-27T17:02:24Z",
+          "url": "https://github.com/langchain-ai/deepagents/releases/tag/langchain-quickjs%3D%3D0.3.11"
+        }
+      ],
+      "release_feed": "https://github.com/langchain-ai/deepagents/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(quickjs): resolve nested schema `$ref`s in PTC signatures (#7441)",
+          "updated": "2026-11-03T03:45:21Z",
+          "url": "https://github.com/langchain-ai/deepagents/commit/5829691de8f43d201f9534fb731643223c0bbccc"
+        },
+        {
+          "title": "release(deepagents-code): 0.2.4 (#7500)",
+          "updated": "2026-11-02T23:05:37Z",
+          "url": "https://github.com/langchain-ai/deepagents/commit/88ad30d69621afb8e2c05c918c73d19a6efb9f45"
+        },
+        {
+          "title": "chore(deps): raise `quickjs-rs` minimum to 0.2.6 in `langchain-quickj…",
+          "updated": "2026-11-02T22:28:48Z",
+          "url": "https://github.com/langchain-ai/deepagents/commit/1f9d08c33f2f4e8cb236897342f8f3d6d1840220"
+        }
+      ]
+    },
+    {
+      "repository": "openai/openai-agents-python",
+      "url": "https://github.com/openai/openai-agents-python",
+      "requested_repository": "openai/openai-agents-python",
+      "group": "framework",
+      "stars": 30466,
+      "forks": 4978,
+      "watchers": 228,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python；另有官方 TS SDK",
+      "captured_at_utc": "2026-11-03T06:22:28+00:00",
+      "branch": "main",
+      "commit_sha": "e355d69152d4f4730dfb03b63dbce53e8d9f5d8c",
+      "source_html_sha256": "6816077bf4d155d0831ccf95c15f7a5c239b38f64b354e7ffbbd53be9d107ed2",
+      "recent_release_entries": [
+        {
+          "title": "v0.24.0",
+          "updated": "2026-10-15T02:37:43Z",
+          "url": "https://github.com/openai/openai-agents-python/releases/tag/v0.24.0"
+        },
+        {
+          "title": "v0.23.1",
+          "updated": "2026-10-02T15:36:24Z",
+          "url": "https://github.com/openai/openai-agents-python/releases/tag/v0.23.1"
+        },
+        {
+          "title": "v0.23.0",
+          "updated": "2026-10-02T01:08:23Z",
+          "url": "https://github.com/openai/openai-agents-python/releases/tag/v0.23.0"
+        }
+      ],
+      "release_feed": "https://github.com/openai/openai-agents-python/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix: improve missing stream completion diagnostics (#5457)",
+          "updated": "2026-10-30T20:13:59Z",
+          "url": "https://github.com/openai/openai-agents-python/commit/e355d69152d4f4730dfb03b63dbce53e8d9f5d8c"
+        },
+        {
+          "title": "fix: stop native tool queues during function failure cleanup (#5446)",
+          "updated": "2026-10-27T19:22:01Z",
+          "url": "https://github.com/openai/openai-agents-python/commit/cd26bbbc52847845fde73b9952b51e62e2bcbdc0"
+        },
+        {
+          "title": "fix(deps): require pymongo 4.18.3 or later (#5445)",
+          "updated": "2026-10-27T19:02:12Z",
+          "url": "https://github.com/openai/openai-agents-python/commit/57027de5f00409443011a3b12c1a54533f8931ee"
+        }
+      ]
+    },
+    {
+      "repository": "sipeed/picoclaw",
+      "url": "https://github.com/sipeed/picoclaw",
+      "requested_repository": "sipeed/picoclaw",
+      "group": "assistant",
+      "stars": 30088,
+      "forks": 4416,
+      "watchers": 155,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Go",
+      "captured_at_utc": "2026-11-03T06:22:40+00:00",
+      "branch": "main",
+      "commit_sha": "bbf6893ca7afad27f1d00a0f5a45982a549c6ed6",
+      "source_html_sha256": "5643eb234bbfdeb237ef89416f2b58eb661ec72656d0cfef91a38e01cbdfb597",
+      "recent_release_entries": [
+        {
+          "title": "Nightly Build",
+          "updated": "2026-07-02T01:26:53Z",
+          "url": "https://github.com/sipeed/picoclaw/releases/tag/nightly"
+        },
+        {
+          "title": "v0.3.1",
+          "updated": "2026-07-03T07:37:06Z",
+          "url": "https://github.com/sipeed/picoclaw/releases/tag/v0.3.1"
+        },
+        {
+          "title": "v0.3.0",
+          "updated": "2026-06-16T02:09:56Z",
+          "url": "https://github.com/sipeed/picoclaw/releases/tag/v0.3.0"
+        }
+      ],
+      "release_feed": "https://github.com/sipeed/picoclaw/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(models): add configurable default fallback chain (#3200)",
+          "updated": "2026-08-19T09:17:32Z",
+          "url": "https://github.com/sipeed/picoclaw/commit/bbf6893ca7afad27f1d00a0f5a45982a549c6ed6"
+        },
+        {
+          "title": "fix: update Go and x/text for govulncheck (#3286)",
+          "updated": "2026-07-23T02:08:09Z",
+          "url": "https://github.com/sipeed/picoclaw/commit/49183d7e8daed0dba89ddbb6fcb60089401d9680"
+        },
+        {
+          "title": "Revert \"docs: add PicoPaw banners to READMEs (#3096)\" (#3285)",
+          "updated": "2026-07-22T09:15:29Z",
+          "url": "https://github.com/sipeed/picoclaw/commit/e14f8daecbefa332b96a180a2094950b602c466f"
+        }
+      ]
+    },
+    {
+      "repository": "simstudioai/sim",
+      "url": "https://github.com/simstudioai/sim",
+      "requested_repository": "simstudioai/sim",
+      "group": "workflow",
+      "stars": 29979,
+      "forks": 3879,
+      "watchers": 127,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:33+00:00",
+      "branch": "main",
+      "commit_sha": "093ea9ddb2f3e47facbc2dc42d4e523ba050dedb",
+      "source_html_sha256": "97aaab7662f71a4c176d0f89e81c999a918fc088fab14ab4d9381df5b585ed4f",
+      "recent_release_entries": [
+        {
+          "title": "v0.9.41",
+          "updated": "2026-11-03T01:56:10Z",
+          "url": "https://github.com/simstudioai/sim/releases/tag/v0.9.41"
+        },
+        {
+          "title": "v0.9.40",
+          "updated": "2026-11-01T21:20:08Z",
+          "url": "https://github.com/simstudioai/sim/releases/tag/v0.9.40"
+        },
+        {
+          "title": "v0.9.39",
+          "updated": "2026-11-01T09:04:18Z",
+          "url": "https://github.com/simstudioai/sim/releases/tag/v0.9.39"
+        }
+      ],
+      "release_feed": "https://github.com/simstudioai/sim/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "v0.9.41: browser extension, ci improvements",
+          "updated": "2026-11-03T01:19:41Z",
+          "url": "https://github.com/simstudioai/sim/commit/093ea9ddb2f3e47facbc2dc42d4e523ba050dedb"
+        },
+        {
+          "title": "chore(release): merge staging into the v0.9.41 release",
+          "updated": "2026-11-03T01:00:43Z",
+          "url": "https://github.com/simstudioai/sim/commit/9b0f81c1ca4c8bf06cd197c0140cece7528044d7"
+        },
+        {
+          "title": "improvement(mothership): let a code call run for up to fifteen minute…",
+          "updated": "2026-11-03T00:58:10Z",
+          "url": "https://github.com/simstudioai/sim/commit/78cd332ac67906ffe195f8ae76765fb1a6b8506c"
+        }
+      ]
+    },
+    {
+      "repository": "alibaba/page-agent",
+      "url": "https://github.com/alibaba/page-agent",
+      "requested_repository": "alibaba/page-agent",
+      "group": "browser",
+      "stars": 29620,
+      "forks": 2643,
+      "watchers": 106,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:38+00:00",
+      "branch": "main",
+      "commit_sha": "9eb6b6646500264d9034dd466a4270cb9fc1ef1e",
+      "source_html_sha256": "57ace95b72cd3d45986399c8d13e213e1c0d79708c5e4411a659cebff8c461c1",
+      "recent_release_entries": [
+        {
+          "title": "🌟v1.12.4",
+          "updated": "2026-09-06T07:46:41Z",
+          "url": "https://github.com/alibaba/page-agent/releases/tag/v1.12.4"
+        },
+        {
+          "title": "🌟v1.12.3",
+          "updated": "2026-09-05T17:47:54Z",
+          "url": "https://github.com/alibaba/page-agent/releases/tag/v1.12.3"
+        },
+        {
+          "title": "🌟v1.12.2",
+          "updated": "2026-07-16T07:41:49Z",
+          "url": "https://github.com/alibaba/page-agent/releases/tag/v1.12.2"
+        }
+      ],
+      "release_feed": "https://github.com/alibaba/page-agent/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "chore(version): bump version to 1.12.4",
+          "updated": "2026-09-06T07:44:57Z",
+          "url": "https://github.com/alibaba/page-agent/commit/9eb6b6646500264d9034dd466a4270cb9fc1ef1e"
+        },
+        {
+          "title": "chore: fix size badge (#714)",
+          "updated": "2026-09-06T07:38:16Z",
+          "url": "https://github.com/alibaba/page-agent/commit/891765cbab001fab3eca910ff43e2df5a1718884"
+        },
+        {
+          "title": "feat: update models (#713)",
+          "updated": "2026-09-05T20:29:53Z",
+          "url": "https://github.com/alibaba/page-agent/commit/eb4a0ff1e0661e491588a580b44c1dc232b1fc66"
+        }
+      ]
+    },
+    {
+      "repository": "mastra-ai/mastra",
+      "url": "https://github.com/mastra-ai/mastra",
+      "requested_repository": "mastra-ai/mastra",
+      "group": "framework",
+      "stars": 29301,
+      "forks": 3070,
+      "watchers": 102,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "NOASSERTION",
+        "name": "Other"
+      },
+      "license_editorial_note": "Apache-2.0 主体；ee 另许可",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:31+00:00",
+      "branch": "main",
+      "commit_sha": "31efa3625ffb20668831c2315a818d9e6237e489",
+      "source_html_sha256": "bc1f21339b463de6170ec5ab878498e560237da484810cd680412d37e892481d",
+      "recent_release_entries": [
+        {
+          "title": "mastracode@0.48.2",
+          "updated": "2026-10-30T23:21:20Z",
+          "url": "https://github.com/mastra-ai/mastra/releases/tag/mastracode%400.48.2"
+        },
+        {
+          "title": "mastra@1.37.0",
+          "updated": "2026-10-30T23:21:21Z",
+          "url": "https://github.com/mastra-ai/mastra/releases/tag/mastra%401.37.0"
+        },
+        {
+          "title": "@mastra/vercel@1.6.3",
+          "updated": "2026-10-30T23:21:22Z",
+          "url": "https://github.com/mastra-ai/mastra/releases/tag/%40mastra%2Fvercel%401.6.3"
+        }
+      ],
+      "release_feed": "https://github.com/mastra-ai/mastra/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "chore: regenerate providers, docs and pricing [skip ci]",
+          "updated": "2026-11-03T06:21:31Z",
+          "url": "https://github.com/mastra-ai/mastra/commit/31efa3625ffb20668831c2315a818d9e6237e489"
+        },
+        {
+          "title": "feat(playground-ui): readable failed Knowledge tool calls and linked …",
+          "updated": "2026-11-03T05:56:50Z",
+          "url": "https://github.com/mastra-ai/mastra/commit/7ad1918a72a1961bbcbd23b4a615ecd7943e98ab"
+        },
+        {
+          "title": "feat(core): remove knowledge.reindex() before the Knowledge alpha (#2…",
+          "updated": "2026-11-03T05:28:33Z",
+          "url": "https://github.com/mastra-ai/mastra/commit/ba50b064243c9e8c389968c14e734af95f7cac76"
+        }
+      ]
+    },
+    {
+      "repository": "browserbase/stagehand",
+      "url": "https://github.com/browserbase/stagehand",
+      "requested_repository": "browserbase/stagehand",
+      "group": "browser",
+      "stars": 25915,
+      "forks": 1805,
+      "watchers": 102,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "TS canonical；Python / Go",
+      "captured_at_utc": "2026-11-03T06:22:37+00:00",
+      "branch": "main",
+      "commit_sha": "9afa0952453e219f7164a0ea16cf293d3dcaddde",
+      "source_html_sha256": "b492f8569659cc2ce623e2ff88f833ca732f6a75f2649c2f113949098e750f09",
+      "recent_release_entries": [
+        {
+          "title": "stagehand-python@4.4.0a0.dev1665: [chore]: remove preview workflow (#3366)",
+          "updated": "2026-11-03T01:19:28Z",
+          "url": "https://github.com/browserbase/stagehand/releases/tag/stagehand-python%404.4.0a0.dev1665"
+        },
+        {
+          "title": "stagehand-python@4.4.0a0.dev1664: [chore]: migrate to uv workspace (#3338)",
+          "updated": "2026-11-03T01:11:00Z",
+          "url": "https://github.com/browserbase/stagehand/releases/tag/stagehand-python%404.4.0a0.dev1664"
+        },
+        {
+          "title": "stagehand-python@4.4.0a0.dev1663",
+          "updated": "2026-10-30T01:04:01Z",
+          "url": "https://github.com/browserbase/stagehand/releases/tag/stagehand-python%404.4.0a0.dev1663"
+        }
+      ],
+      "release_feed": "https://github.com/browserbase/stagehand/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "[chore]: remove preview workflow (#3366)",
+          "updated": "2026-11-03T01:19:28Z",
+          "url": "https://github.com/browserbase/stagehand/commit/9afa0952453e219f7164a0ea16cf293d3dcaddde"
+        },
+        {
+          "title": "[chore]: migrate to uv workspace (#3338)",
+          "updated": "2026-11-03T01:11:00Z",
+          "url": "https://github.com/browserbase/stagehand/commit/becc311b9e547f7338c43facd29042a681540a82"
+        },
+        {
+          "title": "fix(integrations): save facade screenshot artifacts only as images in…",
+          "updated": "2026-10-30T01:04:01Z",
+          "url": "https://github.com/browserbase/stagehand/commit/b7a4b899079f198a0ee78a6dcb62ad02f545cf49"
+        }
+      ]
+    },
+    {
+      "repository": "RooCodeInc/Roo-Code",
+      "url": "https://github.com/RooCodeInc/Roo-Code",
+      "requested_repository": "RooCodeInc/Roo-Code",
+      "group": "coding",
+      "stars": 24256,
+      "forks": 3424,
+      "watchers": 146,
+      "archived": true,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:37+00:00",
+      "branch": "main",
+      "commit_sha": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "source_html_sha256": "362f9ad8c41c6239a44cdd73af0bacde450ea8de0e2bd3be341265864c7d27ff",
+      "recent_release_entries": [],
+      "release_feed": null,
+      "recent_commit_entries": []
+    },
+    {
+      "repository": "Skyvern-AI/skyvern",
+      "url": "https://github.com/Skyvern-AI/skyvern",
+      "requested_repository": "Skyvern-AI/skyvern",
+      "group": "browser",
+      "stars": 23336,
+      "forks": 2233,
+      "watchers": 100,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "AGPL-3.0",
+        "name": "GNU Affero General Public License v3.0"
+      },
+      "license_editorial_note": "AGPL-3.0",
+      "execution_language_note": "Python Agent + TS；驱动含 Rust",
+      "captured_at_utc": "2026-11-03T06:22:37+00:00",
+      "branch": "main",
+      "commit_sha": "cbcd7c8ad9572b511c2da78e51b338bb15c11754",
+      "source_html_sha256": "c49a1d0861695ac823429ef077d2929895caa943cd7b81823d00b87a2337cd06",
+      "recent_release_entries": [
+        {
+          "title": "Release v1.0.56",
+          "updated": "2026-10-16T02:26:32Z",
+          "url": "https://github.com/Skyvern-AI/skyvern/releases/tag/v1.0.56"
+        },
+        {
+          "title": "Release v1.0.55",
+          "updated": "2026-10-14T05:27:41Z",
+          "url": "https://github.com/Skyvern-AI/skyvern/releases/tag/v1.0.55"
+        },
+        {
+          "title": "Release v1.0.54",
+          "updated": "2026-09-22T22:57:33Z",
+          "url": "https://github.com/Skyvern-AI/skyvern/releases/tag/v1.0.54"
+        }
+      ],
+      "release_feed": "https://github.com/Skyvern-AI/skyvern/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Gate the Estuary capture-stall monitor on a slot that stopped confirm…",
+          "updated": "2026-11-03T05:41:38Z",
+          "url": "https://github.com/Skyvern-AI/skyvern/commit/cbcd7c8ad9572b511c2da78e51b338bb15c11754"
+        },
+        {
+          "title": "Run the CI pytest suite as 4 parallel shards (#9227)",
+          "updated": "2026-11-03T05:32:29Z",
+          "url": "https://github.com/Skyvern-AI/skyvern/commit/57d1806a013178e09e45a45a03f479af9cc49065"
+        },
+        {
+          "title": "Upgrade pypa/gh-action-pypi-publish to v1.14.3 in the SDK release wor…",
+          "updated": "2026-11-03T04:48:58Z",
+          "url": "https://github.com/Skyvern-AI/skyvern/commit/a203cabb739641f66c8ab4a8d97fa1f15795f6d6"
+        }
+      ]
+    },
+    {
+      "repository": "google/adk-python",
+      "url": "https://github.com/google/adk-python",
+      "requested_repository": "google/adk-python",
+      "group": "framework",
+      "stars": 22086,
+      "forks": 4292,
+      "watchers": 151,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Python；ADK 另有 Go / TS / Java",
+      "captured_at_utc": "2026-11-03T06:22:28+00:00",
+      "branch": "main",
+      "commit_sha": "1a337ca6a58045304d86450b0f6b65e82efc4a15",
+      "source_html_sha256": "ac5d6f2ce8307e7a543bb0e8af2ab22d9c8743c67f6065cbeb349ca1d7a39d78",
+      "recent_release_entries": [
+        {
+          "title": "v2.13.0",
+          "updated": "2026-10-23T18:08:23Z",
+          "url": "https://github.com/google/adk-python/releases/tag/v2.13.0"
+        },
+        {
+          "title": "v2.12.0",
+          "updated": "2026-10-13T16:35:19Z",
+          "url": "https://github.com/google/adk-python/releases/tag/v2.12.0"
+        },
+        {
+          "title": "v2.11.0",
+          "updated": "2026-10-08T21:50:37Z",
+          "url": "https://github.com/google/adk-python/releases/tag/v2.11.0"
+        }
+      ],
+      "release_feed": "https://github.com/google/adk-python/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix: treat an empty session id as absent in DatabaseSessionService",
+          "updated": "2026-11-03T05:34:12Z",
+          "url": "https://github.com/google/adk-python/commit/1a337ca6a58045304d86450b0f6b65e82efc4a15"
+        },
+        {
+          "title": "fix: stop a slow resumed node from timing out replayed siblings",
+          "updated": "2026-11-03T02:14:48Z",
+          "url": "https://github.com/google/adk-python/commit/3565ad3dd0c95125b92e38b02cfe22a77fe5249e"
+        },
+        {
+          "title": "refactor(plugins): move the eval view SQL into versioned template files",
+          "updated": "2026-11-03T01:14:11Z",
+          "url": "https://github.com/google/adk-python/commit/6b01717298ae5d5dcd60b8905c4f53dbfc3e2434"
+        }
+      ]
+    },
+    {
+      "repository": "coze-dev/coze-studio",
+      "url": "https://github.com/coze-dev/coze-studio",
+      "requested_repository": "coze-dev/coze-studio",
+      "group": "workflow",
+      "stars": 21798,
+      "forks": 3137,
+      "watchers": 121,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Go + TS",
+      "captured_at_utc": "2026-11-03T06:22:33+00:00",
+      "branch": "main",
+      "commit_sha": "fefb05ff27be1da939612fbf9faf5db62583b8ae",
+      "source_html_sha256": "2de28cefb5ef7f3c09cf1027858774947d1c9d8ecd87916874f792e3fa028352",
+      "recent_release_entries": [
+        {
+          "title": "V0.5.1",
+          "updated": "2026-02-05T06:04:16Z",
+          "url": "https://github.com/coze-dev/coze-studio/releases/tag/v0.5.1"
+        },
+        {
+          "title": "v0.5.0",
+          "updated": "2025-10-29T06:48:10Z",
+          "url": "https://github.com/coze-dev/coze-studio/releases/tag/v0.5.0"
+        },
+        {
+          "title": "v0.5.0-beta",
+          "updated": "2025-10-29T06:18:17Z",
+          "url": "https://github.com/coze-dev/coze-studio/releases/tag/v0.5.0-beta"
+        }
+      ],
+      "release_feed": "https://github.com/coze-dev/coze-studio/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(infra): align statefulset servicename with actual service name (#…",
+          "updated": "2026-07-29T03:17:51Z",
+          "url": "https://github.com/coze-dev/coze-studio/commit/fefb05ff27be1da939612fbf9faf5db62583b8ae"
+        },
+        {
+          "title": "fix(plugin): oauth phishing (#2668)",
+          "updated": "2026-04-20T09:20:41Z",
+          "url": "https://github.com/coze-dev/coze-studio/commit/22275b1c2661d35344a7493cffe401e8cc61cf8e"
+        },
+        {
+          "title": "fix: add server-side nonce validation to OAuth state to prevent CSRF/…",
+          "updated": "2026-04-09T11:53:35Z",
+          "url": "https://github.com/coze-dev/coze-studio/commit/0987eca09c127a1d41ddea251ef46545d8439485"
+        }
+      ]
+    },
+    {
+      "repository": "pydantic/pydantic-ai",
+      "url": "https://github.com/pydantic/pydantic-ai",
+      "requested_repository": "pydantic/pydantic-ai",
+      "group": "framework",
+      "stars": 21002,
+      "forks": 3082,
+      "watchers": 117,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:30+00:00",
+      "branch": "main",
+      "commit_sha": "6b3df9a7ba0d3f36197df1b7ba6b59bf631cf879",
+      "source_html_sha256": "70a33bc956bd5f2f7566457a6fe836162f4a9bd4f47a2b1d6048dd7e574d4e73",
+      "recent_release_entries": [
+        {
+          "title": "v2.65.0 (2026-11-02)",
+          "updated": "2026-11-03T01:25:27Z",
+          "url": "https://github.com/pydantic/pydantic-ai/releases/tag/v2.65.0"
+        },
+        {
+          "title": "CLAI2 bleeding",
+          "updated": "2026-11-03T03:27:49Z",
+          "url": "https://github.com/pydantic/pydantic-ai/releases/tag/clai2-bleeding"
+        },
+        {
+          "title": "v2.64.0 (2026-10-30)",
+          "updated": "2026-10-30T23:27:24Z",
+          "url": "https://github.com/pydantic/pydantic-ai/releases/tag/v2.64.0"
+        }
+      ],
+      "release_feed": "https://github.com/pydantic/pydantic-ai/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Skip the `complexity` pre-commit hook in the `content checks` CI job …",
+          "updated": "2026-11-03T03:12:15Z",
+          "url": "https://github.com/pydantic/pydantic-ai/commit/6b3df9a7ba0d3f36197df1b7ba6b59bf631cf879"
+        },
+        {
+          "title": "Watch the PR after handback until it merges or closes in the `pushing…",
+          "updated": "2026-11-03T03:11:09Z",
+          "url": "https://github.com/pydantic/pydantic-ai/commit/a181b7cdebeb0335a9ef2abb2f8b0cb168332491"
+        },
+        {
+          "title": "Add `ModelResponsePartsManager.handle_tool_call_delta_events` and for…",
+          "updated": "2026-11-03T03:09:12Z",
+          "url": "https://github.com/pydantic/pydantic-ai/commit/cbe2a2c39e171ea2218e34679067693b19e212bb"
+        }
+      ]
+    },
+    {
+      "repository": "microsoft/agent-framework",
+      "url": "https://github.com/microsoft/agent-framework",
+      "requested_repository": "microsoft/agent-framework",
+      "group": "framework",
+      "stars": 14505,
+      "forks": 2563,
+      "watchers": 112,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python / C#；Go Preview",
+      "captured_at_utc": "2026-11-03T06:22:28+00:00",
+      "branch": "main",
+      "commit_sha": "4bb5ffa7da18775bdd456d91c1313208e3363381",
+      "source_html_sha256": "4647178cee47a2b98350c50a60c0c885827e5cb43447eae81e6894beadffc78a",
+      "recent_release_entries": [
+        {
+          "title": "python-1.24.0",
+          "updated": "2026-10-30T21:52:13Z",
+          "url": "https://github.com/microsoft/agent-framework/releases/tag/python-1.24.0"
+        },
+        {
+          "title": "dotnet-1.27.0",
+          "updated": "2026-10-30T19:12:03Z",
+          "url": "https://github.com/microsoft/agent-framework/releases/tag/dotnet-1.27.0"
+        },
+        {
+          "title": "dotnet-1.26.0",
+          "updated": "2026-10-23T14:32:13Z",
+          "url": "https://github.com/microsoft/agent-framework/releases/tag/dotnet-1.26.0"
+        }
+      ],
+      "release_feed": "https://github.com/microsoft/agent-framework/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": ".NET: Update A2A SDK to 1.0.0-preview4 (#9995)",
+          "updated": "2026-11-02T21:50:46Z",
+          "url": "https://github.com/microsoft/agent-framework/commit/4bb5ffa7da18775bdd456d91c1313208e3363381"
+        },
+        {
+          "title": "ci: adds a skill for the release notes (#9901)",
+          "updated": "2026-11-02T18:26:32Z",
+          "url": "https://github.com/microsoft/agent-framework/commit/9be4c673782553b2a70afa0c3365c443edca172b"
+        },
+        {
+          "title": ".NET: [BREAKING] align workflow span name with OpenTelemetry conventi…",
+          "updated": "2026-11-02T18:25:06Z",
+          "url": "https://github.com/microsoft/agent-framework/commit/f6548e727767267d42c95971c583afc2bfdae4c7"
+        }
+      ]
+    },
+    {
+      "repository": "langchain4j/langchain4j",
+      "url": "https://github.com/langchain4j/langchain4j",
+      "requested_repository": "langchain4j/langchain4j",
+      "group": "java",
+      "stars": 13346,
+      "forks": 2657,
+      "watchers": 119,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Java",
+      "captured_at_utc": "2026-11-03T06:22:43+00:00",
+      "branch": "main",
+      "commit_sha": "137d3ac83d91094662a7b6b37cecab5c421fe38f",
+      "source_html_sha256": "ad52f927bfc4344f9046d5236a4e66c973e1e09f5032ac385ed9d131e3de77c2",
+      "recent_release_entries": [
+        {
+          "title": "1.19.5 and 1.19.5-beta29",
+          "updated": "2026-11-02T16:06:15Z",
+          "url": "https://github.com/langchain4j/langchain4j/releases/tag/1.19.5"
+        },
+        {
+          "title": "1.5.4 and 1.5.4-beta11",
+          "updated": "2026-11-02T14:38:38Z",
+          "url": "https://github.com/langchain4j/langchain4j/releases/tag/1.5.4"
+        },
+        {
+          "title": "1.19.4 and 1.19.4-beta29",
+          "updated": "2026-11-02T14:37:38Z",
+          "url": "https://github.com/langchain4j/langchain4j/releases/tag/1.19.4"
+        }
+      ],
+      "release_feed": "https://github.com/langchain4j/langchain4j/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(mcp): join multi-line SSE data in Streamable HTTP responses (#6904)",
+          "updated": "2026-11-02T12:43:22Z",
+          "url": "https://github.com/langchain4j/langchain4j/commit/137d3ac83d91094662a7b6b37cecab5c421fe38f"
+        },
+        {
+          "title": "pgvector: reject `java.util.Date` and `java.sql.Timestamp` filter val…",
+          "updated": "2026-11-02T10:46:03Z",
+          "url": "https://github.com/langchain4j/langchain4j/commit/54e78bd6e597bdc5d9e40dd3266ba00360260d00"
+        },
+        {
+          "title": "OpenAI: remove shut-down models from `OpenAiChatModelName`, add GPT-6…",
+          "updated": "2026-11-02T10:35:03Z",
+          "url": "https://github.com/langchain4j/langchain4j/commit/17983a965c799acf493408b7bc0202b994e1437f"
+        }
+      ]
+    },
+    {
+      "repository": "simular-ai/Agent-S",
+      "url": "https://github.com/simular-ai/Agent-S",
+      "requested_repository": "simular-ai/Agent-S",
+      "group": "browser",
+      "stars": 12860,
+      "forks": 1502,
+      "watchers": 90,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:38+00:00",
+      "branch": "main",
+      "commit_sha": "0fff0e634869dab72027435b4586e62300185d41",
+      "source_html_sha256": "cf865ade1d11a6439b21d2737b078a86900b6aa4f4e3fd3a19eb4933f2b48030",
+      "recent_release_entries": [
+        {
+          "title": "v0.3.2",
+          "updated": "2025-12-16T17:38:14Z",
+          "url": "https://github.com/simular-ai/Agent-S/releases/tag/v0.3.2"
+        },
+        {
+          "title": "v0.3.1",
+          "updated": "2025-10-04T22:27:44Z",
+          "url": "https://github.com/simular-ai/Agent-S/releases/tag/v0.3.1"
+        },
+        {
+          "title": "v0.3.0",
+          "updated": "2025-10-03T01:31:39Z",
+          "url": "https://github.com/simular-ai/Agent-S/releases/tag/v0.3.0"
+        }
+      ],
+      "release_feed": "https://github.com/simular-ai/Agent-S/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "docs: tidy README highlights banner and clarify OSWorld V2 scoring note",
+          "updated": "2026-10-21T21:03:57Z",
+          "url": "https://github.com/simular-ai/Agent-S/commit/0fff0e634869dab72027435b4586e62300185d41"
+        },
+        {
+          "title": "Clarify OSWorld V2 uses strict binary scoring (no partial credit)",
+          "updated": "2026-10-21T20:59:53Z",
+          "url": "https://github.com/simular-ai/Agent-S/commit/cdf39848a3feb00f3162eb9f489768f7172dde42"
+        },
+        {
+          "title": "Merge pull request #245 from simular-ai/readme-landing-page",
+          "updated": "2026-10-21T20:54:26Z",
+          "url": "https://github.com/simular-ai/Agent-S/commit/512f0cd8957f2af56ee78a35adc0329eef3c1874"
+        }
+      ]
+    },
+    {
+      "repository": "nearai/ironclaw",
+      "url": "https://github.com/nearai/ironclaw",
+      "requested_repository": "nearai/ironclaw",
+      "group": "assistant",
+      "stars": 12708,
+      "forks": 1488,
+      "watchers": 76,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "MIT OR Apache-2.0",
+      "execution_language_note": "Rust",
+      "captured_at_utc": "2026-11-03T06:22:40+00:00",
+      "branch": "main",
+      "commit_sha": "b0b999d96781516ee05e6ba961d6f3ead900da96",
+      "source_html_sha256": "840074aea2fdb4b84fcf92b90a2355094229d8621a0b8ca76027f8074cd19966",
+      "recent_release_entries": [
+        {
+          "title": "1.4.1 - 2026-09-29",
+          "updated": "2026-09-29T20:40:32Z",
+          "url": "https://github.com/nearai/ironclaw/releases/tag/ironclaw-v1.4.1"
+        },
+        {
+          "title": "1.4.1-rc.2 - 2026-09-24",
+          "updated": "2026-09-24T14:08:09Z",
+          "url": "https://github.com/nearai/ironclaw/releases/tag/ironclaw-v1.4.1-rc.2"
+        },
+        {
+          "title": "1.4.0 - 2026-08-27",
+          "updated": "2026-08-28T11:19:24Z",
+          "url": "https://github.com/nearai/ironclaw/releases/tag/ironclaw-v1.4.0"
+        }
+      ],
+      "release_feed": "https://github.com/nearai/ironclaw/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(telegram): register the Bot API command menu at activation (#8072)",
+          "updated": "2026-09-10T18:55:51Z",
+          "url": "https://github.com/nearai/ironclaw/commit/b0b999d96781516ee05e6ba961d6f3ead900da96"
+        },
+        {
+          "title": "fix(assistant): check pairing before command admission so first conta…",
+          "updated": "2026-09-05T00:25:36Z",
+          "url": "https://github.com/nearai/ironclaw/commit/0280dd1a48a4f813f123735b31558c459d1ce032"
+        },
+        {
+          "title": "fix(device-link): say \"not configured by administrator\" instead of bl…",
+          "updated": "2026-09-05T00:25:22Z",
+          "url": "https://github.com/nearai/ironclaw/commit/af0f6e8efa6b9cafe4cde26dfbed60377c66cc53"
+        }
+      ]
+    },
+    {
+      "repository": "langchain-ai/open_deep_research",
+      "url": "https://github.com/langchain-ai/open_deep_research",
+      "requested_repository": "langchain-ai/open_deep_research",
+      "group": "knowledge",
+      "stars": 12681,
+      "forks": 1861,
+      "watchers": 77,
+      "archived": true,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python",
+      "captured_at_utc": "2026-11-03T06:22:42+00:00",
+      "branch": "main",
+      "commit_sha": "1b7d2e80db9faa586165c60e09096dbbfd483a64",
+      "source_html_sha256": "881b3a6484e52ba7a927a662f1ebe1638eb01aa7c77ce3734854767f8d519b9d",
+      "recent_release_entries": [],
+      "release_feed": null,
+      "recent_commit_entries": []
+    },
+    {
+      "repository": "alibaba/spring-ai-alibaba",
+      "url": "https://github.com/alibaba/spring-ai-alibaba",
+      "requested_repository": "alibaba/spring-ai-alibaba",
+      "group": "java",
+      "stars": 11100,
+      "forks": 2463,
+      "watchers": 113,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Java",
+      "captured_at_utc": "2026-11-03T06:22:43+00:00",
+      "branch": "main",
+      "commit_sha": "17e26ff6fe951d605771c1845229ca3edb043634",
+      "source_html_sha256": "fa778c9f14e825b406542e9b35a2d3e30658e4077ad6aa1a26e3d1edd9260ad2",
+      "recent_release_entries": [
+        {
+          "title": "v2.0.0-M1.1",
+          "updated": "2026-06-25T05:46:04Z",
+          "url": "https://github.com/alibaba/spring-ai-alibaba/releases/tag/v2.0.0-M1.1"
+        },
+        {
+          "title": "v1.1.2.2",
+          "updated": "2026-03-10T09:36:48Z",
+          "url": "https://github.com/alibaba/spring-ai-alibaba/releases/tag/v1.1.2.2"
+        },
+        {
+          "title": "v1.1.2.1",
+          "updated": "2026-03-10T09:34:08Z",
+          "url": "https://github.com/alibaba/spring-ai-alibaba/releases/tag/v1.1.2.1"
+        }
+      ],
+      "release_feed": "https://github.com/alibaba/spring-ai-alibaba/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Merge pull request #4995 from zh-hanlabs/fix/readme-fullwidth-colon",
+          "updated": "2026-10-07T13:48:56Z",
+          "url": "https://github.com/alibaba/spring-ai-alibaba/commit/17e26ff6fe951d605771c1845229ca3edb043634"
+        },
+        {
+          "title": "docs: fix full-width colon in README",
+          "updated": "2026-10-03T05:47:23Z",
+          "url": "https://github.com/alibaba/spring-ai-alibaba/commit/8a01843d804c0e5887909003716109c226dc2bdd"
+        },
+        {
+          "title": "test(graph): pin List<byte[]> element types across serializer round-t…",
+          "updated": "2026-08-25T15:40:27Z",
+          "url": "https://github.com/alibaba/spring-ai-alibaba/commit/f82da0b50f35744c13968191be2b1cd2452ef550"
+        }
+      ]
+    },
+    {
+      "repository": "spring-projects/spring-ai",
+      "url": "https://github.com/spring-projects/spring-ai",
+      "requested_repository": "spring-projects/spring-ai",
+      "group": "java",
+      "stars": 9615,
+      "forks": 3021,
+      "watchers": 112,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Java",
+      "captured_at_utc": "2026-11-03T06:22:42+00:00",
+      "branch": "main",
+      "commit_sha": "317f6ef8a367ae488dbda75a169d5aecf00e4263",
+      "source_html_sha256": "b02762662e3628a9100ce701da2413d62f9c18a28dac31c6323da566083a297d",
+      "recent_release_entries": [
+        {
+          "title": "v2.1.0-RC1",
+          "updated": "2026-10-23T14:56:34Z",
+          "url": "https://github.com/spring-projects/spring-ai/releases/tag/v2.1.0-RC1"
+        },
+        {
+          "title": "v2.0.2",
+          "updated": "2026-10-23T14:56:46Z",
+          "url": "https://github.com/spring-projects/spring-ai/releases/tag/v2.0.2"
+        },
+        {
+          "title": "Spring AI 2.1.0-M1",
+          "updated": "2026-09-25T07:29:26Z",
+          "url": "https://github.com/spring-projects/spring-ai/releases/tag/v2.1.0-M1"
+        }
+      ],
+      "release_feed": "https://github.com/spring-projects/spring-ai/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Merge branch '2.0.x'",
+          "updated": "2026-11-02T23:28:08Z",
+          "url": "https://github.com/spring-projects/spring-ai/commit/317f6ef8a367ae488dbda75a169d5aecf00e4263"
+        },
+        {
+          "title": "Honor topK above 10 in Typesense search",
+          "updated": "2026-11-02T23:04:10Z",
+          "url": "https://github.com/spring-projects/spring-ai/commit/11295ed65a8ab4f54b6b24c88662540fc9b134d9"
+        },
+        {
+          "title": "Add DecisionToolIndex for tool search (#7253)",
+          "updated": "2026-11-02T22:44:21Z",
+          "url": "https://github.com/spring-projects/spring-ai/commit/53c3bce463799490a80749188ae53556b6ff06b4"
+        }
+      ]
+    },
+    {
+      "repository": "strands-agents/harness-sdk",
+      "url": "https://github.com/strands-agents/harness-sdk",
+      "requested_repository": "strands-agents/harness-sdk",
+      "group": "framework",
+      "stars": 9033,
+      "forks": 1461,
+      "watchers": 52,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Python / TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:31+00:00",
+      "branch": "main",
+      "commit_sha": "027cc1503a39ea2ebbb33baa9ee52b2a1f409c11",
+      "source_html_sha256": "464e2b0c5e617e346030cd22a78da5b9c8e6f8461d295f713f32b37f5ba6cf46",
+      "recent_release_entries": [
+        {
+          "title": "typescript/v1.23.0",
+          "updated": "2026-10-30T19:52:57Z",
+          "url": "https://github.com/strands-agents/harness-sdk/releases/tag/typescript%2Fv1.23.0"
+        },
+        {
+          "title": "python/v1.63.0",
+          "updated": "2026-10-30T19:52:53Z",
+          "url": "https://github.com/strands-agents/harness-sdk/releases/tag/python%2Fv1.63.0"
+        },
+        {
+          "title": "harness-typescript/v0.3.3",
+          "updated": "2026-10-30T19:53:20Z",
+          "url": "https://github.com/strands-agents/harness-sdk/releases/tag/harness-typescript%2Fv0.3.3"
+        }
+      ],
+      "release_feed": "https://github.com/strands-agents/harness-sdk/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(site): surface releases in the community hub and add a compact d…",
+          "updated": "2026-11-03T02:28:13Z",
+          "url": "https://github.com/strands-agents/harness-sdk/commit/027cc1503a39ea2ebbb33baa9ee52b2a1f409c11"
+        },
+        {
+          "title": "feat(python): add SystemOneDecisionModel for Jev and decisionapi.net …",
+          "updated": "2026-11-02T22:22:30Z",
+          "url": "https://github.com/strands-agents/harness-sdk/commit/3baec37fed3213d77a8328e325b85a533d4579e7"
+        },
+        {
+          "title": "feat(site): render samples as documentation guides (#5337)",
+          "updated": "2026-11-02T21:46:31Z",
+          "url": "https://github.com/strands-agents/harness-sdk/commit/713bee38540ca5d977ceaa0d87607fa5fe073a37"
+        }
+      ]
+    },
+    {
+      "repository": "agentscope-ai/agentscope-java",
+      "url": "https://github.com/agentscope-ai/agentscope-java",
+      "requested_repository": "agentscope-ai/agentscope-java",
+      "group": "java",
+      "stars": 6226,
+      "forks": 1558,
+      "watchers": 42,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Java",
+      "captured_at_utc": "2026-11-03T06:22:43+00:00",
+      "branch": "main",
+      "commit_sha": "3ed55c5701be625dfcc8200ac5f45d55652713d7",
+      "source_html_sha256": "f26bb9d5f1b693317d9bf8e8d771c47dd4d680b760f170bf4b1303b8f13426db",
+      "recent_release_entries": [
+        {
+          "title": "AgentScope 2.1.0-BETA1",
+          "updated": "2026-10-08T13:29:41Z",
+          "url": "https://github.com/agentscope-ai/agentscope-java/releases/tag/v2.1.0-BETA1"
+        },
+        {
+          "title": "v2.0.4",
+          "updated": "2026-10-09T10:08:53Z",
+          "url": "https://github.com/agentscope-ai/agentscope-java/releases/tag/v2.0.4"
+        },
+        {
+          "title": "agentscope-service/service-controlplane/v2.1.0-BETA1",
+          "updated": "2026-10-08T12:37:24Z",
+          "url": "https://github.com/agentscope-ai/agentscope-java/releases/tag/agentscope-service%2Fservice-controlplane%2Fv2.1.0-BETA1"
+        }
+      ],
+      "release_feed": "https://github.com/agentscope-ai/agentscope-java/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(agui): preserve error tool result content (#3932)",
+          "updated": "2026-11-03T04:02:42Z",
+          "url": "https://github.com/agentscope-ai/agentscope-java/commit/3ed55c5701be625dfcc8200ac5f45d55652713d7"
+        },
+        {
+          "title": "fix(gemini): default GeminiChatModel to gemini-3.8-flash (#3914)",
+          "updated": "2026-11-03T03:53:28Z",
+          "url": "https://github.com/agentscope-ai/agentscope-java/commit/c6f79adb8d49b13a75a18c361633fec6278cd657"
+        },
+        {
+          "title": "fix(tool): read WriteFileTool snippet from the resolved path (#3918)",
+          "updated": "2026-11-03T03:52:17Z",
+          "url": "https://github.com/agentscope-ai/agentscope-java/commit/0762957d7a39fdc9f7889647e651011f7ac6e27d"
+        }
+      ]
+    },
+    {
+      "repository": "JetBrains/koog",
+      "url": "https://github.com/JetBrains/koog",
+      "requested_repository": "JetBrains/koog",
+      "group": "java",
+      "stars": 4650,
+      "forks": 505,
+      "watchers": 161,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Kotlin 核心（Java 可用）",
+      "captured_at_utc": "2026-11-03T06:22:44+00:00",
+      "branch": "develop",
+      "commit_sha": "709079e4a34d6c9234583352550e6a2b88a0bb85",
+      "source_html_sha256": "2fa8a998a7b029aea61ae86aea7a9c0f00a752ce8bb531a3e8a9520aef1804ac",
+      "recent_release_entries": [
+        {
+          "title": "1.3.0",
+          "updated": "2026-09-24T09:28:21Z",
+          "url": "https://github.com/JetBrains/koog/releases/tag/1.3.0"
+        },
+        {
+          "title": "1.2.0",
+          "updated": "2026-08-28T14:01:13Z",
+          "url": "https://github.com/JetBrains/koog/releases/tag/1.2.0"
+        },
+        {
+          "title": "1.1.1",
+          "updated": "2026-07-20T15:03:36Z",
+          "url": "https://github.com/JetBrains/koog/releases/tag/1.1.1"
+        }
+      ],
+      "release_feed": "https://github.com/JetBrains/koog/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "feat(agents): report Gemini cached and thinking tokens to Langfuse (#…",
+          "updated": "2026-10-28T17:04:55Z",
+          "url": "https://github.com/JetBrains/koog/commit/709079e4a34d6c9234583352550e6a2b88a0bb85"
+        },
+        {
+          "title": "build(agents)!: upgrade Exposed to 1.6.0 (#2321)",
+          "updated": "2026-10-28T17:03:44Z",
+          "url": "https://github.com/JetBrains/koog/commit/70f42a2feabe10e530efe8e5b9945695ac06d436"
+        },
+        {
+          "title": "fix(agents): show every message part in Langfuse spans (#2298)",
+          "updated": "2026-10-13T10:35:18Z",
+          "url": "https://github.com/JetBrains/koog/commit/22e342e033c716f835312dd6cbe83193e1cbcf76"
+        }
+      ]
+    },
+    {
+      "repository": "embabel/embabel-agent",
+      "url": "https://github.com/embabel/embabel-agent",
+      "requested_repository": "embabel/embabel-agent",
+      "group": "java",
+      "stars": 4543,
+      "forks": 445,
+      "watchers": 66,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Java / Kotlin（JVM）",
+      "captured_at_utc": "2026-11-03T06:27:05+00:00",
+      "branch": "main",
+      "commit_sha": "159c239a787a6043f738fd22cbd1fb7453ce4dca",
+      "source_html_sha256": "86ca2a00758af5142b867e9921c437ed6e0ff4fb8d5ccf9c0d82f1f2f2701899",
+      "recent_release_entries": [],
+      "release_feed": null,
+      "recent_commit_entries": []
+    },
+    {
+      "repository": "magnitudedev/browser-agent",
+      "url": "https://github.com/magnitudedev/browser-agent",
+      "requested_repository": "magnitudedev/browser-agent",
+      "group": "browser",
+      "stars": 4138,
+      "forks": 245,
+      "watchers": 26,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "TypeScript",
+      "captured_at_utc": "2026-11-03T06:22:38+00:00",
+      "branch": "main",
+      "commit_sha": "f1b587c4173d8242bdb551991de54e70c4d2faf3",
+      "source_html_sha256": "ce104189ebbc8656e629febc3eeb05d27ef57f6672522a0184819b659f775bc4",
+      "recent_release_entries": [
+        {
+          "title": "magnitude-test@0.3.13",
+          "updated": "2026-02-08T20:51:12Z",
+          "url": "https://github.com/magnitudedev/browser-agent/releases/tag/magnitude-test%400.3.13"
+        },
+        {
+          "title": "magnitude-mcp@0.1.3",
+          "updated": "2026-02-08T20:51:09Z",
+          "url": "https://github.com/magnitudedev/browser-agent/releases/tag/magnitude-mcp%400.1.3"
+        },
+        {
+          "title": "magnitude-core@0.3.1",
+          "updated": "2026-02-08T20:51:15Z",
+          "url": "https://github.com/magnitudedev/browser-agent/releases/tag/magnitude-core%400.3.1"
+        }
+      ],
+      "release_feed": "https://github.com/magnitudedev/browser-agent/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "Version Packages",
+          "updated": "2026-02-08T20:44:26Z",
+          "url": "https://github.com/magnitudedev/browser-agent/commit/f1b587c4173d8242bdb551991de54e70c4d2faf3"
+        },
+        {
+          "title": "add changeset for token counting fix",
+          "updated": "2026-02-08T20:40:26Z",
+          "url": "https://github.com/magnitudedev/browser-agent/commit/2ef110264e65e06f2dff0d60ffb5cd36ae636a6e"
+        },
+        {
+          "title": "fix(magnitude-core): fix cumulative token counting in ModelHarness._r…",
+          "updated": "2026-02-08T20:39:02Z",
+          "url": "https://github.com/magnitudedev/browser-agent/commit/304fd5804ec75b1dd1351b42b54019e8113428de"
+        }
+      ]
+    },
+    {
+      "repository": "google/adk-java",
+      "url": "https://github.com/google/adk-java",
+      "requested_repository": "google/adk-java",
+      "group": "java",
+      "stars": 1762,
+      "forks": 442,
+      "watchers": 29,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "license_editorial_note": "Apache-2.0",
+      "execution_language_note": "Java",
+      "captured_at_utc": "2026-11-03T06:22:43+00:00",
+      "branch": "main",
+      "commit_sha": "0bb7f4acfa84848722108547c08d2a97bfc4450d",
+      "source_html_sha256": "92c0d1c726e00b996a7190e24d79521945b702de22853ea6b744d266720cd13b",
+      "recent_release_entries": [
+        {
+          "title": "v1.14.0",
+          "updated": "2026-11-02T15:21:36Z",
+          "url": "https://github.com/google/adk-java/releases/tag/v1.14.0"
+        },
+        {
+          "title": "v1.13.0",
+          "updated": "2026-10-21T13:58:39Z",
+          "url": "https://github.com/google/adk-java/releases/tag/v1.13.0"
+        },
+        {
+          "title": "v1.12.0",
+          "updated": "2026-10-14T10:48:20Z",
+          "url": "https://github.com/google/adk-java/releases/tag/v1.12.0"
+        }
+      ],
+      "release_feed": "https://github.com/google/adk-java/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "fix(tokt): merge a Java plugin's replacement onto the original, as AD…",
+          "updated": "2026-11-02T22:59:49Z",
+          "url": "https://github.com/google/adk-java/commit/0bb7f4acfa84848722108547c08d2a97bfc4450d"
+        },
+        {
+          "title": "feat(tokt): carry transcriptions and turnComplete across the interop",
+          "updated": "2026-11-02T22:23:29Z",
+          "url": "https://github.com/google/adk-java/commit/30edd998914c6412276d1b9c4b72dcdfb9f97976"
+        },
+        {
+          "title": "Merge pull request #1743 from google:release-please--branches--main",
+          "updated": "2026-11-02T16:23:12Z",
+          "url": "https://github.com/google/adk-java/commit/e3a9859b9b5e558e658ab495626142fec62fab2f"
+        }
+      ]
+    },
+    {
+      "repository": "OpenHands/software-agent-sdk",
+      "url": "https://github.com/OpenHands/software-agent-sdk",
+      "requested_repository": "OpenHands/software-agent-sdk",
+      "group": "coding",
+      "stars": 1341,
+      "forks": 736,
+      "watchers": 12,
+      "archived": false,
+      "license_github_detected": {
+        "spdxId": "MIT",
+        "name": "MIT License"
+      },
+      "license_editorial_note": "MIT",
+      "execution_language_note": "Python 执行核心",
+      "captured_at_utc": "2026-11-03T06:22:35+00:00",
+      "branch": "main",
+      "commit_sha": "b0789c73151a967fdd4a10f8383d2c0bc7109563",
+      "source_html_sha256": "09def1969a0777dd14d24f663c52a207dbcf0b83fb293d8d8ab57affee1532f1",
+      "recent_release_entries": [
+        {
+          "title": "1.49.5-r3",
+          "updated": "2026-10-30T00:15:07Z",
+          "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/1.49.5-r3"
+        },
+        {
+          "title": "1.49.5-r2",
+          "updated": "2026-10-29T21:07:11Z",
+          "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/1.49.5-r2"
+        },
+        {
+          "title": "v1.59.0",
+          "updated": "2026-10-28T14:56:13Z",
+          "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.59.0"
+        }
+      ],
+      "release_feed": "https://github.com/OpenHands/software-agent-sdk/releases.atom",
+      "recent_commit_entries": [
+        {
+          "title": "chore(deps): bump typescript-eslint from 8.71.0 to 8.72.1 in /clients…",
+          "updated": "2026-11-03T04:10:36Z",
+          "url": "https://github.com/OpenHands/software-agent-sdk/commit/b0789c73151a967fdd4a10f8383d2c0bc7109563"
+        },
+        {
+          "title": "chore(deps): bump ws and @types/ws in /clients/typescript (#6400)",
+          "updated": "2026-11-03T04:10:11Z",
+          "url": "https://github.com/OpenHands/software-agent-sdk/commit/af6d47e471d5e49c670a1a93033772d96512dd95"
+        },
+        {
+          "title": "chore(deps): bump @typescript-eslint/parser from 8.71.0 to 8.72.1 in …",
+          "updated": "2026-11-03T04:10:04Z",
+          "url": "https://github.com/OpenHands/software-agent-sdk/commit/c98519f1b81fc4a3e802c67dbbf9945405f0236f"
+        }
+      ]
+    }
+  ]
+}

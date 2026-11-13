@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-11"><meta name="document-version" content="1.0-review">
+<meta name="description" content="一次任务里，谁决定下一步、谁发现偏差、谁判断结束？沿真实调用拆开模型、程序和人的责任，理解为什么清单全绿仍可能漏掉目标。"><meta name="color-scheme" content="dark">
+<title>Agent Loop：谁规划、谁纠偏、谁验收，以及为什么仍会假完成 · 铁甲依然在</title><link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/article.css"><script src="../assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-11">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">Agent 引擎与记忆</p><h1>Agent Loop：谁规划、谁纠偏、谁验收，以及为什么仍会假完成</h1><p class="article-summary">一次任务里，谁决定下一步、谁发现偏差、谁判断结束？沿真实调用拆开模型、程序和人的责任，理解为什么清单全绿仍可能漏掉目标。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#decision-core">总判断</a><a href="#four-products">四家机制对比</a><a href="#common-loop">计划、纠偏与验收</a><a href="#failure-risks">失败链与人机成本</a><a href="#intel-case">场景与长上下文</a><a href="#future-and-tradeoffs">演进与来源</a></nav></details><p>公开源码固定版本核对：2026-11-13；未做四产品成对性能实验。</p></aside>
+<main id="article-content"><div class="quick-content"><div class="quick-brief" id="quick-brief"><p class="quick-brief-title">30 秒读法</p><ol><li><strong>谁决定下一步？</strong>开放任务通常由模型判断；程序保存状态、执行动作、检查明确条件。</li><li><strong>为什么清单全绿也可能失败？</strong>清单只证明已登记事项被标成完成，不证明原始需求没有漏。</li><li><strong>怎么减少假完成？</strong>把真实环境、独立证据和明确的失败分支接进 loop，而不是只追加提醒词。</li></ol><span class="after">后面按机制展开；每张图都可回到完整深入版核对条件。</span></div><section id="decision-core" class="section" data-toc-group="总判断">
+ <div class="kicker">01 / 总判断</div><h2>通用自主 loop 通常由模型决定策略，计划不一定先完整列出</h2>
+ <p>人预设流程、模型动态拆任务、外层流程与内层模型混用，都可以成立。先区分步骤从哪里来，再讨论计划和执行。</p>
+ <figure id="fig-organization">
+<div class="figure-top"><span>机制示意</span><b>图 01｜拆任务不等于预设工作流</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE01.svg" alt="关键差别是步骤从哪里来。是否显示任务清单，不能单独决定它属于哪种组织方式。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>关键差别是步骤从哪里来。是否显示任务清单，不能单独决定它属于哪种组织方式。 <a href="?view=deep#deep-decision-core">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#decision-core">MD 源文</a></figcaption></figure>
+ <div class="callout"><b>需要同时校正：</b>拆任务并非预设工作流专属；执行程序也能检查测试、订单、计算规则等实质条件，能力不止格式校验。内容是否充分，仍依赖模型或人。</div>
+ <div class="plain-terms"><h3>先把术语翻译成具体事情</h3>
+ <p><b>上下文：</b>本次实际递给模型的材料。<b>状态：</b>程序记的已做、待做、等待事项。<b>内容判断：</b>读懂后决定意味着什么、是否切题。<b>候选答复：</b>模型准备交付、由程序接着处理收尾的答复。</p></div>
+ <div id="decision-ownership"><div class="table-scroll"><table><thead><tr><th>判断事项</th><th>通常谁判断</th><th>程序实际控制什么</th></tr></thead><tbody><tr><td>拆哪些任务、顺序是否合理</td><td><span class="actor model">[M] 模型</span>；工作流可由人预设</td><td>提供指令与模式，保存步骤，按已记录的先后关系调度</td></tr><tr><td>结果意味着什么、是否该换路线</td><td><span class="actor model">[M] 模型</span>；明确规则可由代码判断</td><td>提供观察，触发检查，执行固定分支或新计划</td></tr><tr><td>是否切题、论证是否充分</td><td><span class="actor model">[M] 模型</span> / <span class="actor human">[H] 人</span></td><td>另调评审、给标准与证据、按结果继续或结束</td></tr><tr><td>测试失败、预算耗尽、订单存在</td><td><span class="actor code">[C] 程序</span> 检查明确条件</td><td>读取真实状态并实施规则；不自动覆盖全部需求</td></tr></tbody></table></div></div><a class="deep" href="?view=deep#deep-decision-ownership">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#decision-ownership">MD 源文</a>
+</section>
+<section id="four-products" class="section" data-toc-group="四家机制对比">
+ <div class="kicker">02 / 分析四家</div><h2>从同一个例子看：模型想什么，程序做什么</h2>
+ <p>四家都反复进行“程序提供材料 → 模型决定下一步 → 程序执行并交回结果”。下面把每一步的责任说开，源码函数名留在资料索引里。</p>
+ <div class="scenario"><span>统一构造例子</span><b>两份项目报告互相矛盾，怎样给出说明？</b><p>报告 A 说“基本完成”，报告 B 说“还有很多未做”。用户要求：解释差异、列未决问题，并保存说明。示例用于解释机制，不是四家实测结果。</p></div>
+ <figure id="fig-products">
+<div class="figure-top"><span>机制示意</span><b>图 02｜模型提出下一步，程序执行并检查能否停</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE02.svg" alt="例如模型提出“再核对日期”，程序读取相应材料并交回结果。模型认为可以交付，程序再处理待办、错误和已配置检查。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>例如模型提出“再核对日期”，程序读取相应材料并交回结果。模型认为可以交付，程序再处理待办、错误和已配置检查。 <a href="?view=deep#deep-four-products">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#four-products">MD 源文</a></figcaption></figure>
+ <div class="product-grid">
+ <article id="hermes-loop" class="product"><h3>Hermes：模型安排工作，程序替它执行和记进度</h3>
+ <p>程序给模型工具和“复杂工作请记清单”的提示；是否先列计划、列什么，主要还是模型判断。</p>
+ <div class="table-scroll"><table><thead><tr><th>什么时候</th><th>程序做什么</th><th>模型做什么</th></tr></thead><tbody><tr><td>开始：程序 → 模型</td><td>把原问题、规则和读取文件等能力交给模型，发起调用。</td><td>理解任务，决定先读两份报告，或先登记暂定步骤。</td></tr><tr><td>中间：模型 → 程序 → 模型</td><td>执行读取；把内容或错误交回；保存模型提出的清单更新。</td><td>例如发现日期不同，决定先核对日期，修改查证顺序；不必另有一次专门重规划调用。</td></tr><tr><td>收尾：模型提议，程序处理</td><td>接到准备交付的答复，检查待执行动作及已配置检查，按实际条件继续或返回。</td><td>判断解释是否充分、未决项是否遗漏；提出交付，或依据检查反馈继续查、继续改。</td></tr></tbody></table></div>
+ <div class="product-explanation"><b>用例子说明：</b>模型漏掉“列未决项”，程序仍可能忠实保存一张漏项清单。把清单标为“已完成”，并不会自动补出这一要求。</div>
+ <p class="feature"><b>这个版本的特别之处：</b>有一项默认关闭的可选收尾检查，主要看代码修改及验证记录。程序决定是否发出核查提醒，模型决定怎样核查；它不自动判断任意报告是否切题。</p>
+ <a class="deep" href="?view=deep#deep-hermes-loop">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#hermes-loop">MD 源文</a></article>
+ <article id="agentscope-loop" class="product"><h3>AgentScope：程序按当前记录接续，模型决定查什么</h3>
+ <p>原来的函数名，实际是在说：有动作就执行、需要确认就等、结果回来再让模型判断、可以返回时处理结束。</p>
+ <div class="table-scroll"><table><thead><tr><th>什么时候</th><th>程序做什么</th><th>模型做什么</th></tr></thead><tbody><tr><td>开始：程序 → 模型</td><td>建立本轮记录、准备输入并发起请求。</td><td>理解任务，选择先查材料还是回答；不强制所有任务先另调一个规划模型。</td></tr><tr><td>中间：动作与判断接力</td><td>处理读取等动作，记录结果；如需确认或外部结果，就暂停等待，再接着运行。</td><td>解释报告、提出下一步；如用清单，则给出步骤、先后关系及进度。</td></tr><tr><td>收尾：模型提议，程序返回</td><td>检查是否还有待执行动作、待确认事项或额外检查；处理后决定继续还是返回答复。</td><td>形成解释与未决项，判断还缺什么；另设内容评审时，由评审模型或人读内容。</td></tr></tbody></table></div>
+ <div class="product-explanation"><b>用例子说明：</b>程序能记住“报告 A 已读、报告 B 还在等结果”，让任务恢复后接着做。是否读懂了矛盾、是否还缺一条重要证据，仍需要内容判断。</div>
+ <p class="feature"><b>完成标记意味着什么：</b>程序记录“本轮已结束”或“约定字段已生成”，不代表报告已经回答完整。就像表格填满了，也可能没有答到问题。</p>
+ <a class="deep" href="?view=deep#deep-agentscope-loop">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#agentscope-loop">MD 源文</a></article>
+ <article id="codex-loop" class="product"><h3>Codex：模型选择操作，程序交回真实执行结果</h3>
+ <p>模型在实际工作区里读、写和检查；程序把文件内容、改动与检查结果交回来，供模型继续判断。</p>
+ <div class="table-scroll"><table><thead><tr><th>什么时候</th><th>程序做什么</th><th>模型做什么</th></tr></thead><tbody><tr><td>开始：程序 → 模型</td><td>提供任务、工作环境信息和可用动作，发起请求。</td><td>决定先找报告、先读文件还是先记步骤；进度清单的内容也由模型提交。</td></tr><tr><td>中间：模型 → 程序 → 模型</td><td>执行获准的读取、编辑或检查，返回真实内容、差异和错误。</td><td>发现日期不同时重查口径；写完说明后，决定检查遗漏、修改说明或继续查证。</td></tr><tr><td>收尾：模型提议，程序检查</td><td>检查是否还有待处理动作、新输入或阻止结束的已配置检查；需要时送回反馈继续调用。</td><td>提出答复；如果程序另发起评审，评审模型读内容，主模型再按反馈修改。</td></tr></tbody></table></div>
+ <div class="product-explanation"><b>用例子说明：</b>“说明文件已保存”可以是程序检查结果，但“是否遗漏用户要求的未决问题”通常还要模型或人读内容。</div>
+ <p class="feature"><b>别混淆：</b>执行中的进度清单与专门的计划模式不同。程序保存清单，不是在替模型生成正确计划；独立评审也需要明确发起。</p>
+ <a class="deep" href="?view=deep#deep-codex-loop">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#codex-loop">MD 源文</a></article>
+ <article id="claude-loop" class="product"><h3>Claude Code：模型选择路线，程序可在结束前加检查</h3>
+ <p>模型根据材料决定下一步。程序负责准备材料、执行动作，还可按开发者的配置在收尾时多做一项检查。</p>
+ <div class="table-scroll"><table><thead><tr><th>什么时候</th><th>程序做什么</th><th>模型做什么</th></tr></thead><tbody><tr><td>开始：程序 → 模型</td><td>交入任务、规则和可用能力；启用计划模式时，按模式限制当前动作。</td><td>理解需要、调查材料并写计划；计划内容并不是程序自动算出来的。</td></tr><tr><td>中间：程序反馈，模型调整</td><td>执行动作，把结果及用户新要求送入后续调用。</td><td>识别矛盾、改查证顺序；用户纠正范围时，理解新要求与旧约束的关系。</td></tr><tr><td>收尾：模型提议，程序可加检查</td><td>在收尾位置运行已配置检查，按结果允许结束或继续。</td><td>主模型提出答复；若检查再调用模型，评审模型判断遗漏，主模型负责修订。</td></tr></tbody></table></div>
+ <div class="product-explanation"><b>用例子说明：</b>可以让脚本检查文件是否存在，也可以让程序另请模型对照“解释差异、列未决项”检查内容。发起检查的是程序；第二种检查的结论来自评审模型。</div>
+ <p class="feature"><b>结束时检查（Hook）：</b>就是事先约定“走到这里，多做一项检查”。是否启用、用脚本还是模型，都要看配置。它不是默认就能准确验收所有答案。</p>
+ <a class="deep" href="?view=deep#deep-claude-loop">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#claude-loop">MD 源文</a></article>
+ </div>
+ <div class="callout"><b>“两者一起”要展开：</b>开始由程序发请求、模型读任务；中间由模型选动作、程序执行、模型看结果；收尾由模型提出交付、程序按已配置条件继续或结束。若另加内容评审，仍需说明是哪一个模型在判断。</div>
+</section>
+<section id="common-loop" class="section" data-toc-group="计划、纠偏与验收">
+ <div class="kicker">03 / 再总：实际调用链</div><h2>模型理解与计划校准，常发生在同一次正常调用中</h2>
+ <figure id="fig-core">
+<div class="figure-top"><span>机制示意</span><b>图 03｜最小 loop：不强制先规划，也不默认另调验收模型</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE03.svg" alt="一次模型调用可同时理解目标、解释结果、修订计划和选择行动。图中职责框不等于各自一次 API 调用。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>一次模型调用可同时理解目标、解释结果、修订计划和选择行动。图中职责框不等于各自一次 API 调用。 <a href="?view=deep#deep-common-loop">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#common-loop">MD 源文</a></figcaption></figure>
+ <figure id="fig-timeline">
+<div class="figure-top"><span>机制示意</span><b>图 04｜不是每个概念阶段都额外调用一次模型</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE04.svg" alt="这里的调用次数只服务于示意。实际任务可能直接回答，也可能多轮探索，没有统一固定次数。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>这里的调用次数只服务于示意。实际任务可能直接回答，也可能多轮探索，没有统一固定次数。 <a href="?view=deep#deep-common-loop">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#common-loop">MD 源文</a></figcaption></figure>
+ <p>模型在一次调用里的思考，不一定被写成一张完整任务表。意图理解、规划、执行后分析，是解释谁做什么的词；只有系统明确拆成独立请求时，才是多次 API 调用。</p>
+ <details><summary>哪些结束信号容易被误读？</summary>
+ <div class="table-scroll"><table><thead><tr><th>信号</th><th>实际能说明</th><th>不能证明</th></tr></thead><tbody><tr><td>请求执行动作（如 tool_use）</td><td>需要执行动作，把结果放入后续输入</td><td>计划正确或该动作有价值</td></tr><tr><td>本次生成收尾（如 end_turn）</td><td>程序可以处理继续或结束</td><td>没有漏任务、答案满足用户</td></tr><tr><td>输出被长度限制截断（如 max_tokens）</td><td>生成被限制，可能不完整</td><td>正常完成</td></tr><tr><td>限流、额度、网络异常</td><td>API 或资源错误；应走错误路径</td><td>模型主动完成</td></tr><tr><td>轮次或预算耗尽</td><td>程序必须停止或降级</td><td>未完成事项已解决</td></tr><tr><td>清单全部 completed</td><td>登记状态均已标完成</td><td>初始需求完整、工作实际已核实</td></tr></tbody></table></div>
+ <p>各家字段不同，需结合响应内容、待处理动作与错误处理；不能只看一个停止枚举。</p></details><a class="deep" href="?view=deep#deep-common-loop">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#common-loop">MD 源文</a>
+</section>
+<section id="plan-and-replan" class="section" data-toc-group="计划、纠偏与验收">
+ <div class="kicker">04 / 分：计划与过程校准</div><h2>触发可以硬编码，新的解题策略仍可能由模型判断</h2>
+ <figure id="fig-planning">
+<div class="figure-top"><span>机制示意</span><b>图 05｜谁要求计划，与谁写出计划，是两个问题</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE05.svg" alt="人也可以直接预设工作流。即使固定了规划阶段，步骤是否完整、排序是否合理，仍需有效判断。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>人也可以直接预设工作流。即使固定了规划阶段，步骤是否完整、排序是否合理，仍需有效判断。 <a href="?view=deep#deep-plan-and-replan">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#plan-and-replan">MD 源文</a></figcaption></figure>
+ <p>“模型主动规划”与“指令要求它规划”可以同时成立。模式决定当前允许什么，工具保存模型提交什么；两者都不能独立证明模型理解完整。</p>
+ <figure id="fig-replan">
+<div class="figure-top"><span>机制示意</span><b>图 06｜硬编码能触发纠偏，新的查证路线常由模型决定</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE06.svg" alt="模型在正常的下一轮里就能重新安排步骤，不要求程序另外调用一次规划模型。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>模型在正常的下一轮里就能重新安排步骤，不要求程序另外调用一次规划模型。 <a href="?view=deep#deep-plan-and-replan">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#plan-and-replan">MD 源文</a></figcaption></figure>
+ <div class="callout">并行也是同样的分工：模型或人提出任务实际需要的先后顺序；系统若实现依赖校验与调度，程序可按登记关系推进，普通并发器未必检查依赖。没有登记的任务实际需要的先后顺序也不会自动出现。</div>
+ <a class="deep" href="?view=deep#deep-plan-and-replan">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#plan-and-replan">MD 源文</a>
+</section>
+<section id="acceptance-paths" class="section" data-toc-group="计划、纠偏与验收">
+ <div class="kicker">05 / 分：候选输出之后</div><h2>要确保新增一轮模型复核，必须把调用显式安排进去</h2>
+ <p>初始提示写“回答前检查”，可能促使模型自检、运行测试或委托复核；它不证明程序设置了必经的独立复核调用。下图四种路径可组合，但不是所有产品的默认流程。</p>
+ <figure id="fig-acceptance">
+<div class="figure-top"><span>机制示意</span><b>图 07｜候选答复之后的四条验收路径</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE07.svg" alt="若要确保候选结果后另做一轮模型判断，必须把调用写进程序或配置。提示词要求自检不等于已新增调用。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>若要确保候选结果后另做一轮模型判断，必须把调用写进程序或配置。提示词要求自检不等于已新增调用。 <a href="?view=deep#deep-acceptance-paths">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#acceptance-paths">MD 源文</a></figcaption></figure>
+ <div class="simulator" id="acceptance-demo">
+ <div class="sim-heading"><b>观察：同一份候选结果，可以进入哪条控制路径？</b><span>教学演示 · 不运行真实模型</span></div>
+ <div class="mode-buttons" role="group" aria-label="选择验收路径">
+  <button type="button" data-mode="plain" aria-pressed="true">A 直接收尾</button><button type="button" data-mode="self" aria-pressed="false">B 同模型复核</button><button type="button" data-mode="review" aria-pressed="false">C 独立评审</button><button type="button" data-mode="mixed" aria-pressed="false">D 混合检查</button>
+ </div>
+ <div id="trace-output" aria-live="polite">
+ <ol class="trace"><li><span class="actor model">[M]</span> 产生候选答复，可能已自检，也可能遗漏要求。</li><li><span class="actor code">[C]</span> 无待执行动作，且未配置额外检查，结束本轮。</li></ol>
+ <p class="trace-verdict"><b>额外模型调用：没有保证。</b> 结束本轮不等于独立验收通过。</p>
+ </div></div>
+ <h3>评审必须拿到什么</h3>
+ <div class="evidence-strip"><span>原始问题</span><span>当前有效要求</span><span>候选产物</span><span>真实检查结果</span><span>已知缺口</span></div>
+ <p>只让评审阅读执行者“已全部完成”的总结，可能继承同一遗漏。只问模型一次的收尾检查 拿到历史文件路径，也不等于读取了历史全文。</p>
+ <div class="callout danger"><b>失败分支必须存在：</b>检查失败、评审无法判断、响应无效或预算耗尽，要能返回部分完成、受阻或待复核。不能因重试结束就自动升级为成功。</div>
+ <p>若候选内容已流式展示，后续检查不能撤回用户已经看过的内容。业务若要求通过后才发布，需区分预览和正式交付。</p>
+ <a class="deep" href="?view=deep#deep-acceptance-paths">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#acceptance-paths">MD 源文</a>
+</section>
+<section id="failure-risks" class="section" data-toc-group="失败链与人机成本">
+ <div class="kicker">06 / 风险主线</div><h2>拆解、执行、自评可能共同维护一个错误理解</h2>
+ <figure id="fig-failure">
+<div class="figure-top"><span>机制示意</span><b>图 08｜为什么清单全绿，任务仍然没完成</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE08.svg" alt="已登记事项有没有做完，与最初有没有漏掉要求，是两类检查。重复读取同一张漏项计划可能只会重复确认错误。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>已登记事项有没有做完，与最初有没有漏掉要求，是两类检查。重复读取同一张漏项计划可能只会重复确认错误。 <a href="?view=deep#deep-failure-risks">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#failure-risks">MD 源文</a></figcaption></figure>
+ <div class="table-scroll"><table><thead><tr><th>风险</th><th>程序能改善什么</th><th>仍然依赖什么</th></tr></thead><tbody><tr><td>最初漏掉要求</td><td>保存原问题、需求与产物对应</td><td>需求抽取和覆盖判断可能也由模型完成</td></tr><tr><td>任务状态假完成</td><td>要求验证记录、查询真实环境</td><td>记录是否覆盖任务，状态是否有可信证据</td></tr><tr><td>执行偏离但动作都成功</td><td>保留目标、配置检查点</td><td>行动是否真正解决原问题</td></tr><tr><td>纠正破坏旧约束</td><td>版本化有效要求与变更</td><td>自然语言修改关系的理解</td></tr><tr><td>压缩丢失 / 旧计划锚定</td><td>外部状态、原文回读、失效标记</td><td>摘要正确、知道何时重读与改向</td></tr><tr><td>自评或多模型共同误判</td><td>分开材料与评审路径、组合检查</td><td>共享盲点不会自动消失</td></tr><tr><td>测试通过但业务不符</td><td>独立场景、最后的实际结果与回归评测</td><td>验收标准本身是否完整</td></tr></tbody></table></div>
+ <p class="risk-statement">更多步骤、更多模型、更严格 JSON，都不能单独证明“全部满足”。判断者、标准和证据必须逐项追清。</p>
+ <a class="deep" href="?view=deep#deep-failure-risks">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#failure-risks">MD 源文</a>
+</section>
+<section id="collaboration-reliability" class="section" data-toc-group="失败链与人机成本">
+ <div class="kicker">07 / 人机协作</div><h2>模型没有承担好的判断，会作为协作成本回到人身上</h2>
+ <figure id="fig-human">
+<div class="figure-top"><span>机制示意</span><b>图 09｜任务最后做成了，可能包含大量人工判断与编排劳动</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE09.svg" alt="人工逐项拆分是可用的接管方式之一，无法保证子任务正确，也不是所有困难任务的唯一方案。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>人工逐项拆分是可用的接管方式之一，无法保证子任务正确，也不是所有困难任务的唯一方案。 <a href="?view=deep#deep-collaboration-reliability">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#collaboration-reliability">MD 源文</a></figcaption></figure>
+ <p>用户给的<a href="https://github.com/zhouxiaohei/show-something/blob/main/%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md">协作可靠性文章</a>，把问题放在累计目标稳定性、人工纠偏与失败恢复上。本专题进一步把这些成本对应到 loop 的理解、计划、执行、压缩和验收环节。</p>
+ <p>相关研究在各自设置下观察到：同一套执行程序 下模型所需纠正量不同，相近解决率可能对应不同过程成本，专业模拟用户的反馈会改变功能测试结果。这些发现支持测量协作条件，不足以证明普遍产品排名。</p>
+ <div class="table-scroll"><table><thead><tr><th>人承担的工作</th><th>对应系统薄弱处</th><th>值得记录的结果</th></tr></thead><tbody><tr><td>不断把要求写得更明确</td><td>初始理解与任务漏建</td><td>表达字数、澄清质量、原需求覆盖</td></tr><tr><td>盯住每一步是否跑偏</td><td>规划与过程校准</td><td>监督时间、错误暴露时间</td></tr><tr><td>反复纠正同一处并重申旧要求</td><td>纠正吸收与约束保持</td><td>纠正后是否破坏仍有效约束</td></tr><tr><td>重开会话、重建计划和证据</td><td>上下文与恢复</td><td>恢复轮次、人工时间、丢失内容</td></tr></tbody></table></div>
+ <details><summary>为什么不直接沿用文章的产品排名和数字？</summary><p>文章对 Claude 的相对偏好是综合判断。统一 OpenCode 比较模型，不能直接证明两个产品优劣；模型与执行程序 同时变化的实验不能分别归因；issue 没有发生率分母。SWE-Journey 的 Final F2P 是功能测试失败转通过指标，不能泛称完整任务成功率。</p></details>
+ <h3>人工逐项拆分可以接管，但不是唯一方案</h3>
+ <p>还可采用关键阶段人工确认、稳定业务流程加模型子任务、真实反馈加独立评审。选择取决于模型能力与任务可验证性。人逐项指挥会提高人工负担，拆得过碎还可能损失整体语境。</p>
+ <div class="callout">如果系统中的模型和检查都缺少关键知识，继续包装流程无法保证补足能力。需要补充资料、收窄目标，或引入懂这个问题的人。</div>
+ <a class="deep" href="?view=deep#deep-collaboration-reliability">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#collaboration-reliability">MD 源文</a>
+</section>
+<section id="intel-case" class="section" data-toc-group="场景与长上下文">
+ <div class="kicker">08 / 场景展开：情报研判</div><h2>“数据消失”不能从计划开始就变成“异常行动”</h2>
+ <p>构造案例：某区域多架航空器 ADS-B 航迹同时消失，用户希望解释原因。若模型直接开始收集“行动迹象”，计划本身就可能带入未经确认的前提。</p>
+ <figure id="fig-intel">
+<div class="figure-top"><span>机制示意</span><b>图 10｜情报研判：最早的计划就可能带入错误假设</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE10.svg" alt="外层可要求检查必要事项，阶段内仍由模型探索。哪些证据有区分力、哪些解释遗漏，仍需领域判断。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>外层可要求检查必要事项，阶段内仍由模型探索。哪些证据有区分力、哪些解释遗漏，仍需领域判断。 <a href="?view=deep#deep-intel-case">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#intel-case">MD 源文</a></figcaption></figure>
+ <div class="table-scroll"><table><thead><tr><th>程序可检查</th><th>仍需模型或分析人员判断</th></tr></thead><tbody><tr><td>引用存在、原文可回查、抓取时间与窗口</td><td>来源是否可信、原文是否真正支持论断</td></tr><tr><td>已知上游 ID、重复链接、字段一致性</td><td>不同材料是否实质同源、证据是否独立</td></tr><tr><td>规定问题是否都有对应材料</td><td>竞争解释是否漏项、反证是否有区分力</td></tr><tr><td>状态与必填项一致、已知缺口被登记</td><td>结论是否超出证据、不确定性表达是否合适</td></tr></tbody></table></div>
+ <div class="callout danger">调查可以在规定范围内完成交付，同时保留“证据无法区分两种解释”。报告写完、调查结束与真相已确定，必须分开。</div>
+ <a class="deep" href="?view=deep#deep-intel-case">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#intel-case">MD 源文</a>
+</section>
+<section id="context-state" class="section" data-toc-group="场景与长上下文">
+ <div class="kicker">09 / 提示词、状态与长内容</div><h2>模型每一轮只依据实际进入输入的内容判断</h2>
+ <figure id="fig-context">
+<div class="figure-top"><span>机制示意</span><b>图 11｜外部记忆能保存状态，不能自动保证模型读到并用对</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE11.svg" alt="提示词可以修正和版本化。历史常用追加方式维护，但压缩、截断与状态重建都会改变下一轮输入。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>提示词可以修正和版本化。历史常用追加方式维护，但压缩、截断与状态重建都会改变下一轮输入。 <a href="?view=deep#deep-context-state">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#context-state">MD 源文</a></figcaption></figure>
+ <div class="two-column"><div><h3>提示词可以修正</h3><p>模板里的错字和过期规则可以更改、删除并版本化。对话中的历史错误通常以更正和当前有效状态处理；不能把矛盾规则不断追加就算解决。</p></div><div><h3>状态保存也会出错</h3><p>任务板、摘要和验证记录都可能由模型填写。要保留它们的依据与未决项，避免下一轮只继承一句“已经核实”。</p></div></div>
+ <a class="deep" href="?view=deep#deep-context-state">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#context-state">MD 源文</a>
+</section>
+<section id="grill-loop" class="section" data-toc-group="场景与长上下文">
+ <div class="kicker">10 / 用 grill 看懂技能怎样工作</div><h2>每轮新问题由模型生成，一轮可以问多题</h2>
+ <p>用户回答以后，要针对回答生成下一轮问题，需要模型再次处理对话。不是每道题固定一次请求；读资料、调用工具或研究任务还可能增加调用。等待用户时，这份技能本身不要求持续运行模型。</p>
+ <figure id="fig-grill">
+<div class="figure-top"><span>机制示意</span><b>图 12｜grill 是规则驱动的问答循环，问题由模型生成</b></div>
+<div class="diagram-scroll"><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE12.svg" alt="这是作者构造的技能规则及宿主公开机制的示意。模型可能漏问或过早认为已经理解；本图不代表技能自带独立提问或验收引擎。 核对深入版 ↗ · MD 源文" loading="lazy" decoding="async"></div>
+<figcaption>这是作者构造的技能规则及宿主公开机制的示意。模型可能漏问或过早认为已经理解；本图不代表技能自带独立提问或验收引擎。 <a href="?view=deep#deep-grill-loop">核对深入版 ↗</a> · <a href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#grill-loop">MD 源文</a></figcaption></figure>
+ <div class="table-scroll"><table><thead><tr><th>层次</th><th>实际做什么</th><th>本例问答技能的情况</th></tr></thead><tbody><tr><td>技能规则</td><td>规定怎样组织问答、等待和收尾</td><td>入口要求采用提问规则：找关键选择、一次问当前可答的问题、等回答再调整。</td></tr><tr><td>模型判断</td><td>理解回答，决定具体问什么、哪些还没解决</td><td>没有独立脚本能替模型理解所有答案；是否问完仍可能误判。</td></tr><tr><td>执行程序</td><td>加载或提供规则，保存对话，组织模型和工具调用</td><td>显示问题、接收回答，把新信息送入后续处理；技能不是另一个后台模型引擎。</td></tr></tbody></table></div>
+ <div class="scenario"><span>构造例子</span><p>用户说“比较两种情报解释，每日更新”。程序把这段话送回；模型才会决定下一轮问“证据来自哪里”“多久失效”。如果模型没想到来源独立性很关键，技能也不会自动替它补问。</p></div>
+ <p>技能还要求：模型认为问题问完后，开始后续实施前先取得用户确认。这是模型需遵循的文字规则，不是自带代码审批门。当前用户明确要求科普、不要访谈时，不应机械追问。</p>
+ <a class="deep" href="?view=deep#deep-grill-loop">查看问答回放、触发配置与调用次数边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#grill-loop">MD 源文</a>
+</section>
+<section id="future-and-tradeoffs" class="section" data-toc-group="演进与来源">
+ <div class="kicker">11 / 演进、成本与取舍</div><h2>提高可验证性，也持续检验模型与执行程序 的能力边界</h2>
+ <div class="future-grid">
+ <article><span>01</span><h3>模型更能保持目标</h3><p>规划、解释反馈和长程执行进步后，重新评测哪些外部补偿仍有用，移除造成僵化的旧结构。</p></article>
+ <article><span>02</span><h3>更多结果可外部核验</h3><p>用环境状态、独立测试和明确条件减少单靠自报；复杂内容应该怎样验收仍是难点。</p></article>
+ <article><span>03</span><h3>评审看到有效证据</h3><p>提供原需求与结果，校准评审错误；分离生成与评价会增加机会，也会增加费用与误判路径。</p></article>
+ <article><span>04</span><h3>失败进入评测与改进</h3><p>把漏项、假完成和纠正失效变成可重放案例，验证修改是否有效，而非持续追加提醒。</p></article>
+ </div>
+ <p>这是对公开研究的归纳，不是统一行业路线图。复核、多 Agent 和长上下文都有费用与延迟；增加多少值得，必须按任务测。</p>
+ <p class="closing">判断一个 Agent 是否可靠，要看它在能力边界内能否持续解决问题，以及在越界时能否暴露缺口、保住约束并减少人的接管成本。</p>
+ <a class="deep" href="?view=deep#deep-future-and-tradeoffs">查看机制、证据与边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#future-and-tradeoffs">MD 源文</a>
+</section>
+<section class="section" id="public-sources" data-toc-group="演进与来源"><h2>依据与边界</h2><p>Hermes 机制已按公开固定提交 <code>450ad505</code>补核。问答技能是作者构造演示；文中没有把技能读写当成模型权重训练，也没有进行四产品成对性能实验。</p><a class="deep" href="?view=deep#deep-sources-and-verification">核对公开来源与版本 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20Loop%EF%BC%9A%E8%A7%84%E5%88%92%E3%80%81%E7%BA%A0%E5%81%8F%E4%B8%8E%E9%AA%8C%E6%94%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.md#sources-and-verification">Markdown 对应段落</a></section></div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><!-- document-id: show-11 -->
+<!-- document-version: 1.0-review -->
+
+<p><a id="deep-overview"></a></p>
+<!-- document-type: show -->
+
+<h1>Agent Loop：谁规划、谁纠偏、谁验收，以及为什么仍会假完成</h1>
+<p><a href="%E8%AE%B2%E8%A7%A3-11-Agent%E8%BF%90%E8%A1%8C%E5%BE%AA%E7%8E%AF.html">图解讲解</a> · <a href="../index.html">返回首页</a></p>
+<p>文档类型：技术科普与机制研究。结构模板：A 结论先行 + C 对比分析。按“总—分—总—分层展开”组织：先回答判断责任，再分别核对四家，然后重建通用 loop，展开调用时机、失败链、人机协作和情报研判。</p>
+<p><a href="%E8%AE%B2%E8%A7%A3-11-Agent%E8%BF%90%E8%A1%8C%E5%BE%AA%E7%8E%AF.html">打开 HTML 展示版</a> · <a href="../index.html">项目入口</a> · <a href="#deep-sources-and-verification">源码与资料索引</a></p>
+<p><a id="deep-decision-core"></a></p>
+<h2>1. 总论：通用 Agent 主要靠模型理解任务、选择下一步</h2>
+<p><strong>对于没有预先写死解题步骤的通用任务，通常由模型理解目标、决定下一步，并在需要时拆分或修改计划；执行程序（harness）负责发起调用、执行动作、记录进度和运行已定义的检查。</strong> 模型能力不足时，任务理解、计划、纠偏和内容验收可能一起失效。把它们画成四个模块，不能自动得到四份可靠判断。</p>
+<p>先校正两个容易让整篇讨论失焦的说法。</p>
+<p><strong>“拆任务就是流程编排型 Agent”不成立。</strong> 人或程序预设步骤，是工作流；模型在执行中发现子问题、调整顺序，也是拆任务。通用自主 loop 不一定先输出完整任务表：模型可以先查资料，读到结果后再决定下一步。把步骤写成清单是可选的；根据新结果决定下一步，是循环继续工作的关键。</p>
+<p><strong>“harness 只能校验格式”也过窄。</strong> 代码可以核验订单实际存在、计算结果符合规则、测试是否通过等实质条件。但“这篇报告是否切题”“论据是否足以支撑结论”通常需要模型或人理解内容。程序可以把某项检查设为必须执行，不能由此证明检查标准已经完整。</p>
+<h3>1.1 三种任务组织方式，以及混用关系</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>步骤从哪里来</th>
+<th>执行中谁决定下一步</th>
+<th>典型适用情况与风险</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>预设工作流</td>
+<td>人制定规则、模板或依赖图，代码保存</td>
+<td>代码按条件分支；某个步骤里面仍可调用模型</td>
+<td>稳定业务流程可控；未设计的情况可能走错分支</td>
+</tr>
+<tr>
+<td>模型自主 loop</td>
+<td>用户目标、指令和当前观察进入模型</td>
+<td>模型选择行动；必要时显式列计划</td>
+<td>开放问题灵活；遗漏、偏离、假完成主要受模型能力影响</td>
+</tr>
+<tr>
+<td>混合系统</td>
+<td>外层规定必须经过的阶段；内层由模型探索</td>
+<td>代码决定阶段约束，模型决定阶段内策略</td>
+<td>兼顾业务约束与探索；阶段齐全仍不等于判断正确</td>
+</tr>
+</tbody></table></div>
+<p>“是否显式列计划”和“是否由模型决策”是两个维度。一个没有任务清单的 Agent 仍然可能在持续规划；一个显示精美任务板的 Agent 也可能只是执行人写好的工作流。</p>
+<h3>1.2 本文的责任标记</h3>
+<ul>
+<li><strong>[M] 模型判断</strong>：理解含义、提出计划、解释失败、判断切题与否。主模型与评审模型都属于这一类。</li>
+<li><strong>[C] 程序控制</strong>：发起调用、解析响应、执行动作、读写状态、检查明确规则、处理预算与退出。</li>
+<li><strong>[H] 人的判断</strong>：定义业务标准、修订目标、判断难以自动验证的结果；是否需要介入取决于任务与能力。</li>
+</ul>
+<p>后文把模型周围的执行系统简称为“程序”（技术上常叫 harness）；Hermes 是一个具体 Agent 产品。程序还可以再调用其他模型，所以“系统做了验收”必须继续追问：<strong>是代码直接检查，还是程序又请一个模型读内容？</strong></p>
+<p>先把常用术语对应到具体动作：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>术语</th>
+<th>本文实际指什么</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>上下文</td>
+<td>这一次真正交给模型看的材料</td>
+<td>用户要求、报告片段、上一步结果</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>程序记下的已做、待做、等待事项</td>
+<td>报告 A 已读，报告 B 等待读取</td>
+</tr>
+<tr>
+<td>内容判断，也叫语义判断</td>
+<td>读懂内容后判断它意味着什么、是否切题</td>
+<td>两份报告日期不同，能否直接比较</td>
+</tr>
+<tr>
+<td>候选答复</td>
+<td>模型准备交付、尚需程序处理收尾的答复</td>
+<td>草拟说明已写出；额外检查是否运行看配置</td>
+</tr>
+<tr>
+<td>结束时检查，常叫 Hook</td>
+<td>开发者事先约定走到这里就多做一项检查</td>
+<td>检查说明文件存在，或再请模型查遗漏</td>
+</tr>
+</tbody></table></div>
+<p><a id="deep-decision-ownership"></a></p>
+<h3>1.3 先给判断责任总表</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>决定什么</th>
+<th>通用自主 loop 的通常判断来源</th>
+<th>程序能保证的部分</th>
+<th>仍可能出错的地方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>要不要列计划、拆哪些任务</td>
+<td>[M]；[H]/模式可要求必须列</td>
+<td>[C] 提供指令、计划工具和存储</td>
+<td>模型没意识到需要计划，或起初漏解需求</td>
+</tr>
+<tr>
+<td>谁先谁后、哪些可并行</td>
+<td>[M] 提出依赖；预设流程可由 [H] 给定</td>
+<td>已实现依赖校验与调度时，[C] 按登记关系和资源限制调度</td>
+<td>普通并发器未必检查依赖；登记关系也可能错误</td>
+</tr>
+<tr>
+<td>当前行动是否偏离</td>
+<td>[M] 对照目标与观察；[C] 检查明确约束</td>
+<td>[C] 发现测试失败、越界、超限等</td>
+<td>没有违反硬条件，仍然可能解决错问题</td>
+</tr>
+<tr>
+<td>是否重规划、怎样改</td>
+<td>[M] 决定语义策略；[C] 可触发检查</td>
+<td>[C] 重试、切换预设分支、保存计划版本</td>
+<td>不理解根因时，换计划也可能继续错</td>
+</tr>
+<tr>
+<td>结果是否满足需要</td>
+<td>可检查项由 [C]；复杂内容由 [M]/[H]</td>
+<td>[C] 强制检查、核验环境事实、执行判定分支</td>
+<td>标准漏项、评审误判、共同误解</td>
+</tr>
+<tr>
+<td>是否结束本次运行</td>
+<td>[M] 可以提出收尾；[C] 最终执行退出</td>
+<td>[C] 处理停止事件、错误、预算和可选检查步骤</td>
+<td>正常结束不代表业务成功</td>
+</tr>
+</tbody></table></div>
+<p>后文每个涉及判断的位置，都要说明是代码检查、模型读内容，还是人作决定。“安排步骤”“验收”只是工作名称，不能省略实际判断者。</p>
+<p><a id="deep-four-products"></a></p>
+<h2>2. 分析四家：每一步都说清程序做什么、模型做什么</h2>
+<p>四家都在反复做这件事：<strong>程序把任务和新结果交给模型，模型决定下一步，程序再执行。</strong> 差别是怎样保存进度、怎样暂停恢复、怎样加检查。Hermes 是可直接使用的 Agent 应用；AgentScope 是供开发者组装 Agent 的框架；Codex、Claude Code 是编码 Agent 产品。比较范围不同，不能仅凭下面的机制说明给出能力排名。</p>
+<p>本节统一使用一个构造例子：<strong>“比较两份项目报告，解释为什么一份说基本完成、另一份说还有很多未做；列出仍无法确认的问题，保存一份说明。”</strong> 下面演示各产品的机制怎样承载这个任务，不声称已经实测了相同次数或同样结果。源码函数名、原始字段和固定版本统一放到<a href="#deep-sources-and-verification">源码与资料索引</a>。</p>
+<p><a id="deep-hermes-loop"></a></p>
+<h3>2.1 Hermes：模型安排工作，程序执行并替它记进度</h3>
+<p>可以把它理解成“模型带着工具和工作记录，边做边决定下一步”。程序会把任务、可用工具和相关记录准备好；复杂任务使用清单的要求，也会作为提示交给模型。<strong>清单怎么拆、先查什么，主要由模型决定；程序并不会仅凭这句提示就准确识别所有复杂任务。</strong> <a href="#deep-source-h1">H1</a> <a href="#deep-source-h2">H2</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>程序负责什么</th>
+<th>模型负责什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开始：先获得材料</td>
+<td>把原始要求和“可读取文件、可记录计划”等能力交给模型；模型请求读文件后，程序执行读取</td>
+<td>理解三个要求：解释矛盾、列未决项、保存说明；决定先读报告，或先登记暂定步骤。此时还不知道矛盾原因</td>
+</tr>
+<tr>
+<td>中间：根据新结果改路线</td>
+<td>把读到的内容或错误放入下一次模型输入；保存模型提交的清单更新</td>
+<td>例如发现两份报告日期不同，决定先查时间口径，再判断是否真的矛盾；需要时补任务、改顺序</td>
+</tr>
+<tr>
+<td>收尾：决定继续还是返回</td>
+<td>在模型给出准备交付的答复后，检查还有没有待执行动作、是否触发已配置检查、是否遇到预算或错误边界；然后继续或结束</td>
+<td>判断是否已经解释了矛盾、是否列出未决项；决定再查、再改，或提出最终答复。额外检查要求补做时，再解释反馈并继续</td>
+</tr>
+</tbody></table></div>
+<p><strong>清单是谁维护的？</strong> 模型提交“先读报告”“核对时间”等步骤及其进度；程序负责保存、显示和检查格式。模型把某条标成“已完成”，程序可以照此记录，但不会因此自动知道它是否漏读了一份报告。</p>
+<p><strong>收尾检查是谁判断的？</strong> 本篇核对的公开固定版本还有一项默认关闭的可选检查，主要根据代码是否改过、是否留下验证记录，决定要不要提醒模型继续核查。<strong>程序判断的是这些明确记录；收到提醒后，模型决定怎样检查和修复。</strong> 它并不会自动验收任意研究报告的内容。<a href="#deep-source-h3">H3</a></p>
+<p>这种分工能让任务路线保持灵活，又能把进度保存下来。风险是：如果模型起初漏掉“列未决项”，程序可能完整保存并执行一张本来就漏项的清单。</p>
+<p><a id="deep-agentscope-loop"></a></p>
+<h3>2.2 AgentScope：程序按当前记录接续工作，模型决定具体查什么</h3>
+<p>这里最容易被源码名误导的，其实是一个普通的程序控制过程：<strong>有动作没执行，就处理动作；需要等待确认，就暂停；结果已经返回，就再让模型判断；到了可返回答复的位置，就处理结束。</strong> 程序查看的是当前记录，研究方向仍由模型根据内容决定。<a href="#deep-source-a1">A1</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>程序负责什么</th>
+<th>模型负责什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开始：建立本轮工作记录</td>
+<td>准备输入，记录这轮刚开始、尚无结果，并发起模型请求</td>
+<td>理解用户要求，决定直接回答还是先读材料；并没有通用规定要求先另调一个规划模型</td>
+</tr>
+<tr>
+<td>中间：动作与判断接力</td>
+<td>处理模型提出的读取等动作，保存结果；若需要确认或外部结果，就等待，条件满足后再接着运行</td>
+<td>看报告后判断日期、口径或项目范围是否一致，提出下一步；若使用任务清单，则提交步骤、先后关系和进度</td>
+</tr>
+<tr>
+<td>收尾：返回这一轮的结果</td>
+<td>接到可返回答复，检查待执行动作、待确认事项及开发者加的检查；按当前记录处理后决定继续或返回</td>
+<td>形成解释和未决项，判断是否还需要补查；若另行安排了内容评审，则由承担评审的模型或人判断</td>
+</tr>
+</tbody></table></div>
+<p><strong>什么叫“保存状态”？</strong> 例如程序记住“报告 A 已读、报告 B 还在等结果、当前等用户确认”。恢复时可以接着处理，不必让用户重新讲一遍。但“记住做到了哪”不等于“知道做得对不对”。</p>
+<p>如果要求按“结论、依据、未决项”等字段返回，程序还可以检查约定的输出是否已经生成。这不表示“未决项”写得全面，正如表格每格都填了字，也可能没有回答问题。</p>
+<p>这种设计方便开发者把 Agent 接入可暂停、可恢复的服务。<strong>它让程序能准确接续已经记录的步骤；能否提出正确步骤、解释材料、判断遗漏，仍依赖模型、业务检查和人。</strong></p>
+<p><a id="deep-codex-loop"></a></p>
+<h3>2.3 Codex：模型提出行动和修改，程序把真实执行结果交回来</h3>
+<p>可以把它理解成“模型在真实工作区里做事，执行程序不断把文件、命令和检查结果交给它”。模型既能处理代码，也能处理工作区里的说明文档。编辑、检查、看结果、再修复，可以反复发生；这些词并不各自对应固定的一次模型调用。<a href="#deep-source-o1">O1</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>程序负责什么</th>
+<th>模型负责什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开始：把任务放进实际工作环境</td>
+<td>提供用户要求、相关工作区信息和可用动作，发起模型请求；若启用某种模式，则按该模式的规则组织输入</td>
+<td>决定先找报告、先读文件还是先列步骤。执行中的进度清单由模型提交，程序负责接收与展示</td>
+</tr>
+<tr>
+<td>中间：执行、反馈、再判断</td>
+<td>运行获准的读取、编辑或检查动作，返回内容、错误、文件差异及检查结果</td>
+<td>例如发现日期不一致，决定重查口径；写出说明后，决定是否需要检查遗漏、修正文档或继续查资料</td>
+</tr>
+<tr>
+<td>收尾：处理待办与附加检查</td>
+<td>模型提出收尾后，检查是否还有待处理动作、新输入或阻止结束的已配置检查；需要继续时，把反馈交回模型</td>
+<td>提出准备交付的答复；若程序安排了独立评审，评审模型再判断结果，主模型根据反馈修订</td>
+</tr>
+</tbody></table></div>
+<p><strong>计划由谁定？</strong> 一般仍由模型根据任务和指令安排。执行中的“进度清单”与专门的“计划模式”是不同机制；本篇不拿一个工具名称来替代二者的说明。程序能保存计划，不能仅凭保存成功就证明计划正确。<a href="#deep-source-o2">O2</a></p>
+<p><strong>结束是谁决定的？</strong> 两者共同完成：模型写出它准备交付的答案；程序按实际控制条件决定还要不要继续调用。若另行发起评审，<strong>程序负责发起和执行分支，评审模型负责看内容是否有问题。</strong> 没有公开证据支持把它写成每次都默认发生。</p>
+<p>真实文件和检查结果能帮助模型减少猜测。但如果模型只检查“说明文件已保存”，仍可能遗漏“列出未决项”。检查通过能证明到哪里，要看检查实际覆盖了什么。</p>
+<p><a id="deep-claude-loop"></a></p>
+<h3>2.4 Claude Code：模型决定怎么做，程序可在收尾时加一道检查</h3>
+<p>官方描述中的“Claude 决定下一步”，指的是模型根据前一步的信息进行判断；程序负责提供工具、维护本次给模型看的材料，并组织执行。<a href="#deep-source-c1">C1</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>程序负责什么</th>
+<th>模型负责什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开始：准备输入与当前模式</td>
+<td>把任务、规则和可用能力交给模型；如果启用计划模式，程序按该模式限制当前可进行的动作</td>
+<td>理解用户想要什么，调查材料并安排步骤。计划模式里的计划内容也由模型写</td>
+</tr>
+<tr>
+<td>中间：把新情况送回模型</td>
+<td>执行动作，保存并提供相关结果；把用户新增的要求放入后续输入</td>
+<td>读报告、识别冲突、改变查证顺序；用户纠正“不要扩展范围”时，理解这次纠正和旧要求的关系</td>
+</tr>
+<tr>
+<td>收尾：运行已配置的检查</td>
+<td>模型准备结束时，程序可运行开发者事先加好的检查步骤，并按结果允许结束或继续</td>
+<td>主模型提出答复；如检查使用另一轮模型，则由评审模型判断遗漏或论证问题；需要修订时，主模型继续处理</td>
+</tr>
+</tbody></table></div>
+<p>结束时“加一道检查”在产品中称为 Hook，可理解为<strong>事先约定：走到某个位置，就多做一件检查工作</strong>。它不是天然懂业务的判断者。具体可以这样实现：<a href="#deep-source-c4">C4</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>检查方式</th>
+<th>谁发起、执行</th>
+<th>谁判断什么</th>
+<th>结果以后怎么办</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>跑检查脚本</td>
+<td>程序在收尾位置执行已配置脚本</td>
+<td>脚本可按文件、测试或明确规则作出程序判断；脚本也可能被开发者写成另调模型</td>
+<td>程序读取约定结果，决定允许结束还是送回反馈</td>
+</tr>
+<tr>
+<td>再问模型一次</td>
+<td>程序发送配置的评审指令与事件信息；开发者需提供评审所需的原始要求和材料</td>
+<td>评审模型判断是否满足要求、哪里还缺内容</td>
+<td>程序接收判断，允许结束或让主模型修订</td>
+</tr>
+<tr>
+<td>让验证 Agent 查材料</td>
+<td>程序启动已配置的验证任务</td>
+<td>验证模型可读文件、看证据，再给判断</td>
+<td>程序处理判断；模型仍可能误判</td>
+</tr>
+</tbody></table></div>
+<p>例如：“说明文件是否存在”可以写成代码检查；“是否解释了矛盾，是否漏了未决项”通常需要模型或人读内容。<strong>程序能保证某个已配置检查被触发，不能因此保证检查结论正确。</strong> 没有公开依据表明每次答复后都默认有独立内容验收。</p>
+<p>这种设计让开发者可以在需要的位置补检查。代价是额外时间、调用和误判机会；提示词、任务记录和额外评审都需要根据实际任务验证效果。<a href="#deep-source-c2">C2</a> <a href="#deep-source-c3">C3</a></p>
+<h3>2.5 四家比较后，最该记住的共同分工</h3>
+<p><strong>程序负责“把该运行的部分接起来”，模型负责“理解当前情况、决定具体怎么做”。</strong> 例如模型提出“还要核对日期”，程序执行读取并把结果交回；模型认为“可以交付了”，程序再检查有没有待执行动作、已配置的收尾检查或资源问题。</p>
+<p>所以，“开始—中间—结束”都可能由两者接力。不能只写“Agent 判断”而省略判断者，也不能把程序保存的“已完成”直接解释成用户要求已经全部满足。</p>
+<p><a id="deep-common-loop"></a></p>
+<h2>3. 再总：一个请求从输入到输出，到底调用几次模型</h2>
+<h3>3.1 最小 loop 没有强制独立的意图层、规划层和验收层</h3>
+<figure><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE03.svg" alt="模型判断与程序组织的运行循环"><figcaption>机制示意。模型判断、程序动作与额外验收分别承担责任，结束状态不自动证明用户目标已满足。</figcaption></figure>
+
+<p>一轮模型调用可以同时承担目标理解、分析观察、调整计划、选择下一动作和决定收尾。我们为解释而拆出的职责，不一定对应多次调用；模型的内部思考也不等于可观察的完整计划表。</p>
+<h3>3.2 一个具体回放：不是“先把所有任务拆完，再执行第一层”</h3>
+<p>以下是构造示例，不声称四家都按同样次数运行。任务为“分析两份材料对某项目进度的矛盾，给出依据和未解决问题”。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>谁做什么</th>
+<th>是否发生新的模型调用</th>
+<th>产生什么，仍缺什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输入后</td>
+<td>[C] 加入原问题、规则和可用工具</td>
+<td>否，准备阶段</td>
+<td>模型尚未作出内容判断</td>
+</tr>
+<tr>
+<td>第一次调用</td>
+<td>[M] 判断先读两份材料，可提出对照计划并请求读取</td>
+<td>是，调用 1</td>
+<td>计划可能只是暂定；此时还不能知道全部子问题</td>
+</tr>
+<tr>
+<td>读取执行</td>
+<td>[C] 执行动作并返回材料</td>
+<td>否，工具阶段</td>
+<td>获得内容或错误，不代表已经理解</td>
+</tr>
+<tr>
+<td>观察后</td>
+<td>[M] 发现两份材料使用不同日期口径，新增核对时间任务</td>
+<td>是，调用 2</td>
+<td>理解结果、重规划和选动作可在同一次完成</td>
+</tr>
+<tr>
+<td>再次执行</td>
+<td>[C] 执行查询或读取</td>
+<td>否</td>
+<td>保存原始观察</td>
+</tr>
+<tr>
+<td>收敛</td>
+<td>[M] 对照证据，解释冲突并给出候选答复</td>
+<td>是，调用 3</td>
+<td>仍可能漏掉“未解决问题”这个要求</td>
+</tr>
+<tr>
+<td>停止处理</td>
+<td>[C] 若未配置额外检查，可以返回该答复</td>
+<td>不必再调用</td>
+<td>结束不代表已独立检查遗漏</td>
+</tr>
+<tr>
+<td>可选复核</td>
+<td>[C] 把原始问题、有效要求、结果证据发给评审 [M]</td>
+<td>若配置，则调用 4 或更多</td>
+<td>评审可发现遗漏，也可能继续漏掉</td>
+</tr>
+</tbody></table></div>
+<p>工具结果放入后续模型输入以后，一般需要模型理解其含义再决定策略。参数与分支已经确定的机械动作，也可以由程序直接连着执行；没有必要把每条确定性数据处理都变成一次模型调用。</p>
+<h3>3.3 哪些状态意味着什么</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>观察到的信号</th>
+<th>程序能知道什么</th>
+<th>不能据此知道什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模型请求执行动作（例如 <code>tool_use</code>）</td>
+<td>需要交接执行动作，随后通常继续</td>
+<td>当前计划正确、动作有价值</td>
+</tr>
+<tr>
+<td>模型本次生成收尾（例如 <code>end_turn</code>），且没有待执行动作</td>
+<td>这次生成可以进入程序的收尾处理</td>
+<td>所有用户要求都满足</td>
+</tr>
+<tr>
+<td>输出碰到长度限制（例如 <code>max_tokens</code>）</td>
+<td>输出碰到长度限制，可能不完整</td>
+<td>任务成功；不能一律当成完整答复</td>
+</tr>
+<tr>
+<td>限流、余额不足、网络错误</td>
+<td>API 或资源异常，应按错误路径处理</td>
+<td>模型已主动完成；这些也不是同一类模型停止原因</td>
+</tr>
+<tr>
+<td>最大轮次、时间或预算到达</td>
+<td>程序必须停止或降级</td>
+<td>未完成事项因此消失</td>
+</tr>
+<tr>
+<td>任务清单全部 completed</td>
+<td>所记录条目的状态均被标完成</td>
+<td>初始需求没有漏项，或条目有真实验证</td>
+</tr>
+</tbody></table></div>
+<p>各供应商使用的字段名不同。程序要一起检查返回内容、待处理动作和错误，不能只看一个“结束”标记就认定任务成功。</p>
+<p><a id="deep-plan-and-replan"></a></p>
+<h2>4. 分层展开：计划、纠偏与验收分别如何触发</h2>
+<h3>4.1 “谁要求计划”与“谁生成计划”是两个问题</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>触发方式</th>
+<th>程序具体做什么</th>
+<th>模型具体做什么</th>
+<th>能保证什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模型按任务自行决定</td>
+<td>[C] 提供普通任务与行动能力</td>
+<td>[M] 直接行动或形成计划</td>
+<td>灵活，但不保证显式列计划</td>
+</tr>
+<tr>
+<td>指令要求复杂任务规划</td>
+<td>[C] 在提示词或工具说明里提供要求</td>
+<td>[M] 判断复杂度并写步骤</td>
+<td>提供行为引导，未增加可靠的复杂度检测器</td>
+</tr>
+<tr>
+<td>显式计划模式</td>
+<td>[C] 切换模式、权限和输出约束</td>
+<td>[M] 调查并生成计划</td>
+<td>控制当前允许行为；不保证计划完整</td>
+</tr>
+<tr>
+<td>强制规划节点</td>
+<td>[C] 工作流先发起一轮规划调用，再进入后续阶段</td>
+<td>[M] 产出结构化计划</td>
+<td>可以保证调用被执行；内容质量仍取决于模型及标准</td>
+</tr>
+<tr>
+<td>人写业务流程</td>
+<td>[H] 定义步骤，[C] 按步骤调度</td>
+<td>[M] 完成被分配的语义子任务</td>
+<td>降低部分规划负担；业务流程设计责任在人</td>
+</tr>
+</tbody></table></div>
+<p>因此，“模型主动拆计划”和“提示词让模型规划”可以同时成立：模型是在指令、工具和训练形成的行为条件下决定的。不要把它们想成互斥的两种大脑。</p>
+<h3>4.2 中间何时重新规划</h3>
+<p>最小 loop 中，下一次模型调用就是最常见的校准位置。假设查询得到“没有该日期的记录”，模型可能决定换数据源，也可能发现原来的时间假设错误。这不必额外出现一个“重新规划”的模型调用。</p>
+<p>更明确的系统可以由代码在检查失败、关键阶段结束、用户纠正或连续无进展时触发复核。<strong>触发依据可以硬编码，解释失败与生成新路线仍可由模型承担。</strong> 若业务已有确定规则，例如超时后切备用接口，代码也能直接走固定分支。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>情况</th>
+<th>代码能确定的事实</th>
+<th>需要内容判断的部分</th>
+<th>失败边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据源返回空结果</td>
+<td>本次返回空</td>
+<td>是真实不存在、查询条件错，还是覆盖缺失</td>
+<td>模型可能把“未查到”误当“不存在”</td>
+</tr>
+<tr>
+<td>测试失败</td>
+<td>命令与断言失败</td>
+<td>根因、修复方案、是否需要改整体路线</td>
+<td>反复局部打补丁可能离目标更远</td>
+</tr>
+<tr>
+<td>用户说“只改解释，别改功能”</td>
+<td>收到新消息；可以更新已明确字段</td>
+<td>哪些旧要求继续有效、哪些被替换</td>
+<td>模型可能把局部纠正当成全部新任务</td>
+</tr>
+<tr>
+<td>计划条目已过时</td>
+<td>若有显式版本规则，可标记旧版本</td>
+<td>新证据是否足以推翻旧假设</td>
+<td>任务板可以保持整齐，同时全程沿用错误假设</td>
+</tr>
+</tbody></table></div>
+<h3>4.3 并行与串行是谁决定</h3>
+<p>模型或人判断任务之间实际的先后关系，例如“先确认统计口径，再比较数量”；有任务调度器时，代码按登记的依赖和资源约束释放任务。没有显式 DAG 的实现，也可能只是模型一次提出多个独立动作，由执行程序执行。</p>
+<p><strong>系统若实现依赖校验与调度，程序可以按已登记关系释放任务；普通并发执行器未必检查这些关系。</strong> 即使正确执行登记关系，也不能自动发现漏登记的任务之间实际的先后关系。子任务并行完成后，是否真的可合并、是否相互矛盾，常常还需要模型判断。增加多个 Agent 也增加协调、共享状态与归并错误的机会。</p>
+<p><a id="deep-acceptance-paths"></a></p>
+<h3>4.4 输出以后，是否还要 harness 主动要求模型验收</h3>
+<p><strong>如果要保证“产生候选结果之后，确实发生一次新的模型复核调用”，就需要程序或外层工作流显式安排这次调用。</strong> 在初始提示词中写“回答前认真检查”，可能促使模型自检、运行测试或主动委托复核；但它不等价于程序已经设置了一个必须经过的独立评审步骤。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>路径</th>
+<th>候选输出后的实际行为</th>
+<th>有无额外模型调用</th>
+<th>判断能力来自哪里</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A：正常模型自行收尾</td>
+<td>程序按响应协议结束</td>
+<td>没有保证</td>
+<td>原调用的模型；可能自检，也可能漏检</td>
+</tr>
+<tr>
+<td>B：强制同一模型复核</td>
+<td>程序把候选结果及检查要求再送给同一模型</td>
+<td>有，若代码确实执行</td>
+<td>仍是该模型；可能沿用原误解</td>
+</tr>
+<tr>
+<td>C：独立评审模型或 Agent</td>
+<td>程序提供原需求、有效约束与结果证据，要求评审</td>
+<td>有；验证 Agent 可能多轮</td>
+<td>评审模型；具有另一条检查路径但并非真值</td>
+</tr>
+<tr>
+<td>D：代码检查或混合检查</td>
+<td>程序运行测试、查询真实状态；语义项按需交给模型或人</td>
+<td>代码检查不需要；语义检查可能需要</td>
+<td>代码对明确条件判断，模型/人补充语义</td>
+</tr>
+</tbody></table></div>
+<p>同一模型的新一轮复核可能发现先前没注意的错误，因此不能说毫无价值；它与原执行共享知识和偏差，也不能被当作独立正确性证明。换模型、换上下文或多模型投票同样不能自动消除共同盲点。</p>
+<p>“判断满足需要”要有输入：原始用户需求、当前仍有效的约束、候选产物、真实检查结果和已知缺口。只让评审读取执行者的“已全部完成”总结，可能连原始遗漏都一起继承。</p>
+<h3>4.5 谁决定停：模型提议，程序执行；成功标准另算</h3>
+<p>下面给实现者一段教学伪代码，展示一种可选混合实现；函数名是本文自定义的步骤标签，不是四家的内部接口。<code>semantic_reviewer</code> 若存在，本身是模型调用。示例中的 <code>*_safely</code> 包装器捕获调用异常并转成错误结果；其中 <code>run_checks_safely</code> 把检查异常映射为 <code>unknown</code>。响应分类包含完整性与可执行参数检查。生产实现还须遵守具体供应商的流式与工具协议。</p>
+<pre><code class="language-python">while iteration_policy_allows():             # [C] 有界轮次与重试，避免无限循环
+    if not resources_available_for(&quot;model&quot;):
+        return incomplete_with_remaining_work()
+    reply = call_model_safely(build_context()) # [C] 发请求，[M] 作出语义选择
+    record(reply)
+    kind = classify_and_validate(reply)      # [C] 先检查协议、完整性与参数
+    if kind in {&quot;error&quot;, &quot;incomplete&quot;, &quot;invalid&quot;}:
+        if recovery_policy(reply).can_retry:
+            add_feedback(reply)
+            continue
+        return incomplete_with_remaining_work()
+    if kind == &quot;executable_actions&quot;:
+        if not resources_available_for(&quot;actions&quot;):
+            return incomplete_with_remaining_work()
+        results = execute_allowed_safely(reply) # [C] 结果或错误都保存并放入后续模型输入
+        record(results)
+        continue                             # [M] 下一轮解释观察与改向
+    candidate = extract_candidate(reply)
+    hard = run_checks_safely(candidate)      # [C] not_configured/passed/failed/unknown
+    if hard.status == &quot;failed&quot;:
+        add_feedback(hard)
+        continue
+    if hard.status == &quot;unknown&quot;:
+        return unverified_candidate(candidate, hard)
+    review = &quot;not_configured&quot;               # 未配置检查与检查通过不是同一状态
+    if semantic_reviewer_is_configured():
+        if not resources_available_for(&quot;review&quot;):
+            return unverified_candidate(candidate, &quot;review_not_run&quot;)
+        review = call_reviewer_safely(       # [C] 触发；[M] 判断
+            original_request, active_requirements, candidate, evidence)
+        decision = parse_verdict_or_error(review) # [C] approve/revise/unknown/error
+        if decision == &quot;revise&quot;:
+            add_feedback(review)
+            continue
+        if decision != &quot;approve&quot;:           # 无效、矛盾或未知都不能默认放行
+            return unverified_candidate(candidate, review)
+    return deliver_with_scope(candidate, hard, review) # 仅声明实际检查范围
+return incomplete_with_remaining_work()
+</code></pre>
+<p>真实实现还要定义无效评审响应、超时、重复失败、人工打断及最终化边界。需要阻止循环空转；重试用尽应明确表示失败或未决，不能因此把候选结果升级为已验收。</p>
+<p>如果候选答复已经流式展示给用户，后续检查只能继续修正或阻止运行结束，不能让用户“没看过”之前内容。若业务要求通过检查后才发布，就需要区分预览与正式交付，并在输出层实现这个区别。</p>
+<p><a id="deep-failure-risks"></a></p>
+<h2>5. 风险：关键判断可能共享同一个错误</h2>
+<h3>5.1 从需求误解到假完成，是一条可以自洽的失败链</h3>
+<figure><img src="%E9%85%8D%E5%9B%BE/11/%E5%9B%BE08.svg" alt="需求遗漏到假完成的失败链"><figcaption>机制示意。模型判断、程序动作与额外验收分别承担责任，结束状态不自动证明用户目标已满足。</figcaption></figure>
+
+<p>这条链的危险是后续各步都可能“正确遵守了错误任务表”。任务状态保存、依赖排序和重试逻辑越可靠，也不能补上最初未被识别的 C。独立对照原需求有机会发现遗漏，评审模型仍可能再次误解。</p>
+<h3>5.2 风险、能做的控制与残余依赖</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>风险</th>
+<th>发生机制与可见症状</th>
+<th>harness 可以做什么</th>
+<th>仍然依赖什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>需求漏建、任务漏拆</td>
+<td>一开始只理解部分要求；清单全绿但缺交付</td>
+<td>保存原问题；建立需求到产物的对应；阻止未覆盖的已知项收尾</td>
+<td>需求抽取与对应关系可能仍由模型生成</td>
+</tr>
+<tr>
+<td>计划错误、依赖错误</td>
+<td>先分析后定义口径；并行分支使用不同假设</td>
+<td>保留计划版本；强制已知前置条件；暴露冲突</td>
+<td>哪些前置条件必要，需要领域理解</td>
+</tr>
+<tr>
+<td>一直修小问题，却没解决原问题</td>
+<td>工具都成功，却查了不相关问题；不断修小问题</td>
+<td>对照有效目标；设置检查点；统计无进展信号</td>
+<td>“有无实质进展”在开放任务中仍需内容判断</td>
+</tr>
+<tr>
+<td>纠正覆盖旧约束</td>
+<td>新反馈修好了指定点，却重新做被排除的工作</td>
+<td>版本化有效约束与变更；保存明确排除项</td>
+<td>自然语言里哪些被替换，模型或人须解释</td>
+</tr>
+<tr>
+<td>上下文丢失与旧计划锚定</td>
+<td>压缩丢否定条件；提醒反复灌入过时步骤</td>
+<td>保存原文与有效状态；可按需重读；标记计划失效</td>
+<td>摘要可能漏项；模型可能不主动重读</td>
+</tr>
+<tr>
+<td>工具结果误读</td>
+<td>返回空被当成不存在；工具成功被当成业务成功</td>
+<td>返回类型化状态、覆盖范围与错误；保留原始结果</td>
+<td>解释观察、识别数据局限仍需模型/人</td>
+</tr>
+<tr>
+<td>自己检查时沿用同一误解</td>
+<td>同一误解同时支配计划、执行和评价</td>
+<td>独立提供原需求与证据；组合不同检查</td>
+<td>多个模型可能共享知识盲点与偏差</td>
+</tr>
+<tr>
+<td>验收标准不完备</td>
+<td>测试通过，但测试未覆盖用户真正关心的场景</td>
+<td>增加独立场景、回归评测和最后的实际环境状态检查</td>
+<td>测试与标准设计同样可能错误</td>
+</tr>
+<tr>
+<td>做到一半却声称完成</td>
+<td>完成部分就宣称完成；限额退出却仍报成功</td>
+<td>区分结束原因；报告未决项和已做验证</td>
+<td>没被系统发现的漏项仍可能隐形</td>
+</tr>
+<tr>
+<td>持续试错扩大损失</td>
+<td>没找到根因仍反复改动，消耗资源或破坏已有结果</td>
+<td>预算、检查点、隔离、回退与中止</td>
+<td>哪条路线值得继续，需要有效判断</td>
+</tr>
+</tbody></table></div>
+<p>风险不是笼统的“模型偶尔出错”。它涉及判断责任的集中：<strong>如果拆解者、执行者和验收者实际依赖同一套错误理解，后面的“检查”就可能只是重复确认这个误解。</strong></p>
+<h3>5.3 不能从机制图读出的保证</h3>
+<p>增加检查次数不一定提高质量；模型可能根据错误反馈越改越差。增加子 Agent 不一定带来真正独立判断；它们可能只拿到同一份漏项计划。把输出限制为 JSON 不会使内容变真；它只是更容易被程序处理。让模型报一个“把握多大”的数字，也不能证明这个数字与实际正确率相符。</p>
+<p>目前没有可以对任意自然语言任务可靠判定“全部满足用户需要”的通用代码验收器。这里是能力与标准的边界，不是为某一个产品开脱。具体系统能改善多少，必须按任务、模型、输入和验收方法做实测。</p>
+<p><a id="deep-collaboration-reliability"></a></p>
+<h2>6. 协作可靠性：模型没承担好的工作，会回到人身上</h2>
+<h3>6.1 为什么人会被迫重新做规划、纠偏与验收</h3>
+<p>你的观察在困难任务中成立：当模型不能稳定保持目标，人会接管需求解释、切分任务、安排顺序、评估中间结果、修改路线和验收。模型退回到执行较窄子任务，外层智能编排由人完成。</p>
+<p>这能提高某些任务的完成机会，但不能保证子任务答案正确。人需要足够专业，才能识别偏差并给出有用反馈；拆得太碎还可能破坏整体上下文，让人承担额外归并工作。</p>
+<pre><code class="language-text">模型不能稳定承担的判断
+→ 人补充需求和拆分
+→ 人审查每个中间结果
+→ 人吸收新信息、重新定计划
+→ 人把下一步再交给模型
+→ 最终产物中包含大量人工编排和验收劳动
+</code></pre>
+<p>因此，“模型最后做出来了”不足以描述系统价值。还要问：为此消耗了多少人的判断、监督和恢复成本。</p>
+<h3>6.2 用户给的文章与本专题的关系</h3>
+<p><a href="https://github.com/zhouxiaohei/show-something/blob/main/%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md">《为什么最好用的是 Claude Code：分数打平之后，赢在协作可靠性》</a>提供的关键框架是：累计目标与约束是否稳定，错误后能否低成本拉回，以及人要付出多少协作劳动。<a href="#deep-source-r1">R1</a></p>
+<p>本文把这个问题接到 loop 上：初始理解有误，用户承担显式化成本；计划和执行偏离，用户承担监督成本；纠正未被完整吸收，用户承担反复纠偏成本；压缩或恢复损坏状态，用户承担重建任务的成本。四类成本都对应具体执行环节，而不只是主观“用着顺不顺”。</p>
+<p>文章对 Claude 的相对偏好是有证据边界的综合判断，不能直接升级为普遍产品排名。统一框架比较模型，只能说明该条件下的模型差异；模型与产品同时变化的实验，不能拆分两者贡献；issue 没有使用量分母，不能当发生率。<a href="#deep-source-r2">R2</a></p>
+<p>原文关联的 SWE-Journey 中，用户人设对结果的影响值得关注，但其 <code>Final F2P</code> 是功能测试失败转通过指标，不能无对象地写成“完整任务成功率”。本专题不借这些数字推导真实用户场景的提升幅度。<a href="#deep-source-r3">R3</a></p>
+<p>这些研究实际支持了三件值得测的事：统一 harness 下，不同模型需要的纠正量可以不同；相近解决率可以对应不同过程成本；在模拟用户实验中，专业反馈会改变功能测试结果。它们说明协作条件会影响结果，但没有共同证明某款产品在所有真实项目中更可靠。<a href="#deep-source-r2">R2</a> <a href="#deep-source-r3">R3</a></p>
+<h3>6.3 人工逐项拆分不是唯一方案，但有明确适用边界</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>组织方式</th>
+<th>人承担什么</th>
+<th>希望减少什么负担</th>
+<th>适用边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模型自主执行</td>
+<td>定目标、审最终结果，必要时纠正</td>
+<td>日常逐步指挥</td>
+<td>需要模型对该类任务较可靠，且失败可观察</td>
+</tr>
+<tr>
+<td>人确认关键阶段</td>
+<td>先确认范围与完成标准，在关键证据点判断</td>
+<td>不必审每次操作</td>
+<td>检查点必须能暴露重要偏差</td>
+</tr>
+<tr>
+<td>预设业务流程 + 模型子任务</td>
+<td>人设计稳定流程与例外分支</td>
+<td>减少反复设计相同步骤</td>
+<td>不适合把真正未知的探索强行写死</td>
+</tr>
+<tr>
+<td>人逐项编排</td>
+<td>人拆分、排序、看答案再决定下一步</td>
+<td>降低模型一次承担的判断跨度</td>
+<td>人工成本高；总体质量仍取决于人的判断</td>
+</tr>
+</tbody></table></div>
+<p>更强模型、较好的上下文、真实反馈和独立评审，都可能减少人工接管。但如果系统内所有模型与检查都缺少关键知识或判断能力，继续包装流程不能保证补足。此时需要补充资料、收窄目标或引入懂该问题的人。</p>
+<h3>6.4 怎么验证协作成本确实下降</h3>
+<p>不要只比较最终答案分数。对相同起点的真实任务，记录原需求覆盖、纠正次数与字数、纠正后旧约束保持、假完成、人工审查时间、恢复所需轮次、重复尝试成本。清楚区分“自动完成”和“在人多次接管后完成”。</p>
+<p>例如用户只要求修改解释，系统应修复指定解释并保留此前有效的范围约束；如果它为修这一个点引入新功能，即使最后答案评分相同，纠正吸收仍然失败。这是可复核的协作行为。</p>
+<p><a id="deep-intel-case"></a></p>
+<h2>7. 情报研判场景：用一个专题暴露判断责任</h2>
+<p>以下均为构造教学案例，不是实际事件结论。以“某区域多架航空器 ADS-B 航迹同时消失，是否意味着异常行动”为例。外层业务流程只是建议，不是所有情报任务的固定正确顺序。</p>
+<h3>7.1 首先防止把问题改写成未经证实的结论</h3>
+<p>用户问的是异常意味着什么；模型可能直接拆成“收集行动迹象—判断行动意图—写报告”，从计划起点就把“数据消失确为实体异常”当成事实。</p>
+<p>较合理的暂定问题包含：观测是否真实、数据链路与覆盖是否异常、是否有其他记录、哪些解释相互竞争、哪些证据能区分解释。提出这些问题依赖领域知识，通常由模型或分析人员完成；代码可以强制登记规定的检查项，但无法自动穷尽所有替代解释。</p>
+<h3>7.2 从首次调用到重规划的逐步回放</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>实际动作与信息</th>
+<th>判断责任</th>
+<th>风险与后续分支</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>首次理解</td>
+<td>[M] 将问题理解为“评估多种解释”，列暂定证据任务</td>
+<td>[M]/[H] 确定分析问题；[C] 保存</td>
+<td>若起点误解，后续可能只搜支持行动的材料</td>
+</tr>
+<tr>
+<td>获取基本观察</td>
+<td>[C] 执行已选查询，返回时间、区域、数据覆盖与异常情况</td>
+<td>[C] 保存返回；[M] 理解含义</td>
+<td>“查询成功”不代表传感器覆盖完整</td>
+</tr>
+<tr>
+<td>暂定并行</td>
+<td>[M] 提议分别查覆盖状态、其他航迹信息、公开佐证</td>
+<td>[M] 判断可独立；[C] 执行或调度</td>
+<td>多来源可能实际引用同一个上游</td>
+</tr>
+<tr>
+<td>新证据出现</td>
+<td>构造观察：多个页面均引用同一数据服务，且时间窗口接近服务异常</td>
+<td>[M] 识别共同来源与替代解释</td>
+<td>引用数量不能直接当独立证据数量</td>
+</tr>
+<tr>
+<td>重新规划</td>
+<td>[M] 降低既有来源权重，新增核对独立数据链与时钟口径</td>
+<td>[C] 可在冲突检查点强制召回复核；[M] 改路线</td>
+<td>不理解相关性时，重规划可能只增加更多同源页面</td>
+</tr>
+<tr>
+<td>形成候选结论</td>
+<td>[M] 区分已观察事实、解释与尚缺证据</td>
+<td>[M] 论证；[C] 检查形式与可计算条件</td>
+<td>可能措辞笃定、推断超出观察</td>
+</tr>
+<tr>
+<td>验收</td>
+<td>[C] 检查登记要求、引用回查与时间覆盖；[M]/[H] 评估论证和遗漏</td>
+<td>混合</td>
+<td>只能对实际检查与标准负责</td>
+</tr>
+</tbody></table></div>
+<p>并行适合互不依赖的材料获取；必须依赖统一口径的比较，需要先确认口径。是否独立、是否已足够支撑分析，通常仍是内容判断，不能靠并发框架自动决定。</p>
+<h3>7.3 建议把“证据检查”拆成可计算与需判断两部分</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>验收对象</th>
+<th>[C] 可以做的检查</th>
+<th>[M]/[H] 仍须判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>来源与原文</td>
+<td>引用 ID、文件及抓取时间存在；原文可回查</td>
+<td>来源可信度、原文是否真正支持论断</td>
+</tr>
+<tr>
+<td>时间与范围</td>
+<td>时区换算、窗口覆盖、已知过滤条件</td>
+<td>比较范围是否合理，是否有关键缺失</td>
+</tr>
+<tr>
+<td>多源证据</td>
+<td>已知相同 URL、数据服务标识可归并</td>
+<td>不同报道是否实质同源、是否相互独立</td>
+</tr>
+<tr>
+<td>竞争解释</td>
+<td>规定的问题项是否有对应材料</td>
+<td>解释是否遗漏、反证是否有效</td>
+</tr>
+<tr>
+<td>结论与措辞</td>
+<td>已定义的必填项和状态一致性</td>
+<td>不确定性是否表达适当、结论是否超出证据</td>
+</tr>
+</tbody></table></div>
+<h3>7.4 调查结束不等于真相已经确定</h3>
+<p>一次受限调查可以完成交付，同时保留“目前证据无法区分解释甲与乙”。这种结果是否满足任务，取决于用户要求和预先约定的调查范围，不能仅因没有确定结论就视为失败，也不能因报告写完就宣称事实已确定。</p>
+<p>建议记录不同状态：已交付并通过已定义检查、部分完成、数据受阻、待专家复核、资源结束。对“已通过检查”同时列出检查范围及未决项。状态字段的存在是程序能力，状态内容的真实性需要对应证据。</p>
+<p><a id="deep-context-state"></a></p>
+<h2>8. 提示词、状态和长内容：下一轮模型究竟看到了什么</h2>
+<h3>8.1 提示词并非只能追加；一次会话里的历史也并非事实真值</h3>
+<p>固定系统规则、工具说明、项目规范可以纠错、删除过期条目并版本化。若错别字在固定提示模板里，可以修正模板；下一次构造输入时使用新版本。若错误出现在对话中的既有消息或引用原文里，通常通过明确更正、有效状态更新或重新构造上下文处理，不能把历史原文悄悄改成“从未出错”。</p>
+<p>许多 loop 正常执行时把新响应与工具结果接在历史后面，有利于连续性和缓存利用；压缩、截断、状态重建、工具发现又可能改变下一轮实际输入。因此，“历史经常追加”不等于“所有提示词永久只增不减”。</p>
+<p>有效约束必须有当前版本：例如“原先允许改实现，后来明确只改文档”，程序能保存两次输入和一项明确的范围变更；如果变更只写在自然语言里，仍需要模型或人解释其影响。机械地把矛盾要求都追加进去，会留下新的理解负担。</p>
+<h3>8.2 长内容可以外置，但写盘不等于模型知道</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>信息</th>
+<th>适合的保存方式</th>
+<th>当前调用需要什么</th>
+<th>失效风险</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始目标与有效约束</td>
+<td>版本化任务记录、原始消息</td>
+<td>当前有效要求和必要原文</td>
+<td>摘要遗漏否定条件或修改关系</td>
+</tr>
+<tr>
+<td>计划与执行进度</td>
+<td>结构化状态及版本</td>
+<td>当前计划、未完成项、已经不适用的假设</td>
+<td>completed 可能只是模型自报</td>
+</tr>
+<tr>
+<td>长证据与工具原文</td>
+<td>工作区、证据库或数据库</td>
+<td>索引、摘要、引用与加载入口</td>
+<td>模型不知道该重读，或原文不可访问</td>
+</tr>
+<tr>
+<td>最近反馈</td>
+<td>对话和执行轨迹</td>
+<td>与下一步有关的结果及错误</td>
+<td>返回被截断或被摘要误写</td>
+</tr>
+</tbody></table></div>
+<p>按需加载通常需要模型请求读取，或程序在规定条件下检索并注入。文件存在、路径出现在提示词里、文件全文已进入模型输入，是三件不同的事。</p>
+<h3>8.3 压缩与恢复的风险位于判断链上</h3>
+<p>压缩如果丢掉“不要分析人员身份”，后续模型可能重做已经被排除的工作；如果只保留执行者的“已核实”，下一轮会继承无证据的完成状态。需要保存原始材料、有效约束、未决冲突和验证记录，并能重读。</p>
+<p>这些机制改善模型的信息条件，无法保证模型使用正确。可恢复的状态至少应回答：当前做什么、哪些已验证、验证依据在哪里、哪些只是暂定、接下来为什么做。不能只保存一个简短结论。</p>
+<p><a id="deep-grill-loop"></a></p>
+<h3>8.4 grill 的问答怎样进入同一条 Agent loop</h3>
+<p><strong>用户回答后，要生成下一轮有针对性的问题，需要模型再次处理新的对话。</strong> 但“一道题”不等于“一次底层 API 请求”：模型可以在一轮回复里提出多道题；如果期间读文件、查资料或委托其他模型，还可能发生额外调用。没有运行日志，不能仅凭问题数量反推请求次数。</p>
+<p>以作者构造的一份问答技能为例：规则要求先找尚未确定的选择，一轮提出当前可回答的问题，说明建议，等待回答后再调整。规则由模型理解和遵循，没有独立脚本自动理解全部回答或自动生成完整问题树。<a href="#deep-source-g1">G1</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>程序负责什么</th>
+<th>模型负责什么</th>
+<th>是否需要模型处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户点名使用技能</td>
+<td>找到并提供技能规则，或提供可供读取的文件；把规则纳入本次输入</td>
+<td>读懂规则与用户主题，决定当前有哪些关键问题</td>
+<td>生成第一轮问题需要</td>
+</tr>
+<tr>
+<td>第一轮提问</td>
+<td>将模型生成的文字显示给用户，保存对话</td>
+<td>可以一次提出多道题，并说明推荐答案</td>
+<td>多道题可属于同一轮生成</td>
+</tr>
+<tr>
+<td>等待回答</td>
+<td>保存当前对话；等用户输入</td>
+<td>这份技能没有要求模型在后台持续思考</td>
+<td>仅仅等待不需要持续调用</td>
+</tr>
+<tr>
+<td>用户回答之后</td>
+<td>将新回答、相关旧对话及仍适用规则交给模型</td>
+<td>理解回答，判断哪些已经解决、哪些还需追问，再生成下一轮</td>
+<td>需要处理新输入；底层请求数取决于宿主与执行过程</td>
+</tr>
+<tr>
+<td>需要事实材料</td>
+<td>执行模型请求的读取、搜索，或启动已安排的研究任务</td>
+<td>决定查什么，并依据返回结果调整问题</td>
+<td>工具读文件本身不是推理；解释结果通常还要模型</td>
+</tr>
+<tr>
+<td>决定是否问完</td>
+<td>显示模型的总结或确认请求；若配置了独立检查，则另行运行</td>
+<td>判断是否还需追问；技能文字另要求在开始后续实施前取得用户对共同理解的确认</td>
+<td>判断问完仍依赖模型；文字要求不等于已实现代码审批门</td>
+</tr>
+</tbody></table></div>
+<p>一个构造例子：用户说“帮我审视情报专题怎么做”。模型先问“要解决哪个决策、多久更新”；用户回答“比较两种解释，每日更新”。<strong>程序只是把这段回答送回来；模型理解以后，才会决定下一轮问证据来源、更新失效条件，还是认为已经足够。</strong> 如果模型没有意识到“来源是否独立”很关键，技能规则也不会自动替它补上。</p>
+<p>把三层分开就清楚了：<strong>技能写规则，模型按规则理解与提问，执行程序负责传递信息和组织调用。</strong> 有些技能还带脚本或工具，但这份本例问答逻辑本身主要写在规则文件里。它没有改变模型权重，也不因名字叫插件就自带另一个规划大脑。<a href="#deep-source-g1">G1</a> <a href="#deep-source-g2">G2</a></p>
+<p>技能何时被采用，与采用后是否需要调用模型，是两件不同的事。触发配置不直接提供提问、推理或验收能力；具体产品字段须按其官方文档解释。<a href="#deep-source-g3">G3</a></p>
+<p>结束提问和开始实施也要分开：模型认为问题问完后，技能文字要求先让用户确认已达成共同理解，再开始后续实施。这个要求仍需模型遵循；本例规则没有独立程序替它验证。</p>
+<p>技能规则也可能与当前任务冲突。例如这次用户明确要技术科普、不要访谈，就不应仅因点名 grill 而机械重复追问。这是“用户要求优先，模型结合适用规则决定怎么做”的例子。</p>
+<p><a id="deep-future-and-tradeoffs"></a></p>
+<h3>8.5 经验积累和模型参数学习需要分开</h3>
+<p>记忆与技能把经验保存到模型之外，在后续任务中提供给模型使用。这些读写可以改变系统行为，但本身不更新模型参数；若要进行参数层面的持续训练，需要另外的训练流程和验证。<a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory/">Hermes 记忆机制</a></p>
+<h2>9. 为什么这样设计，以及未来能改善到哪里</h2>
+<h3>9.1 模型灵活、程序可重复：组合的价值与成本</h3>
+<p>开放任务难以预先枚举步骤，模型适合根据新信息改策略；明确的资源、协议和业务条件适合由代码执行。把所有事情交给模型，容易增加不必要判断；把未知探索写成固定流程，又可能阻止有效改向。</p>
+<p>每增加一次复核都增加调用费用、延迟和上下文处理，也可能引入错误反馈；多 Agent 还增加材料传递和归并成本。预算管理解决“最多花多少”，评测才帮助判断“多花这些是否值得”。没有对具体任务实测，就不应宣称某个固定复核轮数最优。</p>
+<h3>9.2 未来方向是公开研究的归纳，不是统一路线图</h3>
+<p><strong>模型能力提升。</strong> 更好的目标保持、工具理解、长程纠偏与自检，会减少某些外部补偿。能力增强后，原有脚手架也可能变成约束；需要重新测，而非无限追加步骤。<a href="#deep-source-f1">F1</a></p>
+<p><strong>扩大可验证结果。</strong> 让更多业务目标落到可观察环境状态、独立测试与明确条件上，可以把部分“相信模型”转为“核验事实”。难点是验收标准本身的设计，尤其是开放研究、审美和战略判断。<a href="#deep-source-f2">F2</a></p>
+<p><strong>提高评审的信息与校准质量。</strong> 执行模型与评审分离，给评审原需求与独立证据，再用真实错误校准；这种方式有机会发现自评盲点。评审也是模型，需要承认其误判和未覆盖范围。<a href="#deep-source-f1">F1</a></p>
+<p><strong>用轨迹和评测迭代系统。</strong> 将需求遗漏、假完成、纠正未吸收等失败变成可重放案例，分别修改指令、工具、状态供给或代码；测试是否改善，而不只增加一条“下次别犯”。OpenAI 已公开展示从执行记录、反馈到评测及 harness 修改建议的改进流程。<a href="#deep-source-f3">F3</a></p>
+<p>这些方向都不能直接推出“通用复杂任务将不再需要人的判断”。如果问题尚无充分信息，或者判断标准本来就需要人作价值取舍，系统应能表达未知和请求必要决策，而非靠无限循环输出确定答案。</p>
+<h3>9.3 回到本专题的核心结论</h3>
+<p><strong>通用 Agent loop 把下一步的开放内容与策略判断交给模型；harness 可以改善信息、组织执行并验证明确条件，但不会自动补足模型缺失的理解能力。</strong> 计划、纠偏、验收是否可靠，要追到实际判断者、输入证据和失败分支。</p>
+<p>评估系统的价值，还要看它减少了多少人的规划、监督、纠正与恢复劳动。能持续自动执行，与能持续正确解决问题，必须分别验证。</p>
+<p><a id="deep-sources-and-verification"></a></p>
+<h2>10. 证据、边界与下一步验证</h2>
+<p>本篇事实来源分三类：当前公开固定版本源码、官方机制说明、研究论文。通用流程图及情报场景是本文的机制归纳与构造设计；不把建议当成厂商默认实现，也没有声称完成四产品运行实测。</p>
+<h3>10.1 主要依据</h3>
+<p><a id="deep-source-h1"></a></p>
+<ul>
+<li><strong>H1｜Hermes 公开固定源码。</strong> <a href="https://github.com/NousResearch/hermes-agent/blob/450ad5055eb3c4852d96676ee99287d618bd283a/agent/conversation_loop.py#L1506">主循环</a>，公开提交 <code>450ad5055eb3c4852d96676ee99287d618bd283a</code>；2026-11-13 补核。程序组织模型调用和返回处理，模型提出工具动作或候选最终文本。此基线替换早期本地工作树证据，不声称两份代码逐字相同。</li>
+</ul>
+<p><a id="deep-source-h2"></a></p>
+<ul>
+<li><strong>H2｜Hermes 计划与进度。</strong> <a href="https://github.com/NousResearch/hermes-agent/blob/450ad5055eb3c4852d96676ee99287d618bd283a/tools/todo_tool.py#L229">todo_tool.py</a>、<a href="https://github.com/NousResearch/hermes-agent/blob/450ad5055eb3c4852d96676ee99287d618bd283a/agent/coding_context.py#L123">coding_context.py</a>。计划内容由模型提交，工具校验和保存状态；状态写为 completed 不是工具独立证明业务已完成。</li>
+</ul>
+<p><a id="deep-source-h3"></a></p>
+<ul>
+<li><strong>H3｜Hermes 可选停止检查。</strong> <a href="https://github.com/NousResearch/hermes-agent/blob/450ad5055eb3c4852d96676ee99287d618bd283a/agent/verification_stop.py#L53">verification_stop.py</a>、<a href="https://github.com/NousResearch/hermes-agent/blob/450ad5055eb3c4852d96676ee99287d618bd283a/agent/turn_stop_gates.py#L35">turn_stop_gates.py</a>、<a href="https://github.com/NousResearch/hermes-agent/blob/450ad5055eb3c4852d96676ee99287d618bd283a/agent/verify_hooks.py">verify_hooks.py</a>。<code>verify_on_stop</code> 默认关闭；启用后主要针对代码变更与缺少新验证记录产生提醒，纯 Markdown/README 修改不触发同样检查。<code>pre_verify</code> 还依赖已配置 hook 等条件；这些不是任意报告的默认语义验收器。</li>
+</ul>
+<p><a id="deep-source-a1"></a></p>
+<ul>
+<li><strong>A1｜AgentScope 固定源码。</strong> <a href="https://github.com/agentscope-ai/agentscope/blob/e6c014f/src/agentscope/agent/_agent.py">官方 _agent.py，e6c014f</a>，重点核对工作接续、等待和文本/约定字段输出的结束路径，具体符号见资料索引；<a href="https://github.com/agentscope-ai/agentscope/tree/e6c014f">本地研读入口</a>。</li>
+</ul>
+<p><a id="deep-source-o1"></a></p>
+<ul>
+<li><strong>O1｜Codex 官方长任务说明。</strong> <a href="https://developers.openai.com/blog/run-long-horizon-tasks-with-codex">Run long horizon tasks with Codex</a>，说明反馈、外部状态和持续修复，不据此推定所有内部默认分支。</li>
+</ul>
+<p><a id="deep-source-o2"></a></p>
+<ul>
+<li><strong>O2｜Codex 官方开源实现。</strong> <a href="https://github.com/openai/codex/blob/e7f32cf1928a35a9232a633a51c2a03b5a7e2c72/codex-rs/core/src/tools/handlers/plan.rs">plan.rs，e7f32cf</a> 及该版本核心会话执行控制；完整符号与限制见<a href="#deep-sources-and-verification">源码与资料索引</a>。开源 CLI 不代表所有托管产品路径。</li>
+</ul>
+<p><a id="deep-source-c1"></a></p>
+<ul>
+<li><strong>C1｜Claude Code 官方 loop。</strong> <a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a>。</li>
+</ul>
+<p><a id="deep-source-c2"></a></p>
+<ul>
+<li><strong>C2｜Claude Code 计划模式。</strong> <a href="https://code.claude.com/docs/en/common-workflows#plan-before-editing">Common workflows：Plan before editing</a>。</li>
+</ul>
+<p><a id="deep-source-c3"></a></p>
+<ul>
+<li><strong>C3｜Claude Code 任务工具设计。</strong> <a href="https://claude.dev/blog/seeing-like-an-agent/">Seeing like an agent</a>，团队工程文章，2026-04-10。</li>
+</ul>
+<p><a id="deep-source-c4"></a></p>
+<ul>
+<li><strong>C4｜Claude Code Hook。</strong> <a href="https://code.claude.com/docs/en/hooks">Hooks reference</a>，command、prompt、agent 和 Stop 生命周期；在线能力可能继续变化。</li>
+</ul>
+<p><a id="deep-source-r1"></a></p>
+<ul>
+<li><strong>R1｜用户指定文章。</strong> <a href="https://github.com/zhouxiaohei/show-something/blob/main/%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md">协作可靠性原文</a>。本文采用问题框架，不沿用未经本轮复核的产品排名或 issue 发生率。</li>
+</ul>
+<p><a id="deep-source-r2"></a></p>
+<ul>
+<li><strong>R2｜交互与过程研究。</strong> <a href="https://arxiv.org/html/2606.29957v1">SWE-Together</a>、<a href="https://arxiv.org/html/2607.06184">TraceProbe</a>。预印本；实验设定与可外推范围不同。</li>
+</ul>
+<p><a id="deep-source-r3"></a></p>
+<ul>
+<li><strong>R3｜用户反馈能力。</strong> <a href="https://arxiv.org/html/2610.11559">SWE-Journey</a>，模拟用户、合成长任务；Final F2P 的指标对象须保留。</li>
+</ul>
+<p><a id="deep-source-f1"></a></p>
+<ul>
+<li><strong>F1｜长任务评审与 harness 演进。</strong> <a href="https://www.anthropic.com/research/harness-design-long-running-apps">Harness design for long-running application development</a>，工程实验，2026-03-24；效果依赖任务、模型和配置。</li>
+</ul>
+<p><a id="deep-source-f2"></a></p>
+<ul>
+<li><strong>F2｜Agent 验证与评分。</strong> <a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">Demystifying evals for AI agents</a>，2026-01-09；开发评测和每次运行中的验收不是同一件事。</li>
+</ul>
+<p><a id="deep-source-f3"></a></p>
+<ul>
+<li><strong>F3｜系统改进流程。</strong> <a href="https://developers.openai.com/cookbook/examples/agents_sdk/agent_improvement_loop">Build an Agent Improvement Loop with Traces, Evals, and Codex</a>，2026-05-12；案例不证明任意 Agent 可以可靠自主改进。</li>
+</ul>
+<p><a id="deep-source-g1"></a></p>
+<ul>
+<li><strong>G1｜作者构造的问答技能。</strong> 本文使用“汇集当前可回答的问题、说明建议、等待回答、再更新问题”的简短自然语言规则演示调用责任；这是构造示例，不是某个官方插件的默认采访流程。</li>
+</ul>
+<p><a id="deep-source-g2"></a></p>
+<ul>
+<li><strong>G2｜OpenAI 官方 Skills 机制。</strong> <a href="https://learn.chatgpt.com/docs/build-skills">Build skills</a>、<a href="https://developers.openai.com/plugins/concepts/skills">Skills — Plugins</a>。说明技能指令的加载、显式使用和可选脚本。</li>
+</ul>
+<p><a id="deep-source-g3"></a></p>
+<ul>
+<li><strong>G3｜技能触发配置。</strong> <a href="https://code.claude.com/docs/en/skills">Claude Code Skills</a>。触发策略决定何时采用技能，不能据一个字段名称推断另一个产品的模型调用或加载器行为。</li>
+</ul>
+<h3>10.2 下一步：如何验证这篇解释对应真实系统</h3>
+<p>从实际运行记录中逐项标注模型调用、程序动作、候选最终输出和额外检查调用。重点回放四种情况：初始计划漏掉一个要求、新证据推翻旧假设、局部纠正应保留旧约束、模型提前声称完成。记录谁发现问题、用了什么证据、是否继续以及最后保留什么未决项。</p>
+<p>文档的机械检查只能验证文件、链接和结构；不能证明正文理解、图意或厂商可靠性。本文按公开源码和资料解释机制，没有完成四产品成对实测，不能据此推导相对任务成功率。</p>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 1.0-review · 2026-11-13</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>

@@ -1,19 +1,18 @@
 {
   "schema_version": 1,
   "direction": "show",
-  "title": "show-something · 07–09历史配对与10趋势观察",
-  "entry": "阅读/index.html",
+  "title": "铁甲依然在 · AI 工程札记",
+  "entry": "index.html",
   "metadata_required": true,
   "readers": {
     "deep": "做过 AI/Agent 项目、需要核对推理与依据的工程师和技术负责人",
-    "quick": "希望快速理解场景、机制与工程取舍的同类读者"
+    "quick": "HR、面试官及希望通过图解理解 AI 变化、Agent 机制和工程取舍的读者"
   },
   "delivery": {
     "offline": true,
     "public": true,
     "sensitive_constraints": [
-      "不披露内部地址、凭据、用户数据和项目专名；所有解释案例明确为构造",
-      "2026-11-05：用户已授权提交并推送第10篇与相关入口、配对配置和核验记录；不重写其他篇目的历史验收。"
+      "不披露内部地址、凭据、用户数据和项目专名；构造案例明确标识，真实实践注明证据与范围。"
     ],
     "remote": "origin/main"
   },
@@ -51,15 +50,66 @@
       "html": "阅读/AI 趋势新闻 2026-11月观察.html",
       "specification": "SHOW v3.3（2026-10-29）",
       "stage_note": "2026-11-05：MD与7幅图解HTML同版，完成本轮检查；用户已授权提交并推送至origin/main，保留0.1-review版本。"
+    },
+    {
+      "id": "show-11",
+      "version": "1.0-review",
+      "markdown": "原文/Agent Loop：规划、纠偏与验收的运行机制.md",
+      "html": "阅读/讲解-11-Agent运行循环.html",
+      "status": "local-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "markdown_version": "1.0-review",
+      "html_version": "1.0-review",
+      "last_paired_version": "1.0-review"
+    },
+    {
+      "id": "show-12",
+      "version": "1.0-review",
+      "markdown": "原文/AI 正在怎样改写工作、公司与社会.md",
+      "html": "阅读/讲解-12-AI与组织演进.html",
+      "status": "local-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "markdown_version": "1.0-review",
+      "html_version": "1.0-review",
+      "last_paired_version": "1.0-review"
+    },
+    {
+      "id": "show-13",
+      "version": "1.0-review",
+      "markdown": "原文/Agent 赛道与语言选型：先决定交付方式，再选运行底座.md",
+      "html": "阅读/讲解-13-Agent赛道与语言选型.html",
+      "status": "local-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "markdown_version": "1.0-review",
+      "html_version": "1.0-review",
+      "last_paired_version": "1.0-review"
+    },
+    {
+      "id": "show-14",
+      "version": "1.0-review",
+      "markdown": "原文/AI 协作项目底座：从四语言设计到可验证的 Java 样板.md",
+      "html": "阅读/讲解-14-AI协作工程底座.html",
+      "status": "local-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "markdown_version": "1.0-review",
+      "html_version": "1.0-review",
+      "last_paired_version": "1.0-review"
+    },
+    {
+      "id": "show-15",
+      "version": "1.0-review",
+      "markdown": "原文/为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍.md",
+      "html": "阅读/讲解-15-会话之外的工作组织.html",
+      "status": "local-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "markdown_version": "1.0-review",
+      "html_version": "1.0-review",
+      "last_paired_version": "1.0-review"
     }
   ],
-  "markdown_reader": "Markdown 正本使用支持显式 HTML id 与相对链接的阅读器。新增 HTML 将正本预渲染为离线深入视图，?view=deep#锚点用于真实浏览器定位；Markdown 定位链接保留给相容阅读器。",
+  "markdown_reader": "新增讲解页内置由完整正本生成的深入版，?view=deep#deep-锚点用于浏览器精确定位；保留Markdown源文及显式锚点。",
   "supporting_documents": [
-    "README.md",
-    "复核/2026-10-28-Top3选题与核验.md",
-    "复核/2026-10-28-07-v2.1图文复核.md",
-    "复核/2026-10-28-09-HTML深度图解与复核.md",
-    "复核/2026-11-05-10-本地审阅与核验.md"
+    "README.md"
   ],
-  "specification": "07–09沿用SHOW v3.2（2026-10-28）历史记录；10采用SHOW v3.3（2026-10-29）。本轮仅检查10及其入口，不追溯前九篇验收。"
+  "specification": "11–15采用SHOW v3.3（2026-10-29）；历史篇目的版本与验收记录按原登记保留。"
 }

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="{{THEME}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="{{DESCRIPTION}}">
+  <meta name="theme-color" content="#090d14">
+  <title>{{TITLE}}</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body data-page="home" data-home="{{HOME}}">
+  <a class="skip-link" href="#recommended">跳到推荐阅读</a>
+  <header class="site-header">
+    <div class="shell nav-inner">
+      <a class="brand" href="{{HOME}}" aria-label="铁甲依然在，首页">
+        <img src="assets/mark.svg" width="30" height="30" alt="">
+        <span>铁甲依然在</span>
+      </a>
+      <nav aria-label="主导航">
+        <a href="#recommended">推荐阅读</a>
+        <a href="#topics">探索主题</a>
+        <a class="theme-link" href="{{OTHER_HOME}}" aria-label="{{OTHER_LABEL}}" title="{{OTHER_LABEL}}">{{THEME_ICON}}</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-atmosphere" aria-hidden="true">
+        <div class="hero-aura"></div>
+        <svg class="hero-orbit" viewBox="0 0 1200 660" fill="none">
+          <defs>
+            <linearGradient id="orbit-ink" x1="230" y1="560" x2="1050" y2="70" gradientUnits="userSpaceOnUse"><stop stop-color="#75E9D8" stop-opacity="0"/><stop offset=".42" stop-color="#6CC9E7" stop-opacity=".35"/><stop offset=".72" stop-color="#A596F7" stop-opacity=".8"/><stop offset="1" stop-color="#A596F7" stop-opacity="0"/></linearGradient>
+            <radialGradient id="world-ink"><stop stop-color="#101D35" stop-opacity=".1"/><stop offset=".8" stop-color="#192E48" stop-opacity=".1"/><stop offset="1" stop-color="#92B4EC" stop-opacity=".22"/></radialGradient>
+          </defs>
+          <g transform="translate(838 306) rotate(-24)">
+            <circle r="233" fill="url(#world-ink)" stroke="#94BDE5" stroke-opacity=".15"/>
+            <ellipse rx="233" ry="74" stroke="#A5B3ED" stroke-opacity=".13"/>
+            <ellipse rx="233" ry="156" stroke="#A5B3ED" stroke-opacity=".1"/>
+            <ellipse rx="80" ry="233" stroke="#A5B3ED" stroke-opacity=".14"/>
+            <ellipse rx="169" ry="233" stroke="#A5B3ED" stroke-opacity=".1"/>
+            <path d="M-233 0H233M0-233V233" stroke="#A5B3ED" stroke-opacity=".1"/>
+          </g>
+          <g stroke="url(#orbit-ink)">
+            <ellipse cx="784" cy="330" rx="500" ry="135" transform="rotate(-28 784 330)"/>
+            <ellipse cx="784" cy="330" rx="525" ry="155" transform="rotate(-28 784 330)" stroke-opacity=".24"/>
+            <ellipse cx="784" cy="330" rx="550" ry="175" transform="rotate(-28 784 330)" stroke-opacity=".12"/>
+          </g>
+          <circle class="orbit-beacon" cx="1072" cy="126" r="4" fill="#D5CFFF"/>
+          <circle cx="1072" cy="126" r="12" fill="#B3A3FF" opacity=".12"/>
+          <circle cx="656" cy="508" r="2" fill="#80DDE1" opacity=".7"/>
+        </svg>
+      </div>
+      <div class="shell hero-inner">
+        <p class="eyebrow"><span class="signal-dot"></span> AI · AGENT · HUMAN</p>
+        <h1 id="hero-title"><span>你想改变</span><span>世界么</span></h1>
+        <p class="hero-copy">{{HERO_COPY}}</p>
+      </div>
+      <div class="hero-horizon" aria-hidden="true"></div>
+    </section>
+    <div class="reading-surface">
+      <div class="shell">
+        <section class="recommended section-block" id="recommended" aria-labelledby="recommended-title">
+          <div class="section-heading"><h2 id="recommended-title">推荐阅读</h2><span class="heading-line" aria-hidden="true"></span></div>
+          <div class="featured-grid" id="featured-grid">{{FEATURED}}</div>
+        </section>
+        <section class="topics section-block" id="topics" aria-labelledby="topics-title">
+          <div class="section-heading"><h2 id="topics-title">探索主题</h2><span class="heading-line" aria-hidden="true"></span></div>
+          <div class="topic-grid" id="topic-grid">{{TOPICS}}</div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><span class="footer-signature">铁甲依然在</span><div class="footer-links"><a href="index-a.html"{{DARK_CURRENT}}>深色</a><span aria-hidden="true">/</span><a href="index-c.html"{{HYBRID_CURRENT}}>混合</a><a href="#hero-title" class="back-top" aria-label="回到顶部">↑</a></div></div></footer>
+  <script type="application/json" id="site-data">{{DATA}}</script>
+</body>
+</html>

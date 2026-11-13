@@ -1,0 +1,24 @@
+<section class="content-section" id="outside-chat"><p class="kicker">从会话到持续工作</p><h2>多开几个会话以后，谁来组织工作</h2>
+<p>一个 Agent 可以在对话里查资料、写代码、调用工具。任务跨过几天、不断收到新消息后，人往往又成了协调者：记住哪件事属于谁，补充背景，判断是否继续，发现进程已经停了。</p>
+<p>DeepSeek Super-Agent 的公开研究原型尝试把一部分组织责任放到会话之外。它用工单保存工作，通过路由把新来件接到合适任务，由执行器推进已经授权的工作。这里优化的资源是人的注意力，系统同时增加了需要维护的状态和规则。</p>
+<figure><div class="figure-top"><span>机制示意</span><b>图 02｜注意力移交的收益与代价</b></div><div class="diagram-scroll"><img src="配图/15/10-注意力与取舍.svg" alt="把人的协调负担移交给系统组织时的收益与代价"></div><figcaption>观察人原来在哪些步骤反复管理，再判断路由、工单和持久化能否减少这些成本。消息更少，不足以证明总工作更省。</figcaption></figure>
+<figure id="fig-continuous-work"><div class="figure-top"><span>流程示意</span><b>图 01｜会话外的持续工作流程</b></div><div class="diagram-scroll"><img src="配图/15/13-持续工作流程.svg" alt="新消息经过授权、路由、工单、执行、恢复和验收的组织流程" loading="lazy" decoding="async"></div><figcaption>程序能检查路由、授权和状态；任务价值和业务合格仍需模型或人判断，失败分支要单独设计。</figcaption></figure><div class="callout">这是固定版本的研究参考原型，不是正式 DeepSeek 产品，也不等同于官方设计文章里的全部能力。</div><a class="deep" href="?view=deep#why-organize">查看动因、原型身份与公开依据 ↗</a> <a class="md-source" href="{{MD_URL}}#why-organize">Markdown 对应段落</a></section>
+
+<section class="content-section" id="organization-cost"><h2>接上持续任务，也接下持续责任</h2>
+<p>把状态从对话移到工单库，可以让程序在重启后找到工作线索；但工单库、模型会话和工作文件不是同一份东西。恢复任务时，系统必须知道哪些状态已保存，哪些动作已经对外发生。</p>
+<div class="table-scroll"><table><thead><tr><th>组织机制</th><th>希望减少的人工负担</th><th>系统新增的责任</th></tr></thead><tbody><tr><td>路由与工单</td><td>人记住新消息归属哪件工作</td><td>避免错投、重复建单和漏传约束</td></tr><tr><td>来源准入与授权</td><td>每次重新确认谁可以发起什么</td><td>区分消息抵达、接单与获准执行</td></tr><tr><td>持久化与恢复</td><td>手动重建跨会话背景</td><td>处理数据库、会话与外部动作的一致性</td></tr><tr><td>健康检查与看护</td><td>反复问“还在运行吗”</td><td>区分进程活着、任务有进展和业务结果正确</td></tr></tbody></table></div>
+<p>来源准入可以由程序检查，任务是否值得做、该怎样交付仍有模型或人的判断。仓库中的自动合并规则主要通过交付提示表达；需要强制审批时，仍应由分支保护等执行边界承担。</p>
+<figure><div class="figure-top"><span>机制示意</span><b>图 03｜三种控制分别管什么</b></div><div class="diagram-scroll"><img src="配图/15/11-三种控制.svg" alt="程序边界、模型判断与业务验收分担不同责任"></div><figcaption>接单身份、任务理解与最终价值属于不同判断。能用代码强制的条件，应与依赖语义理解的部分分别验证。</figcaption></figure>
+<a class="deep" href="?view=deep#tradeoffs">核对五组取舍及失败边界 ↗</a></section>
+
+<section class="content-section" id="what-is-proven"><h2>蓝图、公开原型和实验分别说明什么</h2>
+<p>设计文章解释想建立怎样的持续工作系统；公开代码提供可以核对的具体实现；实验则只回答某个任务设定里的比较。三者不能直接叠成一份“所有能力已实现”的产品清单。</p>
+<figure><div class="figure-top"><span>机制示意</span><b>图 04｜蓝图、原型与实验的证据边界</b></div><div class="diagram-scroll"><img src="配图/15/12-蓝图与原型.svg" alt="蓝图方向、公开实现及仍需验证的能力逐项对照"></div><figcaption>沿每项能力寻找具体证据。部署文档中的定时健康检查配方，不能直接证明蓝图中完整、通用的独立看护能力已经交付。</figcaption></figure>
+<p>官方文章的合成调度实验使用简化环境，以耗时工具模拟编程工作，每种方案运行 5 次。报告给出完成时间 p95 为 15.7 分钟与中性提示对照的 29.5 分钟。</p>
+<p>这些数字说明该设定中的调度比较。它没有测真实代码正确性，也不能与没有运行同样输入的 Hermes、AgentScope 作业务质量排名。本篇核对了公开原文和固定源码，没有复现实验。</p><a class="deep" href="?view=deep#prototype-boundary">查看完整口径、固定版本与原始来源 ↗</a> <a class="md-source" href="{{MD_URL}}#prototype-boundary">Markdown 对应段落</a></section>
+
+<section class="content-section" id="when-to-use"><h2>先找到反复协调的成本，再决定引入哪一层</h2>
+<p>持续研究、跨天补充材料、多个独立议题并行，都可能从明确的任务归属、输入队列和恢复机制中受益。一次短问答通常不需要先增加路由层；稳定的固定报表也可以由脚本调度。</p>
+<p>可以从一个具体任务开始：保存原始目标和已获授权，记录新消息怎样进入任务，制造一次中断，再检查工作能否接续。最后同时看人工协调、系统维护、调用费用和结果质量。</p>
+<p>如果真正的困难只是资料找不到，先把资料入口和状态记录做好。如果人每天在多件工作之间重新解释背景，才更值得评估路由和持续执行。架构复杂度应当对应真实消失的负担。</p>
+<p class="closing">会话之外的组织，让更多工作有机会持续推进。它的价值要由减少的协调与恢复成本，以及最终成果共同证明。</p><a class="deep" href="?view=deep#adoption">查看采用条件与反场景 ↗</a></section>
