@@ -112,7 +112,8 @@
   "markdown_reader": "新增讲解页内置由完整正本生成的深入版，?view=deep#deep-锚点用于浏览器精确定位；保留Markdown源文及显式锚点。",
   "supporting_documents": [
     "README.md",
-    "工程/维护规范.md"
+    "工程/维护规范.md",
+    "阅读/index.html"
   ],
   "specification": "11–15采用SHOW v3.3（2026-10-29）；历史篇目的版本与验收记录按原登记保留。",
   "repository_layout": {
@@ -130,6 +131,9 @@
     "engineering_directory": "工程",
     "sources": "来源",
     "local_review_directory": "工程/复核",
-    "category_page": "工程/pages/category.html"
+    "category_page": "工程/pages/category.html",
+    "legacy_entries": {
+      "阅读/index.html": "index.html"
+    }
   }
 }

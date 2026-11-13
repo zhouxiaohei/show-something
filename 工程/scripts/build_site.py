@@ -126,7 +126,21 @@ def build():
         "JS": relative("工程/assets/site.js"),
     }
     category.write_text(fill((TEMPLATES / "category.html").read_text(), category_values))
-    print(f"Built index.html and {category.relative_to(ROOT)}; validated {len(posts)} article pairs and {len(chosen)} recommendations.")
+    legacy_entries = layout.get("legacy_entries", {})
+    for old_path, target_path in legacy_entries.items():
+        old_page = (ROOT / old_path).resolve()
+        target = (ROOT / target_path).resolve()
+        if not old_page.is_relative_to(ROOT) or not target.is_relative_to(ROOT) or old_page == target:
+            raise ValueError(f"Invalid legacy entry: {old_path} -> {target_path}")
+        if not target.is_file():
+            raise ValueError(f"Missing redirect target: {target_path}")
+        destination = href(os.path.relpath(target, old_page.parent).replace(os.sep, "/"))
+        old_page.parent.mkdir(parents=True, exist_ok=True)
+        old_page.write_text(fill((TEMPLATES / "redirect.html").read_text(), {
+            "TARGET": esc(destination),
+            "TARGET_JSON": json.dumps(destination).replace("<", "\\u003c"),
+        }))
+    print(f"Built index.html, {category.relative_to(ROOT)} and {len(legacy_entries)} legacy entries; validated {len(posts)} article pairs and {len(chosen)} recommendations.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>前往首页 · 铁甲依然在</title>
+  <link rel="canonical" href="{{TARGET}}">
+  <script>
+    const destination = new URL({{TARGET_JSON}}, location.href);
+    destination.search = location.search;
+    destination.hash = location.hash;
+    location.replace(destination.href);
+  </script>
+  <meta http-equiv="refresh" content="0; url={{TARGET}}">
+</head>
+<body>
+  <p>页面已迁移，正在前往首页。若未自动跳转，请<a href="{{TARGET}}">打开首页</a>。</p>
+</body>
+</html>
