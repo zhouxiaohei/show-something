@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from './vendor/marked.mjs';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const manifest = JSON.parse(fs.readFileSync(path.join(root, 'scripts/article_manifest.json'), 'utf8'));
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const manifest = JSON.parse(fs.readFileSync(path.join(root, '工程/config/article_manifest.json'), 'utf8'));
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const localUrl = value => value.split('/').map(encodeURIComponent).join('/');
 const strip = value => value.replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ').trim();
@@ -53,11 +53,11 @@ for (const doc of manifest) {
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="document-id" content="${escape(doc.id)}"><meta name="document-version" content="${escape(doc.version)}">
 <meta name="description" content="${escape(doc.summary)}"><meta name="color-scheme" content="dark">
-<title>${escape(doc.title)} · 铁甲依然在</title><link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/article.css"><script src="../assets/article.js" defer></script></head>
+<title>${escape(doc.title)} · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
 <body id="article-top" data-article="${escape(doc.id)}">
 <a class="skip-link" href="#article-content">跳到正文</a>
-<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
 <div class="article-shell article-heading"><p class="article-eyebrow">${escape(doc.category)}</p><h1>${escape(doc.title)}</h1><p class="article-summary">${escape(doc.summary)}</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="${mdUrl}">Markdown 原文 ↗</a></div></div>
 <div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录">${tocHtml}</nav></details><p>${escape(doc.dateNote)}</p></aside>
 <main id="article-content"><div class="quick-content">${quick}</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content">${deep}</article></details></main></div>

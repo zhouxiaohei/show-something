@@ -1,2 +1,4 @@
 .DS_Store
-/复核/
+/工程/复核/
+__pycache__/
+*.pyc

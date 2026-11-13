@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="{{THEME}}">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,22 +7,23 @@
   <meta name="description" content="{{DESCRIPTION}}">
   <meta name="theme-color" content="#090d14">
   <title>{{TITLE}}</title>
-  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/site.css">
-  <script src="assets/site.js" defer></script>
+  <link rel="icon" href="{{MARK}}" type="image/svg+xml">
+  {{THEME_BOOTSTRAP}}
+  <link rel="stylesheet" href="{{CSS}}">
+  <script src="{{JS}}" defer></script>
 </head>
-<body data-page="home" data-home="{{HOME}}">
+<body data-page="home">
   <a class="skip-link" href="#recommended">跳到推荐阅读</a>
   <header class="site-header">
     <div class="shell nav-inner">
       <a class="brand" href="{{HOME}}" aria-label="铁甲依然在，首页">
-        <img src="assets/mark.svg" width="30" height="30" alt="">
+        <img src="{{MARK}}" width="30" height="30" alt="">
         <span>铁甲依然在</span>
       </a>
       <nav aria-label="主导航">
         <a href="#recommended">推荐阅读</a>
         <a href="#topics">探索主题</a>
-        <a class="theme-link" href="{{OTHER_HOME}}" aria-label="{{OTHER_LABEL}}" title="{{OTHER_LABEL}}">{{THEME_ICON}}</a>
+        <button type="button" class="theme-link" data-theme-toggle aria-label="切换为混合配色" title="切换为混合配色">{{THEME_ICON}}</button>
       </nav>
     </div>
   </header>
@@ -73,7 +74,7 @@
       </div>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell footer-inner"><span class="footer-signature">铁甲依然在</span><div class="footer-links"><a href="index-a.html"{{DARK_CURRENT}}>深色</a><span aria-hidden="true">/</span><a href="index-c.html"{{HYBRID_CURRENT}}>混合</a><a href="#hero-title" class="back-top" aria-label="回到顶部">↑</a></div></div></footer>
+  <footer class="site-footer"><div class="shell footer-inner"><span class="footer-signature">铁甲依然在</span><div class="footer-links"><button type="button" data-theme-choice="dark" aria-pressed="true">深色</button><span aria-hidden="true">/</span><button type="button" data-theme-choice="hybrid" aria-pressed="false">混合</button><a href="#hero-title" class="back-top" aria-label="回到顶部">↑</a></div></div></footer>
   <script type="application/json" id="site-data">{{DATA}}</script>
 </body>
 </html>

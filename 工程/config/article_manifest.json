@@ -9,7 +9,7 @@
     "summary": "一次任务里，谁决定下一步、谁发现偏差、谁判断结束？沿真实调用拆开模型、程序和人的责任，理解为什么清单全绿仍可能漏掉目标。",
     "dateNote": "公开源码固定版本核对：2026-11-13；未做四产品成对性能实验。",
     "version": "1.0-review",
-    "quick": "scripts/articles/11-quick.html"
+    "quick": "工程/scripts/articles/11-quick.html"
   },
   {
     "n": "12",
@@ -21,7 +21,7 @@
     "summary": "当一个人可以直接调动更多执行能力，交接、岗位和公司的边界会怎样变化？从具体成果出发，理解正在发生的重组与仍未确定的未来。",
     "dateNote": "原研究截止：2026-11-05；公开副本定点补核：2026-11-13。",
     "version": "1.0-review",
-    "quick": "scripts/articles/12-quick.html"
+    "quick": "工程/scripts/articles/12-quick.html"
   },
   {
     "n": "13",
@@ -33,7 +33,7 @@
     "summary": "成品、平台、框架和运行底座承担不同的建设责任。先判断买、改还是自建，再把语言、并发、状态和恢复放到真实任务里比较。",
     "dateNote": "项目台账为 2026-11-03 快照；关键机制补核：2026-11-13。",
     "version": "1.0-review",
-    "quick": "scripts/articles/13-quick.html"
+    "quick": "工程/scripts/articles/13-quick.html"
   },
   {
     "n": "14",
@@ -45,7 +45,7 @@
     "summary": "把“按规范开发”落到可执行检查、违规反例和真实启动。四语言是设计范围，Java Lite V2 是已实现并在本轮重新验证的首个样板。",
     "dateNote": "设计调研：2026-11-03；Java 样板本轮复验：2026-11-13。",
     "version": "1.0-review",
-    "quick": "scripts/articles/14-quick.html"
+    "quick": "工程/scripts/articles/14-quick.html"
   },
   {
     "n": "15",
@@ -57,6 +57,6 @@
     "summary": "多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看持续工作的组织方式，以及它增加的维护成本。",
     "dateNote": "原型固定版本：8c32a9d；公开依据补核：2026-11-13。",
     "version": "1.0-review",
-    "quick": "scripts/articles/15-quick.html"
+    "quick": "工程/scripts/articles/15-quick.html"
   }
 ]

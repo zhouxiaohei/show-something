@@ -3,11 +3,11 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="document-id" content="show-13"><meta name="document-version" content="1.0-review">
 <meta name="description" content="成品、平台、框架和运行底座承担不同的建设责任。先判断买、改还是自建，再把语言、并发、状态和恢复放到真实任务里比较。"><meta name="color-scheme" content="dark">
-<title>Agent 赛道与语言选型：先决定交付方式，再选运行底座 · 铁甲依然在</title><link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/article.css"><script src="../assets/article.js" defer></script></head>
+<title>Agent 赛道与语言选型：先决定交付方式，再选运行底座 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
 <body id="article-top" data-article="show-13">
 <a class="skip-link" href="#article-content">跳到正文</a>
-<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
 <div class="article-shell article-heading"><p class="article-eyebrow">Agent 引擎与记忆</p><h1>Agent 赛道与语言选型：先决定交付方式，再选运行底座</h1><p class="article-summary">成品、平台、框架和运行底座承担不同的建设责任。先判断买、改还是自建，再把语言、并发、状态和恢复放到真实任务里比较。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/Agent%20%E8%B5%9B%E9%81%93%E4%B8%8E%E8%AF%AD%E8%A8%80%E9%80%89%E5%9E%8B%EF%BC%9A%E5%85%88%E5%86%B3%E5%AE%9A%E4%BA%A4%E4%BB%98%E6%96%B9%E5%BC%8F%EF%BC%8C%E5%86%8D%E9%80%89%E8%BF%90%E8%A1%8C%E5%BA%95%E5%BA%A7.md">Markdown 原文 ↗</a></div></div>
 <div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#summary">先决定交付方式，再选语言</a><a href="#landscape">三种建设责任，不能塞进一张总榜</a><a href="#languages">主控语言跟着运行方式和关键依赖走</a><a href="#java-harness">Java 什么时候优先，什么时候另算成本</a><a href="#verification">用真实任务和失败注入收束选型</a></nav></details><p>项目台账为 2026-11-03 快照；关键机制补核：2026-11-13。</p></aside>
 <main id="article-content"><div class="quick-content"><section class="content-section" id="summary"><p class="kicker">从建设责任出发</p><h2>先决定交付方式，再选语言</h2>

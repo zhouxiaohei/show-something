@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>探索主题 · 铁甲依然在</title>
+  <meta name="description" content="按主题阅读 AI、Agent 与工程实践。">
+  <link rel="icon" href="{{MARK}}" type="image/svg+xml">
+  {{THEME_BOOTSTRAP}}
+  <link rel="stylesheet" href="{{CSS}}">
+  <script src="{{JS}}" defer></script>
+</head>
+<body data-page="category">
+  <a class="skip-link" href="#article-list">跳到文章列表</a>
+  <header class="site-header category-header"><div class="shell nav-inner"><a class="brand" href="{{HOME}}" id="category-brand"><img src="{{MARK}}" width="30" height="30" alt=""><span>铁甲依然在</span></a><nav aria-label="主导航"><a href="{{HOME}}#recommended" id="recommended-link">推荐阅读</a><a href="{{HOME}}#topics" id="topics-link">探索主题</a><button type="button" class="theme-link" data-theme-toggle aria-label="切换为混合配色" title="切换为混合配色">{{THEME_ICON}}</button></nav></div></header>
+  <main class="category-main shell">
+    <a class="return-link" href="{{HOME}}#topics" id="return-link"><span aria-hidden="true">←</span> 返回主题</a>
+    <div class="category-intro"><p class="category-eyebrow">探索主题</p><h1 id="category-title">文章专题</h1><p id="category-description"></p></div>
+    <nav class="topic-tabs" aria-label="切换主题" id="topic-tabs"></nav>
+    <section class="article-list" id="article-list" aria-labelledby="category-title"></section>
+    <noscript><p>请启用 JavaScript 查看分类，或<a href="{{HOME}}#recommended">返回首页推荐阅读</a>。</p></noscript>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><span class="footer-signature">铁甲依然在</span><a class="return-link" href="{{HOME}}" id="footer-home">返回首页 <span aria-hidden="true">↗</span></a></div></footer>
+  <script type="application/json" id="site-data">{{DATA}}</script>
+</body>
+</html>
