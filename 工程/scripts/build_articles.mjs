@@ -61,7 +61,7 @@ for (const doc of manifest) {
 <div class="article-shell article-heading"><p class="article-eyebrow">${escape(doc.category)}</p><h1>${escape(doc.title)}</h1><p class="article-summary">${escape(doc.summary)}</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="${mdUrl}">Markdown 原文 ↗</a></div></div>
 <div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录">${tocHtml}</nav></details><p>${escape(doc.dateNote)}</p></aside>
 <main id="article-content"><div class="quick-content">${quick}</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content">${deep}</article></details></main></div>
-<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · ${escape(doc.version)} · 2026-11-13</span><a href="#article-top">回到顶部 ↑</a></footer>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · ${escape(doc.version)} · ${escape(doc.updated ?? '2026-11-13')}</span><a href="#article-top">回到顶部 ↑</a></footer>
 <dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
 </body></html>`;
   fs.writeFileSync(path.join(root, doc.html), document);

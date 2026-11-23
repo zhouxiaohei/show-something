@@ -58,5 +58,18 @@
     "dateNote": "原型固定版本：8c32a9d；公开依据补核：2026-11-13。",
     "version": "1.0-review",
     "quick": "工程/scripts/articles/15-quick.html"
+  },
+  {
+    "n": "16",
+    "id": "show-16",
+    "title": "Agent 记忆到底怎么来的：从会话记录到长期复用",
+    "markdown": "原文/Agent 记忆到底怎么来的：从会话记录到长期复用.md",
+    "html": "阅读/讲解-16-Agent记忆与长期复用.html",
+    "category": "Agent 引擎与记忆",
+    "summary": "用具体文件表看清五种实现的持久指令与Memory：用途、生成更新、读取、全局或局部，以及轻重成本和可选团队共享。",
+    "dateNote": "2026-11-20补核文件范围与设计理由；Codex、Hermes、AgentScope/ReMe保留指定源码版本，费用未作同负载实测。",
+    "version": "1.6-review",
+    "quick": "工程/scripts/articles/16-quick.html",
+    "updated": "2026-11-20"
   }
 ]

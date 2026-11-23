@@ -107,6 +107,18 @@
       "markdown_version": "1.0-review",
       "html_version": "1.0-review",
       "last_paired_version": "1.0-review"
+    },
+    {
+      "id": "show-16",
+      "version": "1.6-review",
+      "status": "local-reviewed",
+      "markdown": "原文/Agent 记忆到底怎么来的：从会话记录到长期复用.md",
+      "html": "阅读/讲解-16-Agent记忆与长期复用.html",
+      "markdown_version": "1.6-review",
+      "html_version": "1.6-review",
+      "last_paired_version": "1.6-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-23：同步研究版15.0；按v13恢复五个实例章节，保留文件表与生命周期，删除低层实现细节并补OpenClaw/ReMe大白话对比；研究版与站内版完成结构、展示、构建和回归检查。"
     }
   ],
   "markdown_reader": "新增讲解页内置由完整正本生成的深入版，?view=deep#deep-锚点用于浏览器精确定位；保留Markdown源文及显式锚点。",
@@ -115,7 +127,7 @@
     "工程/维护规范.md",
     "阅读/index.html"
   ],
-  "specification": "11–15采用SHOW v3.3（2026-10-29）；历史篇目的版本与验收记录按原登记保留。",
+  "specification": "11–16采用SHOW v3.3（2026-10-29）；历史篇目的版本与验收记录按原登记保留。",
   "repository_layout": {
     "root_files": [
       "README.md",

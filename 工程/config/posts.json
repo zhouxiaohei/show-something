@@ -155,6 +155,14 @@
       "category": "engine",
       "url": "阅读/讲解-15-会话之外的工作组织.html",
       "md": "原文/为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍.md"
+    },
+    {
+      "id": "16",
+      "title": "Agent 记忆到底怎么来的：从会话记录到长期复用",
+      "oneLiner": "从五种实现的具体文件，看记忆怎样生成、更新和读取，哪些全局、哪些局部，以及复杂机制的成本与理由。",
+      "category": "engine",
+      "url": "阅读/讲解-16-Agent记忆与长期复用.html",
+      "md": "原文/Agent 记忆到底怎么来的：从会话记录到长期复用.md"
     }
   ]
 }
