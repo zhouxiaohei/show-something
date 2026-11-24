@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="zh-CN" data-theme="dark">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="document-id" content="show-15"><meta name="document-version" content="1.0-review">
-<meta name="description" content="多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看持续工作的组织方式，以及它增加的维护成本。"><meta name="color-scheme" content="dark">
-<title>为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<meta name="document-id" content="show-15"><meta name="document-version" content="2.1-review">
+<meta name="description" content="多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看权限合同、代码与模型的分工，以及它没解决的漏执行与执行偏离。"><meta name="color-scheme" content="dark">
+<title>DeepSeek Super-Agent 的设计取舍 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
 <body id="article-top" data-article="show-15">
 <a class="skip-link" href="#article-content">跳到正文</a>
 <header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
-<div class="article-shell article-heading"><p class="article-eyebrow">Agent 引擎与记忆</p><h1>为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍</h1><p class="article-summary">多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看持续工作的组织方式，以及它增加的维护成本。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%20Agent%20%E9%9C%80%E8%A6%81%E4%BC%9A%E8%AF%9D%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E7%BB%87%EF%BC%9ADeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md">Markdown 原文 ↗</a></div></div>
-<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#outside-chat">多开几个会话以后，谁来组织工作</a><a href="#organization-cost">接上持续任务，也接下持续责任</a><a href="#what-is-proven">蓝图、公开原型和实验分别说明什么</a><a href="#when-to-use">先找到反复协调的成本，再决定引入哪一层</a></nav></details><p>原型固定版本：8c32a9d；公开依据补核：2026-11-13。</p></aside>
+<div class="article-shell article-heading"><p class="article-eyebrow">Agent 引擎与记忆</p><h1>DeepSeek Super-Agent 的设计取舍</h1><p class="article-summary">多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看权限合同、代码与模型的分工，以及它没解决的漏执行与执行偏离。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/DeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#outside-chat">多开几个会话以后，谁来组织工作</a><a href="#organization-cost">接上持续任务，也接下持续责任</a><a href="#permission-and-split">权限是合同：名单、过滤、委托书与默认旁观</a><a href="#design-review">设计复盘：解决了什么，又带来了什么</a><a href="#what-is-proven">蓝图、公开原型和实验分别说明什么</a><a href="#when-to-use">先找到反复协调的成本，再决定引入哪一层</a></nav></details><p>原型固定版本：8c32a9d；公开依据补核：2026-11-13、2026-11-24（含多会话 token 开销核实）。</p></aside>
 <main id="article-content"><div class="quick-content"><section class="content-section" id="outside-chat"><p class="kicker">从会话到持续工作</p><h2>多开几个会话以后，谁来组织工作</h2>
 <p>一个 Agent 可以在对话里查资料、写代码、调用工具。任务跨过几天、不断收到新消息后，人往往又成了协调者：记住哪件事属于谁，补充背景，判断是否继续，发现进程已经停了。</p>
 <p>DeepSeek Super-Agent 的公开研究原型尝试把一部分组织责任放到会话之外。它用工单保存工作，通过路由把新来件接到合适任务，由执行器推进已经授权的工作。这里优化的资源是人的注意力，系统同时增加了需要维护的状态和规则。</p>
 <figure><div class="figure-top"><span>机制示意</span><b>图 02｜注意力移交的收益与代价</b></div><div class="diagram-scroll"><img src="配图/15/10-注意力与取舍.svg" alt="把人的协调负担移交给系统组织时的收益与代价"></div><figcaption>观察人原来在哪些步骤反复管理，再判断路由、工单和持久化能否减少这些成本。消息更少，不足以证明总工作更省。</figcaption></figure>
-<figure id="fig-continuous-work"><div class="figure-top"><span>流程示意</span><b>图 01｜会话外的持续工作流程</b></div><div class="diagram-scroll"><img src="配图/15/13-持续工作流程.svg" alt="新消息经过授权、路由、工单、执行、恢复和验收的组织流程" loading="lazy" decoding="async"></div><figcaption>程序能检查路由、授权和状态；任务价值和业务合格仍需模型或人判断，失败分支要单独设计。</figcaption></figure><div class="callout">这是固定版本的研究参考原型，不是正式 DeepSeek 产品，也不等同于官方设计文章里的全部能力。</div><a class="deep" href="?view=deep#deep-why-organize">查看动因、原型身份与公开依据 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%20Agent%20%E9%9C%80%E8%A6%81%E4%BC%9A%E8%AF%9D%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E7%BB%87%EF%BC%9ADeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md#why-organize">Markdown 对应段落</a></section>
+<figure id="fig-continuous-work"><div class="figure-top"><span>流程示意</span><b>图 01｜会话外的持续工作流程</b></div><div class="diagram-scroll"><img src="配图/15/13-持续工作流程.svg" alt="新消息经过授权、路由、工单、执行、恢复和验收的组织流程" loading="lazy" decoding="async"></div><figcaption>程序能检查路由、授权和状态；任务价值和业务合格仍需模型或人判断，失败分支要单独设计。</figcaption></figure><div class="callout">这是固定版本的研究参考原型，不是正式 DeepSeek 产品，也不等同于官方设计文章里的全部能力。</div><a class="deep" href="?view=deep#deep-why-organize">查看动因、原型身份与公开依据 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/DeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md#why-organize">Markdown 对应段落</a></section>
 
 <section class="content-section" id="organization-cost"><h2>接上持续任务，也接下持续责任</h2>
 <p>把状态从对话移到工单库，可以让程序在重启后找到工作线索；但工单库、模型会话和工作文件不是同一份东西。恢复任务时，系统必须知道哪些状态已保存，哪些动作已经对外发生。</p>
@@ -23,11 +23,25 @@
 <figure><div class="figure-top"><span>机制示意</span><b>图 03｜三种控制分别管什么</b></div><div class="diagram-scroll"><img src="配图/15/11-三种控制.svg" alt="程序边界、模型判断与业务验收分担不同责任"></div><figcaption>接单身份、任务理解与最终价值属于不同判断。能用代码强制的条件，应与依赖语义理解的部分分别验证。</figcaption></figure>
 <a class="deep" href="?view=deep#deep-tradeoffs">核对五组取舍及失败边界 ↗</a></section>
 
+<section class="content-section" id="permission-and-split"><h2>权限是合同：名单、过滤、委托书与默认旁观</h2>
+<p>此前的权限方案回答“能不能做”：弹窗确认、容器沙箱、只读模式，都是静态开关。这个原型换了一个问题：在什么情境、为了哪个已同意的目标、做到哪一步——权限跟着工单走，默认方向是少要而不是多要。</p>
+<p>四层依次是：白名单显式声明谁有权指挥（输入渠道与世界共享，一封钓鱼邮件也是“环境事件”）；事件不等于权限，主动工作默认只记录“本来会做什么”，一行不动；每个工单附带不可更改的授权说明，超出范围必须回来重新申请；说话频率也有硬预算——确认一次、干活静默、有结果再开口。</p>
+<figure><div class="figure-top"><span>机制示意</span><b>图 05｜权限四层流水线</b></div><div class="diagram-scroll"><img src="配图/15/14-权限四层.svg" alt="名单与规则、两级过滤、工单与授权、默认旁观四层，以及事件不等于权限、可审计、注意力预算三条底线" loading="lazy" decoding="async"></div><figcaption>四层中部分约束由宿主代码强制，个别约束仍是提示词级别的劝告；“路由不读代码”就是其中之一。</figcaption></figure>
+<p>实现上遵循一条分工铁律：凡“答案唯一、错了出事、需要可审计”的事用代码；凡“需要语义理解”的事用模型，且模型的每次判决都被代码固化为带版本号的凭据。局限同样明确：两级过滤的漏听无法审计，授权说明不随中途变化更新，提示注入未解——注意力被搬家到末期验收，不是被消灭。</p>
+<figure><div class="figure-top"><span>速查表</span><b>图 06｜代码与模型分工</b></div><div class="diagram-scroll"><img src="配图/15/15-代码与模型分工.svg" alt="七个环节分别由代码或模型承担，以及为什么这么分" loading="lazy" decoding="async"></div><figcaption>模型每次出场都是“判断”，判断完立刻退场；上场、落地、收尾全是代码。</figcaption></figure>
+<a class="deep" href="?view=deep#deep-permission-layers">查看权限四层的展开 ↗</a> <a class="deep" href="?view=deep#deep-code-model-cases">查看四个实现场景与诚实边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/DeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md#permission-layers">Markdown 对应段落</a></section>
+
+<section class="content-section" id="design-review"><h2>设计复盘：解决了什么，又带来了什么</h2>
+<p>先说定位：这是下一代 Agent 的架构蓝图，不是今天能上手的产品；今天真实落地的是 dsh 主框架，Super-agent 这套组织方式还停在原型阶段。</p>
+<div class="table-scroll"><table><thead><tr><th>解决了什么</th><th>没解决什么</th><th>新引入的问题</th></tr></thead><tbody><tr><td>“少打扰”被做成机制：确认一次、干活静默、出结果才开口</td><td>“干得对不对”：漏执行不可审计，看门狗只查卡死、不查对错</td><td>注意力被搬家：从“随时被打断”变成“末期集中验收”，验收人不认真整套白搭</td></tr><tr><td>闯祸半径被物理限制：独立目录、默认 observe、Mandate 划界</td><td>提示注入与凭证泄漏，官方自列为开放问题</td><td>多会话更贵：官方实验缓存读取约为单会话基线 3.8 倍；行业对照，Anthropic 自报多智能体约 15 倍 token</td></tr><tr><td>判断可审计：Mandate 带规则版本号，事后可还原当时依据</td><td>覆盖率：observe“宁漏勿滥”，漏了多少真活没人知道</td><td>observe 档有真实模型费用；路由、状态机与恢复逻辑成为新的维护负担</td></tr></tbody></table></div>
+<p>做得好的四点：权限默认方向倒过来（少要、逐级挣）；代码与模型分工铁律（模型只判决、代码固化）；信任坡道 off → observe → auto；内部实战背书（官方自述群聊报 bug 后台自复现，未独立核验）。两句反思：设计者证明了“省注意力可以做成机制”，但“可靠执行”还是空的；使用者的启发是——设计 Agent 先问“少花人多少注意力、错了损失多大”，而不是“能多做多少事”。</p>
+<a class="deep" href="?view=deep#deep-design-review">查看完整复盘清单与反思 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/DeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md#design-review">Markdown 对应段落</a></section>
+
 <section class="content-section" id="what-is-proven"><h2>蓝图、公开原型和实验分别说明什么</h2>
 <p>设计文章解释想建立怎样的持续工作系统；公开代码提供可以核对的具体实现；实验则只回答某个任务设定里的比较。三者不能直接叠成一份“所有能力已实现”的产品清单。</p>
 <figure><div class="figure-top"><span>机制示意</span><b>图 04｜蓝图、原型与实验的证据边界</b></div><div class="diagram-scroll"><img src="配图/15/12-蓝图与原型.svg" alt="蓝图方向、公开实现及仍需验证的能力逐项对照"></div><figcaption>沿每项能力寻找具体证据。部署文档中的定时健康检查配方，不能直接证明蓝图中完整、通用的独立看护能力已经交付。</figcaption></figure>
 <p>官方文章的合成调度实验使用简化环境，以耗时工具模拟编程工作，每种方案运行 5 次。报告给出完成时间 p95 为 15.7 分钟与中性提示对照的 29.5 分钟。</p>
-<p>这些数字说明该设定中的调度比较。它没有测真实代码正确性，也不能与没有运行同样输入的 Hermes、AgentScope 作业务质量排名。本篇核对了公开原文和固定源码，没有复现实验。</p><a class="deep" href="?view=deep#deep-prototype-boundary">查看完整口径、固定版本与原始来源 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%20Agent%20%E9%9C%80%E8%A6%81%E4%BC%9A%E8%AF%9D%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E7%BB%87%EF%BC%9ADeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md#prototype-boundary">Markdown 对应段落</a></section>
+<p>这些数字说明该设定中的调度比较。它没有测真实代码正确性，也不能与没有运行同样输入的 Hermes、AgentScope 作业务质量排名。本篇核对了公开原文和固定源码，没有复现实验。</p><a class="deep" href="?view=deep#deep-prototype-boundary">查看完整口径、固定版本与原始来源 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/DeepSeek%20Super-Agent%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D.md#prototype-boundary">Markdown 对应段落</a></section>
 
 <section class="content-section" id="when-to-use"><h2>先找到反复协调的成本，再决定引入哪一层</h2>
 <p>持续研究、跨天补充材料、多个独立议题并行，都可能从明确的任务归属、输入队列和恢复机制中受益。一次短问答通常不需要先增加路由层；稳定的固定报表也可以由脚本调度。</p>
@@ -35,48 +49,177 @@
 <p>如果真正的困难只是资料找不到，先把资料入口和状态记录做好。如果人每天在多件工作之间重新解释背景，才更值得评估路由和持续执行。架构复杂度应当对应真实消失的负担。</p>
 <p class="closing">会话之外的组织，让更多工作有机会持续推进。它的价值要由减少的协调与恢复成本，以及最终成果共同证明。</p><a class="deep" href="?view=deep#deep-adoption">查看采用条件与反场景 ↗</a></section>
 </div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><!-- document-id: show-15 -->
-<!-- document-version: 1.0-review -->
+<!-- document-version: 2.1-review -->
 
 <p><a id="deep-overview"></a></p>
-<h1>为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍</h1>
+<h1>DeepSeek Super-Agent 的设计取舍</h1>
 <p><a href="%E8%AE%B2%E8%A7%A3-15-%E4%BC%9A%E8%AF%9D%E4%B9%8B%E5%A4%96%E7%9A%84%E5%B7%A5%E4%BD%9C%E7%BB%84%E7%BB%87.html">图解讲解</a> · <a href="../index.html">返回首页</a></p>
-<p><strong>先给判断：Super-Agent 试图减少人管理会话和推进任务的负担，代价是系统要承担路由、授权、持久化与恢复的复杂度。</strong> 是否有收益，取决于任务是否跨事件持续变化，以及系统省下的人工管理能否抵过新增协调成本。</p>
-<p>本文以公开研究原型说明持续工作组织的取舍。该原型不是正式 DeepSeek 产品，也不等同于官方蓝图中的全部能力；具体采用仍须按任务验证。</p>
+<p><strong>先给三个判断：其一，Super-Agent 试图减少人管理会话和推进任务的负担，代价是系统要承担路由、授权、持久化与恢复的复杂度；其二，它的权限设计把&quot;能不能做&quot;这个静态开关，换成了&quot;在什么情境、为了哪个已同意的目标、做到哪一步&quot;的合同，这是本原型最值得借鉴的原创；其三，它解决了&quot;少打扰&quot;，没有解决&quot;不干错&quot;，还新引入了多会话账单（缓存读取约为单会话 3.8 倍）与末期集中验收的责任——注意力是被搬家，不是被消灭；这是一份未来设计的蓝图，不是今天能上手的产品。</strong></p>
+<p>本文以公开研究原型与官方设计文章为据，结合公开源码解读说明权限设计与代码-模型分工。原型不是正式 DeepSeek 产品，与内部实例不完全相同；具体采用仍须按任务验证。</p>
 <p><a id="deep-why-organize"></a></p>
-<h2>一、总：原来卡在哪，设计想改变什么</h2>
+<h2>一、总：为什么需要会话之外的组织</h2>
 <h3>1.1 模型能做事以后，瓶颈可能转到人</h3>
 <p>一次对话中，模型能调用工具完成复杂工作；若同时开多个会话，每个都要人记背景、传新要求、判断是否结束，就把协调责任留给了人。官方文章将目标概括为连续交互、并行产出、主动响应和持续在线。<a href="https://x.com/DeepSeekHarness/status/2116857257245987236">官方文章</a></p>
-<p>“更少打扰”在原型中有具体表现：只在有授权时工作，只在结果可用、需要决定或无法继续时发消息；面板突出待人工处理项。普通进度留在工单，不等于不留记录。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/000-philosophy.md">工作原则</a>、<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/005-panel.md">面板</a></p>
 <p><strong>人的注意力</strong>是这里优化的资源，不是一个已经测得的省时比例。普通进度少一点可能让界面更安静，也可能掩盖卡住的工作，所以静默要与可查询状态和健康检查一起设计。</p>
 <figure><img src="%E9%85%8D%E5%9B%BE/15/10-%E6%B3%A8%E6%84%8F%E5%8A%9B%E4%B8%8E%E5%8F%96%E8%88%8D.svg" alt="将手工追踪转为系统组织的收益和代价"><figcaption>图 1｜左边列出原来要人反复做的协调，箭头指向系统台账和路由；下方列出随之增加的程序责任。负担转移有收益，也有维护成本，不能仅凭界面消息少就认定总体更省事。</figcaption></figure>
 
-<h3>1.2 它是什么：工作组织方案，质量仍需另验</h3>
+<h3>1.2 反响：数据很响，口径要分清</h3>
+<p>原型发布约一个月内积累了可观的关注度，但各渠道数字的证据等级不同：</p>
+<ul>
+<li>媒体转述官方 API 统计口径：日活跃用户约 154 万、日耗 token 约 92 万亿、第三方插件约 3.5 万、约 60% 活跃用户装过或做过插件。<a href="https://finance.sina.com.cn/money/fund/jjzl/2026-11-19/doc-inizhrsf0891781.shtml">Tech星球</a> 其中 token 数字未见于官方英文渠道的一手发布，按媒体报道口径对待。</li>
+<li>Super-agent 原型仓库三天内收获约 1.4 万 star，且期间没有新的代码提交；同期 Reddit 讨论热烈、Hacker News 相对冷淡。<a href="https://deniz.in/deepseek-s-dsh-superagent-racked-up-14k-github-stars-with-zero-code-changes">deniz.in</a> star 数说明关注度，不说明质量。</li>
+<li>第三方 Harness Leaderboard（固定模型、只换外壳）将 DeepSeek Harness 列入后，五项评测与榜首统计意义上并列第一；但 Terminal-Bench 2.1 仅排第 6/10，原因是一个行为默认值：任务结束会把自启的后台服务全部杀掉，而有三道题要求服务在 Agent 退出后继续存活。<a href="https://aitecharchive.com/articles/deepseek-harness-dsh-open-source-coding-agent-leaderboard">Leaderboard</a></li>
+</ul>
+<p>这些数字合起来说明：路线引起了真实关注，也暴露了行为默认值层面的瑕疵。它们都不构成&quot;业务收益已验证&quot;的证据。</p>
+<h3>1.3 它是什么：工作组织方案，质量仍需另验</h3>
 <p><strong>路由器</strong>（Router）负责让来件找到工作，<strong>执行器</strong>（Executor）推进已授权任务。独立工作会话可以减少不同任务互相干扰，但上下文更干净不代表事实必然更准；新的路由也可能分错任务、漏传约束。</p>
-<p>后文用到的运行底座（Harness）承载模型、会话与工具；配置档（profile）组织一组运行配置。来源（Source）将外部消息译成触发事件（Trigger），执行会话（Worker）围绕工单做事。这些只是职责名称，不各自承诺新的质量或安全保证。</p>
-<p>类比流水线时要划边界：程序能管理“先登记后执行”，但模糊意图的理解和结果是否满足人要求，都不完全等于流水线合格判定。因此业务验收仍需要题目、证据与人类责任。</p>
-<p><a id="deep-tradeoffs"></a></p>
-<h2>二、分：五组设计取舍怎样形成</h2>
-<h3>2.1 主会话与执行会话分层：保交互，增加协调</h3>
-<p>长任务如果与所有新消息挤在同一会话里，新要求会打断执行，或者排队等很久。原型让主会话路由，具体工单由执行会话做事；长命令转后台，人类追问有优先槽。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/003-execution.md">执行</a></p>
-<p>收益是新来件和原任务执行可以并行组织，代价是多了一次路由理解、多个会话和结果汇总。原型 Router 仍有短时 shell；“分层”描述职责与工具差别，不能简化为一个无工具大脑指挥所有工作。</p>
-<h3>2.2 先准入再研判：降低无关工作，也要维护规则</h3>
-<p>程序先查来源、身份和模式，模型再判断语义。这样可以拒绝明显无资格的新工作，不把每条话都当任务。原型默认观察推断工作，记录“本来会接单”而不派工。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/002-authorization.md">授权</a></p>
-<p>观察模式<strong>仍会用模型研判</strong>，因此有调用费用；它主要验证接单行为，不能证明后续执行、重启和交付都可靠。规则写得太宽会误接，太窄会漏掉有价值工作，这是业务校准问题。</p>
-<h3>2.3 订阅直送：省掉重复归属判断，也保留不可信输入</h3>
-<p>同一讨论的补充材料投给原执行器，可以减少用户重复解释。<strong>订阅</strong>（Subscription）只传上下文；原工单的授权范围并不扩大。是否超出范围需要执行器理解，程序保存交回与归属。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/001-domain.md">领域模型</a></p>
-<p>代价是执行器会接触未必可信的评论、检查结果和引用材料。需要将输入当数据，并在工具侧限制可执行动作；不能把“来源已接入”当成防注入或材料真实性保证。</p>
-<h3>2.4 显式状态：方便恢复，增加数据与事务问题</h3>
-<p>若“做没做、等什么”只在模型上下文，进程重启会失去可靠线索。原型把工单、授权、输入、决定、待办和回执持久化，外部动作在事务后执行。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/007-architecture.md">架构与持久化</a></p>
-<p>代价是要管理数据库迁移、历史增长和外部重复动作。工单库、Harness 会话和工作文件还不是一个存储；要恢复一项工作，需要知道哪些状态在库里、哪些在环境中。仅保存对话，或仅保存一份 SQLite，都不能代表完整恢复。</p>
-<h3>2.5 业务要求留文字：适应团队，也留下强制性差别</h3>
-<p>自动合并要求写进交付提示词，改动容易，适应不同团队。官方却明确，原型程序没有合并专用判定逻辑。需要强制审批时，应依赖仓库分支保护或其他执行门。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/003-execution.md">合并规则</a></p>
-<p>这解释了为何不能把“提示词有规定”写成“代码已经保证”。接单身份由程序校验，是否值得做和怎么交付有模型判断；高影响动作还需要外部强制边界。</p>
-<figure><img src="%E9%85%8D%E5%9B%BE/15/11-%E4%B8%89%E7%A7%8D%E6%8E%A7%E5%88%B6.svg" alt="程序边界、模型判断和业务验收分别承担什么"><figcaption>图 2｜并列看三个责任区：程序检查可判条件，模型理解意图和执行，业务验收核结果。箭头表示协作与反馈，不表示任一责任区能自动推导另外两者已经正确。</figcaption></figure>
+<p>运行底座（Harness）承载模型、会话与工具；来源（Source）将外部消息译成触发事件（Trigger），执行会话（Worker）围绕工单做事。类比流水线时要划边界：程序能管理&quot;先登记后执行&quot;，但模糊意图的理解和结果是否满足人要求，都不完全等于流水线合格判定。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/15/13-%E6%8C%81%E7%BB%AD%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.svg" alt="新消息经过授权、路由、工单、执行、恢复和验收的组织流程"><figcaption>图 2｜从事件到交付的组织流程。程序能检查路由、授权和状态；任务价值和业务合格仍需模型或人判断，失败分支要单独设计。</figcaption></figure>
 
+<p><a id="deep-tradeoffs"></a></p>
+<h2>二、分：五组设计取舍（概要）</h2>
+<p>五组取舍的完整分析见上一版本；这里保留结论，展开集中在第四节（权限）、第五节（复盘）与第七节（分工）。</p>
+<p><strong>主会话与执行会话分层</strong>：长任务不再与所有新消息挤在同一会话里。收益是新来件与原任务可并行组织，代价是多一次路由理解、多个会话与结果汇总。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/003-execution.md">执行</a></p>
+<p><strong>先准入再研判</strong>：程序先查来源、身份与模式，模型再判断语义。原型默认观察推断工作，记录&quot;本来会接单&quot;而不派工；观察模式仍会调用模型，有费用，且只验证接单行为。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/002-authorization.md">授权</a></p>
+<p><strong>订阅直送</strong>：同一讨论的补充材料投给原执行器，省去重复归属判断；订阅只传上下文，不扩大授权范围，执行器仍会接触未必可信的输入。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/001-domain.md">领域模型</a></p>
+<p><strong>显式状态</strong>：工单、授权、输入、决定与回执持久化，外部动作在事务后执行。代价是数据库迁移、历史增长与外部重复动作的管理。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/007-architecture.md">架构与持久化</a></p>
+<p><strong>业务要求留文字</strong>：自动合并要求写进交付提示词；原型程序没有合并专用判定逻辑，强制审批应依赖分支保护等执行边界。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/003-execution.md">合并规则</a></p>
+<p><a id="deep-as-contract"></a></p>
+<h2>三、总：权限从&quot;门禁&quot;换成&quot;合同&quot;，这是真正的原创</h2>
+<h3>3.1 此前的权限方案都是&quot;防贼&quot;思路</h3>
+<p>主流方案回答的都是同一个问题：&quot;AI 能不能做这件事？&quot;——弹窗确认（每次操作请人批准，烦到用户想全关）、容器沙箱（先假定它危险，圈起来跑）、只读模式（一刀切）。这些方案防范的是&quot;它干坏事&quot;，代价是把有用的事也拦住了；它们是静态的、开关式的。</p>
+<h3>3.2 Super-Agent 换成&quot;管家&quot;思路</h3>
+<p>它的权限不是一堵墙，而是<strong>一张跟着任务走的合同</strong>：写明在什么情境下、为了哪个已经同意的目标、可以做到哪一步；而且默认方向是&quot;少要权限、非必要不动手&quot;，不是&quot;先给够、不够再要&quot;。</p>
+<p>对照着看更清楚：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>传统权限方案</th>
+<th>Super-Agent 的做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>回答的问题</td>
+<td>能不能做（二值开关）</td>
+<td>什么情境、哪个目标、做到哪步（情境化）</td>
+</tr>
+<tr>
+<td>默认方向</td>
+<td>先给权限，出事再收</td>
+<td>默认旁观，逐级挣授权</td>
+</tr>
+<tr>
+<td>权限的载体</td>
+<td>系统级配置或会话级开关</td>
+<td>跟工单走、不可更改的凭据</td>
+</tr>
+<tr>
+<td>事后追溯</td>
+<td>难以还原当时依据</td>
+<td>带规则版本号，可精确还原</td>
+</tr>
+</tbody></table></div>
+<p>别人做的是门禁系统，它做的是<strong>委托代办制度</strong>——这是维度差异，不是精度差异。</p>
+<h3>3.3 判断的边界</h3>
+<p>&quot;原创&quot;指的是：系统化地把权限设计的第一性原理从&quot;防 AI 做坏事&quot;换成&quot;少花人的注意力&quot;，并且每一层都有对应实现。但理念的硬化尚未完成：部分约束还是提示词级别的&quot;劝告&quot;，运行时权限仍依赖操作系统账户隔离（见第八节）。</p>
+<p><a id="deep-permission-layers"></a></p>
+<h2>四、分：权限设计的四层展开</h2>
+<figure><img src="%E9%85%8D%E5%9B%BE/15/14-%E6%9D%83%E9%99%90%E5%9B%9B%E5%B1%82.svg" alt="权限设计四层流水线：名单与规则、两级过滤、工单与授权、默认旁观"><figcaption>图 3｜权限设计的四层流水线。下层三个方框是贯穿全程的三条底线：事件不等于权限、判决可审计、注意力有硬预算。</figcaption></figure>
+
+<h3>4.1 第一层：名单与规则——显式声明&quot;谁有权指挥&quot;</h3>
+<p>白名单的本意<strong>不是区分团队和个人，而是因为输入渠道与世界共享</strong>：群聊里有别人，邮箱里有陌生人，GitHub 上任何人都可以评论。哪怕个人助理盯着邮箱和日历，一封钓鱼邮件也是&quot;环境事件&quot;。如果不显式声明&quot;谁的话算数&quot;，就会变成&quot;谁碰巧能给它发消息，谁就算数&quot;。</p>
+<p>团队只是让这个问题最尖锐的场景：原型面向一个 GitHub 仓库、可选接入飞书，只有名单上的人派的活才被接；&quot;没人 @ 也主动干活&quot;必须由团队写好的规则授权，不能由模型临场决定。这好比一个只认工牌的驻场员工：谁有权派活写在制度里，不是看谁喊得响。</p>
+<h3>4.2 第二层：事件 ≠ 权限——听到不等于能动</h3>
+<p>消息、评论、CI 结果都会流进它的耳朵，但<strong>收到不等于能动</strong>。两级过滤先由程序筛掉资格不符的绝大多数，剩下的再交模型研判语义；就算判出&quot;这里有个 bug&quot;，主动修复默认停在 observe 模式——只在后台记录&quot;我本来会做什么、怎么修&quot;，一行代码不动。</p>
+<p>这里有个容易忽略的设计判断：<strong>它把&quot;热情&quot;和&quot;权限&quot;拆成了两个东西</strong>。热情可以很高（什么都研判），权限默认很低（什么都不动）。观察模式的错误方向是&quot;宁漏勿滥&quot;——漏掉的活没有直接损失，误触发也只留下一条记录。这是用覆盖率换安全，不是解决了覆盖问题（见第八节）。</p>
+<h3>4.3 第三层：工单与不可变 Mandate——一张带理由的委托书</h3>
+<p>名单上的人派了活，系统签发一个工单，附带一份<strong>不可更改的授权说明（Mandate）</strong>：谁派的、依据哪个版本的规则、允许动的范围、授权强度（明确指派还是主动推断）。干活过程中这份文书不许改。</p>
+<p>打个比方：你让实习生&quot;修登录页的 bug&quot;，他路上发现数据库密码明文存储——按委托书，他不能顺手重构数据库，超出范围就得回来重新申请。这堵住了 Agent 最经典的失控方式：干着干着&quot;顺手&quot;扩大战场。</p>
+<h3>4.4 第四层：注意力预算——用机制而不是承诺保证&quot;不打扰&quot;</h3>
+<p>权限克制之外，连&quot;说话频率&quot;都有硬约束：确认一次请求，干活期间静默，只在出结果、有疑问或失败时开口；shell 命令 5 秒不返回自动转后台，后台任务每轮 30 分钟封顶；面板只列需要人处理的事。这些是代码机制，不是&quot;尽量少打扰&quot;的承诺。</p>
+<p>&quot;少打扰&quot;要辩证看：一个不吭声但干对了的 Agent，比每步都汇报的更有价值——前提是状态可查询、失败可发现。静默的价值依赖第八节讨论的那些前提。</p>
+<p><a id="deep-design-review"></a></p>
+<h2>五、总：设计复盘——解决了什么，又带来了什么</h2>
+<p>先把定位说死：**Super-Agent 是下一代 Agent 的架构蓝图，不是今天能上手的产品。**官方口径是&quot;架构思路探讨，不是产品功能介绍&quot;，公开原型 README 写明与内部实例不完全相同，部署文档把隔离责任交给使用者另开的操作系统账户。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/README.md">README</a> 今天真实落地、在跑着的是 dsh 主框架（官方披露日活约 154 万、第三方插件约 3.5 万）<a href="https://finance.sina.com.cn/money/fund/jjzl/2026-11-19/doc-inizhrsf0891781.shtml">TECH</a>；Super-agent 这套&quot;路由 + 工单 + 默认旁观&quot;的组织方式，还停在原型阶段。</p>
+<h3>5.1 三个清单：解决了什么、没解决什么、新引入了什么</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>解决了什么</th>
+<th>没解决什么</th>
+<th>新引入的问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;少打扰&quot;被做成机制：确认一次、干活静默、出结果才开口</td>
+<td>&quot;干得对不对&quot;：漏执行不可审计，看门狗只查卡死、不查对错</td>
+<td>注意力被搬家：从&quot;随时被打断&quot;变成&quot;末期集中验收&quot;，验收人不认真，整套克制设计等于白搭</td>
+</tr>
+<tr>
+<td>闯祸半径被物理限制：独立工作目录、默认 observe、Mandate 划定边界</td>
+<td>提示注入与凭证泄漏：官方自列为开放问题</td>
+<td>多会话更贵：官方实验单轮缓存读取约 2,323 万 token，为单会话基线（约 605 万）的 3.8 倍<a href="https://x.com/DeepSeekHarness/status/2116857257245987236">ARTICLE</a>；行业对照，Anthropic 自报其多智能体系统约为普通对话的 15 倍 token<a href="https://www.anthropic.com/engineering/multi-agent-research-system">ANTHROPIC</a>。注意这是缓存读取口径，不等于总账单同倍数上涨</td>
+</tr>
+<tr>
+<td>判断可审计：Mandate 带规则版本号，事后可精确还原当时依据</td>
+<td>覆盖率：observe 档&quot;宁漏勿滥&quot;，漏了多少真活没人知道</td>
+<td>observe 档有真金白银的模型调用费用，且只验证接单行为，不验证执行质量</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>复杂度转移：路由、状态机、数据库迁移、恢复逻辑，从&quot;人操心&quot;变成&quot;系统要维护的东西&quot;</td>
+</tr>
+</tbody></table></div>
+<p>一句话：<strong>它把&quot;打扰&quot;这一栏的问题真的解决了，把&quot;干错&quot;这一栏的问题只是关小了，同时自己新开了一栏账单。</strong></p>
+<h3>5.2 做得好的四点</h3>
+<ol>
+<li><strong>权限哲学原创</strong>：默认方向从&quot;先给够、出事再收&quot;倒成&quot;少要、逐级挣&quot;，权限从开关换成跟任务走的合同——连批评者都承认值得抄。</li>
+<li><strong>代码与模型的分工铁律</strong>：模型只判决，代码负责固化、记账、拦截，判决可测试、可审计（见第六节）。</li>
+<li><strong>信任坡道</strong>：off → observe → auto 三档，权限逐级挣，不一步到位；团队可以先看几天&quot;本来会做什么&quot;的记录再放行。</li>
+<li><strong>内部实战背书</strong>：官方自述内部实例持续运行，群聊里有人报 bug，它后台自己复现、找到修法才出声，有时 PR 已提好（官方自述口径，未独立核验）。</li>
+</ol>
+<h3>5.3 两句反思</h3>
+<p>站在设计者角度：这套设计证明了&quot;省注意力可以做成机制&quot;——热情和权限被拆开、善意被写成代码；但&quot;可靠执行&quot;那一格还是空的，理念跑在工程前面。站在使用者角度：它的启发不限于 Super-agent——设计任何 Agent，先问的应该是&quot;少花人多少注意力、错了损失多大&quot;，而不是&quot;能多做多少事&quot;；把默认方向倒过来这件事，任何团队都学得走。</p>
+<p><a id="deep-code-model-split"></a></p>
+<h2>六、总：代码设计的铁律——模型当法官，代码当书记员</h2>
+<p>原型实现遵循一条可检验的分工铁律：**凡是&quot;答案唯一、错了会出事、需要可审计&quot;的事用代码；凡是&quot;需要语义理解&quot;的事用模型——而且模型的每次判断，都要被代码落成不可更改的记录。**模型是法官，只管判决；代码是书记员加法警，负责记账、递纸、拦人。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/15/15-%E4%BB%A3%E7%A0%81%E4%B8%8E%E6%A8%A1%E5%9E%8B%E5%88%86%E5%B7%A5.svg" alt="七个环节分别由代码或模型承担的分工表"><figcaption>图 4｜七个环节的分工速查。代码承担所有"答案唯一、需要可审计"的环节；模型只出现在语义判断和干活本身；判决结果由代码固化。</figcaption></figure>
+
+<p>这条铁律与既有的三方责任划分相容：程序边界检查明确条件，模型理解意图并执行，业务验收核对最终价值——三者协作，但任何一方都不能自动推导另外两方已经正确。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/15/11-%E4%B8%89%E7%A7%8D%E6%8E%A7%E5%88%B6.svg" alt="程序边界、模型判断和业务验收分别承担什么"><figcaption>图 5｜程序边界、模型判断与业务验收的责任区。箭头表示协作与反馈，不表示任一责任区能自动推导另外两方已经正确。</figcaption></figure>
+
+<p><a id="deep-code-model-cases"></a></p>
+<h2>七、分：四个实现场景展开</h2>
+<h3>7.1 进门判断：Eval 两级过滤</h3>
+<p><strong>谁判</strong>：第一级 Gate 是纯代码——发送者在不在白名单、是不是机器人自己的消息、有没有明确 @、是否重复投递（按事件 id 幂等去重）、仓库在不在监听范围；被拦掉的事件只进审计，不通知任何人。第二级 Assessment 才是模型：对幸存者做语义研判，从 accept（接单）、stop（叫停）、ignore（忽略）、unavailable（干不了）四个固定选项里挑一个。</p>
+<p><strong>为什么这么分</strong>：最直接的是成本与延迟——公开解读按官方模拟负载估算，300 条消息里约 280 条在第一级就被挡掉，不进模型；同线程消息攒批研判后，摊到单个决策的推理时间从 6.4 秒降到 1.6 秒。<a href="https://mp.weixin.qq.com/s?__biz=MzkxNjQyNTQxOQ==&mid=2247485191&idx=1&sn=4b409c9720aaa2fd9b5776b56d99ee3c&chksm=c0f4344bcff49397d882f9c4c29c31303be518855c3c9aeb04c9d70c6cfe727f7932440868b">源码解读</a> 更根本的是稳定性：&quot;这条消息是不是我自己发的&quot;用代码判永远正确，用模型判偶尔出错，而错了就是两个机器人互相触发的死循环。</p>
+<h3>7.2 跟帖归属：路由是纯函数，模型只当替补</h3>
+<p>一条人类跟进消息进来，可能有三个归属：归正在干这单的执行器、送模型研判、或直接丢弃。公开源码用一个纯函数（followupOwners）依次过五道门回答：必须人类触发、非重排队、排除已交还与仅上下文的工单、评估未占用、工单存活且输入未消费。<strong>函数返回空，消息才轮到模型；返回了归属，消息直通执行器，模型完全不参与。</strong></p>
+<p><strong>为什么路由必须用代码</strong>：路由错了会&quot;两头都不管&quot;或&quot;两头都管&quot;。实现原则是路由结果永远从当前状态推导，不存标志位——没有 flag 就没有&quot;标志位说归 A、实际归了 B&quot;的状态不同步；纯函数只有三个入参，可以脱离系统单独测试。<a href="https://repo-explainer.com/deepseek-ai/dsh-superagent-prototype">REPO-EXP</a></p>
+<h3>7.3 执行现场：模型干活，代码当监工</h3>
+<p><strong>模型的活</strong>：读代码、复现、修改、跑测试、拆步骤做计划——全是运行底座现成的能力。<strong>代码的活</strong>：每个工单独立的执行会话与独立工作目录（物理隔离，不是靠提示词请求）；shell 命令 5 秒不返回自动转后台；后台任务 30 分钟被强制终止；调度器周期扫描待处理工单；结果由发件箱按事件携带的回写地址送回原对话；状态存 SQLite，确定性 ID 保证同一事件重投只记一次；看门狗是混合的——进程死活、是否超时由代码查，&quot;有没有实质进展、是否跑偏&quot;由独立巡检会话用模型判断。</p>
+<p><strong>为什么这么分</strong>：代码管&quot;不会出格&quot;，模型管&quot;能不能干成&quot;。独立目录消灭两类经典事故（改 A 时串进 B 的方案、两个任务改同一文件）——这类事靠提示词拦不住，物理上不共享才是真隔离；5 秒转后台与 30 分钟终止是给模型的行为兜底：模型不知道自己卡死了，代码知道。</p>
+<h3>7.4 授权记账：判决由代码落成不可变合同</h3>
+<p>模型研判&quot;该接&quot;之后，接下来全在代码手里：签发不可变 Mandate（规则版本、范围、强度、触发者身份）；规则文件版本化、支持热更新，但改规则<strong>不撤销在跑的工单</strong>——老规则跑到结束，新规则从下一单生效；授权分 off / observe / auto 三档，默认 observe；已结束的工单想恢复，先过 revalidate 钩子重核授权，期间规则收紧则恢复被挡。</p>
+<figure><img src="%E9%85%8D%E5%9B%BE/15/16-%E4%BF%A1%E4%BB%BB%E5%9D%A1%E9%81%93.svg" alt="off、observe、auto 三档授权的信任坡道"><figcaption>图 6｜授权三档的信任坡道。权限是逐级挣来的：先在 observe 档证明判断靠谱，人才交出执行权；规则收紧时，已结束工单的恢复会被代码挡住。</figcaption></figure>
+
+<p><strong>为什么</strong>：权限必须是可审计的状态机，不能靠模型自觉。提示词里写&quot;不要动 CI 配置&quot;是劝告，劝告可以商量；Mandate 里的范围是边界，边界不行。规则变更不溯及既往，是为了避免执行器前半段按 A 规则、后半段按 B 规则干出个无法验收的结果。</p>
+<h3>7.5 一处诚实边界</h3>
+<p>公开源码解读同时指出：**&quot;路由会话不读代码&quot;这条约束，在原型里是提示词规则，不是工具层限制。**也就是说，铁律描述的硬边界里，个别关键处仍是&quot;劝告&quot;级别。这不是否定整套设计，而是提醒：读到&quot;约束&quot;两个字时，要区分它是宿主代码强制，还是提示词请求。<a href="https://mp.weixin.qq.com/s?__biz=MzkxNjQyNTQxOQ==&mid=2247485191&idx=1&sn=4b409c9720aaa2fd9b5776b56d99ee3c&chksm=c0f4344bcff49397d882f9c4c29c31303be518855c3c9aeb04c9d70c6cfe727f7932440868b">IMPL</a></p>
 <p><a id="deep-prototype-boundary"></a></p>
-<h2>三、总：蓝图、原型和实验分别证明什么</h2>
-<h3>3.1 文章蓝图比公开原型范围大</h3>
-<p>原型 README 明确：公开代码经过调整，与内部系统及文章并不完全相同，部分设计尚未实现。原文的计算、状态、环境分离，与公开部署中的数据库、会话、工作目录，不能不加条件地画等号。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/README.md">README</a></p>
+<h2>八、总：局限——注意力被搬家，不是被消灭</h2>
+<h3>8.1 漏执行与执行偏离没有解决</h3>
+<p>第四节的机制保证了&quot;少打扰&quot;和&quot;闯祸半径小&quot;，保证不了&quot;该干的都干了、干的都是对的&quot;：</p>
+<ul>
+<li><strong>漏执行</strong>：两级过滤筛掉的消息里可能混着真该干的活，无人能审计&quot;它漏听了多少&quot;；看门狗只管&quot;是否卡死循环&quot;，不管&quot;判断对不对&quot;——它是看门狗，不是质检员。observe 模式的&quot;宁漏勿滥&quot;是用覆盖率换安全。</li>
+<li><strong>执行偏离</strong>：Mandate 在开工时签发，不随中途变化自动更新；提示注入与凭证泄漏被官方列为开放问题；偏离往往要到人类验收那一刻才被发现。窄窄的兜底是独立目录限制了偏离的爆炸半径——这是止血，不是治病。</li>
+<li><strong>注意力的去向</strong>：省注意力机制的另一面，是把责任从&quot;随时被打断&quot;搬到&quot;末期集中验收&quot;。活少但责任重；验收人不认真，整套克制设计等于白搭。公开研究也提示多智能体协作本身有质量折损：一项 2026 年初的研究报告协作场景成功率比单智能体低约 30%<a href="https://hackeruna.com/en/post/deepseek-super-agent-agente-codigo-open-source-mit">COOPER</a>。</li>
+</ul>
+<p>DeepSeek 自己的口径与此一致：官方称本次发布是架构思路探讨，不是产品功能介绍；公开原型 README 明确与内部实例不完全相同。<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/README.md">README</a></p>
+<h3>8.2 蓝图、公开原型和实验分别说明什么</h3>
+<p>设计文章解释想建立怎样的系统；公开代码提供可核对的具体实现；实验只回答某个任务设定里的比较。三者不能叠成&quot;所有能力已实现&quot;的清单。</p>
 <div class="table-scroll"><table>
 <thead>
 <tr>
@@ -107,17 +250,15 @@
 </tr>
 <tr>
 <td>独立看护</td>
-<td>另一个 profile 中的定时状态检查配方</td>
-<td>完整 Watchdog 的进展判断与偏离纠正</td>
+<td>另一 profile 中的定时状态检查配方</td>
+<td>完整看护的进展判断与偏离纠正</td>
 </tr>
 </tbody></table></div>
-<p><strong>看护者</strong>（Watchdog）是官方文章中独立于主系统的监督会话，会判断基础设施和工作推进。公开配方检查服务状态并按结果恢复，且尊重人工停止；这有借鉴价值，却不能当成整个蓝图已实现。<a href="https://x.com/DeepSeekHarness/status/2116857257245987236">官方文章第6节</a>、<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/8c32a9dc5d72c033816c6a8110b37f40cf94fba4/docs/006-deployment.md">部署</a></p>
-<figure><img src="%E9%85%8D%E5%9B%BE/15/12-%E8%93%9D%E5%9B%BE%E4%B8%8E%E5%8E%9F%E5%9E%8B.svg" alt="文章设计与公开代码之间要逐项核对"><figcaption>图 3｜从左边蓝图向右边公开实现逐项找证据，虚线表示仍需核查的能力。文档里出现一个术语，不足以证明相同系统边界和恢复保证已经存在。</figcaption></figure>
+<figure><img src="%E9%85%8D%E5%9B%BE/15/12-%E8%93%9D%E5%9B%BE%E4%B8%8E%E5%8E%9F%E5%9E%8B.svg" alt="文章设计与公开代码之间要逐项核对"><figcaption>图 7｜从蓝图向公开实现逐项找证据，虚线表示仍需核查的能力。文档里出现一个术语，不足以证明相同系统边界和恢复保证已经存在。</figcaption></figure>
 
-<h3>3.2 实验支持调度比较，不支持业务质量排名</h3>
-<p>官方英文文章于 2026-11-01 发布，注明为中文原文的机器翻译。第7节使用合成负载与简化环境，每个方案运行5次，编程工作以只消耗时间的工具模拟。报告中 Super-Agent 完成时间 p95 为15.7分钟，中性提示的单会话加子代理为29.5分钟。<a href="https://x.com/DeepSeekHarness/status/2116857257245987236">原文与口径</a></p>
-<p>这个实验中，两层安排所列的完成时间p95更低。它不能证明实际代码更正确、研究更准确，也不能与没有跑同样输入的 Hermes、AgentScope 作性能排名。官方设计文章的公开来源与固定原型分别列在文末；本篇没有复现实验。</p>
-<h3>3.3 优缺点必须对着替代做法说</h3>
+<h3>8.3 实验口径</h3>
+<p>官方文章第 7 节使用合成负载与简化环境，每种方案运行 5 次，编程工作以只消耗时间的工具模拟；报告 Super-Agent 完成时间 p95 为 15.7 分钟，中性提示的单会话加子代理为 29.5 分钟。<a href="https://x.com/DeepSeekHarness/status/2116857257245987236">原文与口径</a> 这证明该设定中的调度比较，不证明实际代码更正确，也不能与未跑同样输入的框架作业务质量排名。本篇没有复现实验。</p>
+<h3>8.4 优缺点必须对着替代做法说</h3>
 <div class="table-scroll"><table>
 <thead>
 <tr>
@@ -142,27 +283,26 @@
 <td>不确定性与语义验收成本</td>
 </tr>
 </tbody></table></div>
-<p>所以收益要同时看人和系统：少发几条通知不等于少了人工工作，Worker 变多不等于完成更快。要把重试、纠偏和最后验收都算进去。</p>
+<p>收益要同时看人和系统：少发几条通知不等于少了人工工作，执行器变多不等于完成更快。重试、纠偏和最后验收都要算进去。</p>
 <p><a id="deep-adoption"></a></p>
-<h2>四、分：落到研究任务，哪些设计值得验证</h2>
-<h3>4.1 适用场景和三个反场景</h3>
-<p>跨天研究、多次补材料、多个独立议题并行，符合持续工作组织的约束。可先用工单保存研究范围，用订阅连接新证据，用结构化问题请求裁决；这属于迁移建议，不是原型现成的情报功能。</p>
-<p>一次短问答不必先加路由层；固定统计报表不必每轮交模型决定流程；高影响自动发布不应只凭模型报告放行。这三个反场景分别更适合简单调用、脚本调度和外置审批。</p>
-<h3>4.2 采用条件与失败例子</h3>
-<p>构造场景：系统已有两条独立议题，一个研究部署变化，一个整理产品资料。材料更新同时命中两者，订阅可以分别投递；但是否应合并结论、是否属于独立证据，仍需分析方法和来源治理。并发改善组织，不自动解决证据相互依赖。</p>
-<p>建议先验证“原来人在哪些步骤反复管理”，再决定引入哪层。若实际只需要保存范围和引用，先做单执行器的任务记录；出现大量跨事件纠偏时，再评估路由与多会话。是否迁移已有系统，还需比较接入成本与实际收益。</p>
-<h3>4.3 追问树与坦白表</h3>
-<p><strong>A1：为何把任务从会话分出来？</strong> 减少人手工管理归属。<strong>A2：会不会只是把成本转移给程序？</strong> 会，所以要量化维护和调用。<strong>A3：怎样判断值得？</strong> 看相同任务的总人机成本与质量。依据：1.1、2.1、3.3。</p>
-<p><strong>B1：观察模式证明什么？</strong> 接单判断在回放中的表现。<strong>B2：能证明持续运行吗？</strong> 不能。<strong>B3：还缺什么？</strong> 并发、交付和恢复故障实验。依据：本篇 2.2 与公开原型 README。</p>
-<p>加分题：原文实验快了一些，能推出研究结论更准确吗？不能，试验任务与质量指标不同。</p>
-<p>已核官方文章、固定原型与相关源码，未复现实验，也未测本文涉及的实际业务节省时间或质量。因此文中取舍是有证据的分析，迁移采用建议仍待验证。</p>
+<h2>九、分：落到业务，哪些设计值得验证</h2>
+<h3>9.1 适用场景和三个反场景</h3>
+<p>跨天研究、多次补材料、多个独立议题并行，符合持续工作组织的约束；可先用工单保存范围、用订阅连接新证据、用结构化问题请求裁决。三个反场景：一次短问答不必加路由层；固定统计报表交给脚本调度；高影响自动发布不能只凭模型报告放行，应外置审批。</p>
+<h3>9.2 采用条件与信任坡道</h3>
+<p>建议先验证&quot;原来人在哪些步骤反复管理&quot;，再决定引入哪层；若实际只需要保存范围和引用，先做单执行器的任务记录，出现大量跨事件纠偏时再评估路由与多会话。权限上沿信任坡道走：先以 observe 档运行一段时间，人工审阅&quot;本来会做什么&quot;的记录，判断靠谱后再逐档放行；规则收紧的预期也要预先写进策略文件，因为已开工单不会中途换规则。</p>
+<h3>9.3 追问树与坦白表</h3>
+<p><strong>A1：为何把任务从会话分出来？</strong> 减少人手工管理归属。<strong>A2：会不会只是把成本转移给程序？</strong> 会，所以要量化维护与调用费用。<strong>A3：怎样判断值得？</strong> 看相同任务的总人机成本与质量。依据：1.1、2、8.4。</p>
+<p><strong>B1：观察模式证明什么？</strong> 接单判断在回放中的表现。<strong>B2：能证明持续运行可靠吗？</strong> 不能。<strong>B3：还缺什么？</strong> 并发、交付与恢复的故障实验。依据：4.2、8.2。</p>
+<p><strong>C1：权限设计原创在哪？</strong> 从静态开关换成跟任务走的合同，默认方向从&quot;多给&quot;换成&quot;少要&quot;。<strong>C2：合同能挡住一切偏离吗？</strong> 不能，Mandate 不随中途变化更新，提示注入未解。<strong>C3：哪条约束还是软的？</strong> &quot;路由不读代码&quot;目前是提示词规则。依据：三、四、五、7.5、8.1。</p>
+<p><strong>D1：漏执行有人审计吗？</strong> 没有，两级过滤的漏听不可审计。<strong>D2：验收责任变轻了吗？</strong> 变重了，注意力被集中搬到末期。<strong>D3：多执行器协作的质量折损解了吗？</strong> 没解，公开研究报告约 30% 的成功率下降。依据：8.1。</p>
+<p>已核官方文章、固定原型与公开源码解读；未复现实验，也未测实际业务节省时间或质量。文中取舍是有证据的分析，迁移建议仍待验证。</p>
 <p><a id="deep-next-questions"></a></p>
 <h2>下一步</h2>
-<p>采用前应把每项取舍转换为故障检查，并用同一起点的实际任务比较人工协调、恢复与最终质量。</p>
+<p>采用前把每项取舍转换为故障检查：权限上先走 observe 档并抽审记录；给长任务写清&quot;什么算做完&quot;；只在可丢弃环境放开执行权限。用同一起点的实际任务，比较人工协调、恢复与最终质量，再决定引入哪一层。</p>
 <p><a id="deep-public-baseline"></a></p>
 <h2>公开版本与补核范围</h2>
-<p>公开原型固定在 <code>8c32a9dc5d72c033816c6a8110b37f40cf94fba4</code>。2026-11-13 定点核对 README、执行规则、部署看护配方及官方设计文章。官方文章的合成调度实验不代表真实编码质量；本文没有复现实验，也不把它与未跑同样任务的产品作性能排名。</p>
+<p>公开原型固定在 <code>8c32a9dc5d72c033816c6a8110b37f40cf94fba4</code>。2026-11-13 定点核对 README、执行规则、部署看护配方及官方设计文章；2026-11-24 依据公开源码解读与第三方评测补充权限设计、代码-模型分工与局限分析，并补充设计复盘节：多会话 token 开销（3.8 倍缓存读取）转引自官方实验表，15 倍行业对照引自 Anthropic 多智能体系统工程博客（厂商自报口径）；反响数据（1.2）为媒体转述与社区口径，按证据等级标注；官方实验未复现，合成调度结果不代表真实编码质量。</p>
 </article></details></main></div>
-<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 1.0-review · 2026-11-13</span><a href="#article-top">回到顶部 ↑</a></footer>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 2.1-review · 2026-11-13</span><a href="#article-top">回到顶部 ↑</a></footer>
 <dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
 </body></html>

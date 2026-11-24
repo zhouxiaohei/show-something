@@ -100,7 +100,7 @@
     {
       "id": "show-15",
       "version": "1.0-review",
-      "markdown": "原文/为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍.md",
+      "markdown": "原文/DeepSeek Super-Agent 的设计取舍.md",
       "html": "阅读/讲解-15-会话之外的工作组织.html",
       "status": "local-review",
       "specification": "SHOW v3.3（2026-10-29）",

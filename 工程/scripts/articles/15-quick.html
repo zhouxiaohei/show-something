@@ -11,6 +11,20 @@
 <figure><div class="figure-top"><span>机制示意</span><b>图 03｜三种控制分别管什么</b></div><div class="diagram-scroll"><img src="配图/15/11-三种控制.svg" alt="程序边界、模型判断与业务验收分担不同责任"></div><figcaption>接单身份、任务理解与最终价值属于不同判断。能用代码强制的条件，应与依赖语义理解的部分分别验证。</figcaption></figure>
 <a class="deep" href="?view=deep#tradeoffs">核对五组取舍及失败边界 ↗</a></section>
 
+<section class="content-section" id="permission-and-split"><h2>权限是合同：名单、过滤、委托书与默认旁观</h2>
+<p>此前的权限方案回答“能不能做”：弹窗确认、容器沙箱、只读模式，都是静态开关。这个原型换了一个问题：在什么情境、为了哪个已同意的目标、做到哪一步——权限跟着工单走，默认方向是少要而不是多要。</p>
+<p>四层依次是：白名单显式声明谁有权指挥（输入渠道与世界共享，一封钓鱼邮件也是“环境事件”）；事件不等于权限，主动工作默认只记录“本来会做什么”，一行不动；每个工单附带不可更改的授权说明，超出范围必须回来重新申请；说话频率也有硬预算——确认一次、干活静默、有结果再开口。</p>
+<figure><div class="figure-top"><span>机制示意</span><b>图 05｜权限四层流水线</b></div><div class="diagram-scroll"><img src="配图/15/14-权限四层.svg" alt="名单与规则、两级过滤、工单与授权、默认旁观四层，以及事件不等于权限、可审计、注意力预算三条底线" loading="lazy" decoding="async"></div><figcaption>四层中部分约束由宿主代码强制，个别约束仍是提示词级别的劝告；“路由不读代码”就是其中之一。</figcaption></figure>
+<p>实现上遵循一条分工铁律：凡“答案唯一、错了出事、需要可审计”的事用代码；凡“需要语义理解”的事用模型，且模型的每次判决都被代码固化为带版本号的凭据。局限同样明确：两级过滤的漏听无法审计，授权说明不随中途变化更新，提示注入未解——注意力被搬家到末期验收，不是被消灭。</p>
+<figure><div class="figure-top"><span>速查表</span><b>图 06｜代码与模型分工</b></div><div class="diagram-scroll"><img src="配图/15/15-代码与模型分工.svg" alt="七个环节分别由代码或模型承担，以及为什么这么分" loading="lazy" decoding="async"></div><figcaption>模型每次出场都是“判断”，判断完立刻退场；上场、落地、收尾全是代码。</figcaption></figure>
+<a class="deep" href="?view=deep#permission-layers">查看权限四层的展开 ↗</a> <a class="deep" href="?view=deep#code-model-cases">查看四个实现场景与诚实边界 ↗</a> <a class="md-source" href="{{MD_URL}}#permission-layers">Markdown 对应段落</a></section>
+
+<section class="content-section" id="design-review"><h2>设计复盘：解决了什么，又带来了什么</h2>
+<p>先说定位：这是下一代 Agent 的架构蓝图，不是今天能上手的产品；今天真实落地的是 dsh 主框架，Super-agent 这套组织方式还停在原型阶段。</p>
+<div class="table-scroll"><table><thead><tr><th>解决了什么</th><th>没解决什么</th><th>新引入的问题</th></tr></thead><tbody><tr><td>“少打扰”被做成机制：确认一次、干活静默、出结果才开口</td><td>“干得对不对”：漏执行不可审计，看门狗只查卡死、不查对错</td><td>注意力被搬家：从“随时被打断”变成“末期集中验收”，验收人不认真整套白搭</td></tr><tr><td>闯祸半径被物理限制：独立目录、默认 observe、Mandate 划界</td><td>提示注入与凭证泄漏，官方自列为开放问题</td><td>多会话更贵：官方实验缓存读取约为单会话基线 3.8 倍；行业对照，Anthropic 自报多智能体约 15 倍 token</td></tr><tr><td>判断可审计：Mandate 带规则版本号，事后可还原当时依据</td><td>覆盖率：observe“宁漏勿滥”，漏了多少真活没人知道</td><td>observe 档有真实模型费用；路由、状态机与恢复逻辑成为新的维护负担</td></tr></tbody></table></div>
+<p>做得好的四点：权限默认方向倒过来（少要、逐级挣）；代码与模型分工铁律（模型只判决、代码固化）；信任坡道 off → observe → auto；内部实战背书（官方自述群聊报 bug 后台自复现，未独立核验）。两句反思：设计者证明了“省注意力可以做成机制”，但“可靠执行”还是空的；使用者的启发是——设计 Agent 先问“少花人多少注意力、错了损失多大”，而不是“能多做多少事”。</p>
+<a class="deep" href="?view=deep#design-review">查看完整复盘清单与反思 ↗</a> <a class="md-source" href="{{MD_URL}}#design-review">Markdown 对应段落</a></section>
+
 <section class="content-section" id="what-is-proven"><h2>蓝图、公开原型和实验分别说明什么</h2>
 <p>设计文章解释想建立怎样的持续工作系统；公开代码提供可以核对的具体实现；实验则只回答某个任务设定里的比较。三者不能直接叠成一份“所有能力已实现”的产品清单。</p>
 <figure><div class="figure-top"><span>机制示意</span><b>图 04｜蓝图、原型与实验的证据边界</b></div><div class="diagram-scroll"><img src="配图/15/12-蓝图与原型.svg" alt="蓝图方向、公开实现及仍需验证的能力逐项对照"></div><figcaption>沿每项能力寻找具体证据。部署文档中的定时健康检查配方，不能直接证明蓝图中完整、通用的独立看护能力已经交付。</figcaption></figure>

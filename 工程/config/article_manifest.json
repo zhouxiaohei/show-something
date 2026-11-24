@@ -50,13 +50,13 @@
   {
     "n": "15",
     "id": "show-15",
-    "title": "为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍",
-    "markdown": "原文/为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍.md",
+    "title": "DeepSeek Super-Agent 的设计取舍",
+    "markdown": "原文/DeepSeek Super-Agent 的设计取舍.md",
     "html": "阅读/讲解-15-会话之外的工作组织.html",
     "category": "Agent 引擎与记忆",
-    "summary": "多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看持续工作的组织方式，以及它增加的维护成本。",
-    "dateNote": "原型固定版本：8c32a9d；公开依据补核：2026-11-13。",
-    "version": "1.0-review",
+    "summary": "多开几个会话以后，谁记住任务、接收新消息、管理授权和恢复中断？从一个公开研究原型看权限合同、代码与模型的分工，以及它没解决的漏执行与执行偏离。",
+    "dateNote": "原型固定版本：8c32a9d；公开依据补核：2026-11-13、2026-11-24（含多会话 token 开销核实）。",
+    "version": "2.1-review",
     "quick": "工程/scripts/articles/15-quick.html"
   },
   {

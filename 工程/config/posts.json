@@ -150,11 +150,11 @@
     },
     {
       "id": "15",
-      "title": "为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍",
-      "oneLiner": "用工单、路由、授权与恢复组织持续工作，同时计算新增协调成本。",
+      "title": "DeepSeek Super-Agent 的设计取舍",
+      "oneLiner": "权限从静态门禁换成跟任务走的合同，代码与模型分工可检验；漏执行未解，多会话账单与验收集中是新代价——这是未来设计，不是产品。",
       "category": "engine",
       "url": "阅读/讲解-15-会话之外的工作组织.html",
-      "md": "原文/为什么 Agent 需要会话之外的组织：DeepSeek Super-Agent 的设计取舍.md"
+      "md": "原文/DeepSeek Super-Agent 的设计取舍.md"
     },
     {
       "id": "16",
