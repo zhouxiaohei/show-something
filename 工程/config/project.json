@@ -29,9 +29,11 @@
       "status": "local-review",
       "markdown": "原文/Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环.md",
       "html": "阅读/讲解-08-Agent评测闭环.html",
-      "markdown_version": "2.0-review",
-      "html_version": "2.0",
-      "stage_note": "2026-11-13 目录整理核对：Markdown 为 2.0-review、HTML 为 2.0；保留实际版本分别登记，本次仅修导航，未重做历史两版的完整配对认证。"
+      "markdown_version": "2.1-review",
+      "html_version": "2.1-review",
+      "stage_note": "2026-11-27：v2.1-review 加厚重写。案例换域退款（与 07 解耦）、新增评分器失效模式与闭环慢性失效两层、全文章节加锚点；讲解版按新标准重建并同步本版本。",
+      "version": "2.1-review",
+      "last_paired_version": "2.1-review"
     },
     {
       "id": "show-09",

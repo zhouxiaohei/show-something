@@ -1,0 +1,34 @@
+<section class="content-section" id="dm-answer"><p class="kicker">先给一句话答案</p><h2>"变好了"不是一个分数，是一组能回到责任对象的判断</h2>
+<p>构造一个常见发布场景：客服退款 Agent，新版本回复更快更礼貌、离线总分上升，上线后却出现三类投诉——回复"已退款"但支付系统里没退；读到了别的商户的同名订单；重试给同一买家退了两次款。只看回复文本，会把"说得像完成"当成"业务已经完成"。问题不是缺一个更大的总分，而是"变好"没有被拆成可核对的对象。</p>
+<p class="callout">本文的一句话答案：<strong>任务契约先定义成功终态，离线评测让版本可重复比较，生产证据让线上现象可追溯，审查与发布把失败送回正确的维护对象——四者相连，才构成持续改进的闭环。</strong></p>
+<p>阅读姿态声明：退款场景、任务 YAML、数字和流程均为构造示例；外部资料只承担其明确支持的定义和方法，四部分组合属于设计建议。</p><a class="deep" href="?view=deep#s0">查看四个难点与构造场景 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-loop"><p class="kicker">总设计</p><h2>四个节点：任何一部分都不冒充其他部分</h2>
+<p>直觉方案各有死角：只看最终回复漏掉权限和副作用；只建题库看不到生产分布变化；只接 Trace 没有判断标准；低分直接回流会把判官错误固化成错误标准。总思路是四部分持续协作——任务契约约束离线和生产判断，两者的证据都汇入审查，审查决定修题、修评分、修实现、补观测，还是阻断发布。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜四节点闭环与反馈关系</b></div><div class="diagram-scroll"><img src="配图/08/fig01.svg" alt="任务契约、离线评测、生产证据、审查与发布四节点及反馈箭头" loading="lazy" decoding="async"></div><figcaption>每个请求不必依次经过四个服务；契约同时约束离线与生产。闭环的产物不是一个准确率，而是一组能回到责任对象的判断。</figcaption></figure>
+<p>同一次失败至少有三种不同的核查：事实或终态核查（退款是否真入账）、资料和过程核查（读了什么、调了什么）、任务判断核查（是否满足目标与权限）。三种核查不能合成一个"知识库准确率"。</p><a class="deep" href="?view=deep#s2">查看四部分职责表与三种核查 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-card"><p class="kicker">任务契约</p><h2>一张任务卡把"做对"拆成四个可观察条件</h2>
+<p>退款是<strong>不可逆动作</strong>的典型样本：终态写错还能改，钱退出去就退出去了。所以任务卡的不变量——"不越权读其他商户""同一请求至多退一次款"——不是表达要求，是资金安全约束，必须由幂等键在服务端保证，而不是靠提示词请求模型"别忘了"。资源边界是次级约束：影响能否发布，但不能用低成本掩盖错误终态。</p>
+<figure><div class="figure-top"><span>契约</span><b>图 02｜任务卡四个组成部分</b></div><div class="diagram-scroll"><img src="配图/08/fig02.svg" alt="业务终态、不可接受副作用、对外表达、资源边界四个条件" loading="lazy" decoding="async"></div><figcaption>比较条件另登记：模型、提示词、工具、评分器版本与环境快照；同时换多个变量只能评价"整套组合"。</figcaption></figure>
+<p>[公开资料] Anthropic 将评测中的 task 定义为带输入和成功标准的单个测试，并区分 trial、grader、transcript 与环境最终 outcome；过度要求固定工具顺序会惩罚有效解法——只要终态和不变量满足，合理的替代路线应被允许。</p><a class="deep" href="?view=deep#s3">查看任务卡 YAML 与比较条件 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-graders"><p class="kicker">评分</p><h2>三类评分器：可执行的不变量给代码，开放表达才用语义判断</h2>
+<p>终态、越权、重复退款、预算优先用代码和数据库状态判定；语气和解释才用模型或人工判断。但<strong>确定性不等于正确</strong>——写错订单 ID 的断言可以稳定地产生错误分数。评分器本身要有正例、反例和人工复核记录。</p>
+<figure><div class="figure-top"><span>分工</span><b>图 03｜三类评分器的职责、风险与补强</b></div><div class="diagram-scroll"><img src="配图/08/fig03.svg" alt="代码评分器、模型评分器、人工评分器三栏对照" loading="lazy" decoding="async"></div><figcaption>评分器是闭环里唯一"给所有东西打分"的组件——它的失效会伪装成被评对象的失效，健康度要与版本质量同层检查。</figcaption></figure>
+<p>一次成功和重复可靠也不是一回事：<span class="nowrap">pass@k</span> 关心 k 次里至少一次成功，<span class="nowrap">pass^k</span>（τ-bench 提出）关心 k 次全部成功。构造参数 p=0.7、k=3 时分别是 97.3% 和 34.3%——这是公式推导，不是产品成绩。</p><a class="deep" href="?view=deep#s4">查看评分器分工表与 pass^k 推导 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-bias"><p class="kicker">核心难点</p><h2>裁判自己会错：三种系统性偏差都有受控实验背书</h2>
+<p>模型评分器有三种已知偏差：<strong>位置偏差</strong>（交换候选顺序结论会翻转）、<strong>冗长偏差</strong>（偏好更长但无增量的回答）、<strong>自增强偏差</strong>（偏好同家族模型）。代码评分器有两种工程病：<strong>断言过期</strong>（schema 演进后核对旧枚举值）和<strong>覆盖假象</strong>（正例全过但反例从没测过）。</p>
+<figure><div class="figure-top"><span>偏差</span><b>图 04｜三种偏差的表现与缓解</b></div><div class="diagram-scroll"><img src="配图/08/fig04.svg" alt="位置偏差、冗长偏差、自增强偏差与退款案例落点" loading="lazy" decoding="async"></div><figcaption>[公开资料] MT-Bench（arXiv:2306.05685）与评审公平性研究（arXiv:2305.17926）报告：交换顺序重评可显著缓解位置偏差，评审对长回答有系统性偏好。落点：结论翻转的样本直接进人工队列。</figcaption></figure>
+<p class="callout">退款案例的成本最低防线：把"已退款（成功）"和"退款执行失败，原因是……"两个候选交换位置重评一次——裁判翻供的样本，比任何单一位置的分数都值钱。</p><a class="deep" href="?view=deep#s4">查看偏差表与两种工程病 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-review"><p class="kicker">审查</p><h2>线上失败审查六步：先分类，再复现，最后决定去向</h2>
+<p>遇到低分或投诉，按固定顺序走：确认现象 → 检查证据 → 重建条件 → 最小化样本 → 写参考结果 → 决定去向。同一条线上记录可能产生两种资产但用途不同：<strong>回归集记住已确认的教训，代表性质量集估计目标分布中的表现。</strong>投诉可以过采样用于查错，但不能不加权地代表所有请求。</p>
+<figure><div class="figure-top"><span>流水线</span><b>图 05｜六步审查顺序</b></div><div class="diagram-scroll"><img src="配图/08/fig05.svg" alt="确认现象、检查证据、重建条件、最小化样本、写参考结果、决定去向六步" loading="lazy" decoding="async"></div><figcaption>低分也可能来自评分器写错——第四步之前别急着改题；发布判断要尊重随机性，不能为过门禁无限补跑。</figcaption></figure>
+<p>生产保护必须和第一版一起设计：超时、重试预算、幂等性和不可逆动作的授权边界，不能等"在线评估成熟"之后才补。评测告诉你版本是否满足契约，护栏负责在不满足时阻止动作。</p><a class="deep" href="?view=deep#s6">查看六步细节与发布判断 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-decay"><p class="kicker">慢性失效</p><h2>闭环跑久了的三种病：都伪装成系统在变好</h2>
+<p><strong>回归集刷熟</strong>：版本反复对同一批题调参，分数上升而题目之外的失败率没降——优化的是考卷不是能力，反制是保留集轮换、双线报告。<strong>评分器漂移</strong>：评分模型升级后新旧分数不可比，趋势线悄悄断裂，反制是评分器版本对账。<strong>审查疲劳</strong>：每周审查变成盖章流程，反制是每条结论必须登记"改变了哪个对象"。</p>
+<figure><div class="figure-top"><span>判定</span><b>图 06｜一次成功与重复可靠的差距</b></div><div class="diagram-scroll"><img src="配图/08/fig06.svg" alt="pass@3 为 97.3% 与 pass^3 为 34.3% 的柱状对比" loading="lazy" decoding="async"></div><figcaption>p=0.7、k=3 的公式推导示意。闭环设计再好也防不住节点自身被优化目标侵蚀——题目、评分器、审查结论本身也要有版本、有保留集、有对账。</figcaption></figure>
+<p class="closing">最小可行起步不必先部署完整平台：写一个终态和两个危险反例、建一个可重跑的离线任务、用代码查终态、打通一条带版本的 Trace、每周审查一批失败、预先写好发布门禁——六件事，一个高价值功能就够起步。</p><a class="deep" href="?view=deep#s8">查看慢性失效表与最小起步 ↗</a> <a class="md-source" href="{{MD_URL}}#s8">Markdown 对应段落</a></section>

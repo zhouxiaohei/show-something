@@ -1,0 +1,30 @@
+<section class="content-section" id="dm-readers"><p class="kicker">先给一句话答案</p><h2>PRD 多了一类读者：它们不问，只选</h2>
+<p>功能评审结束后所有人都说听懂了，做出来却是三个互相不兼容的系统——这类问题过去被人脑默默兜住。现在 PRD 多了一类读者：编码 Agent、测试 Agent、设计生成器。痛点不是"Agent 看不懂中文"，而是它能在不询问的情况下选定一种歧义解释，并把这个解释同时写进代码、测试、接口和页面。</p>
+<p class="callout">本文的一句话答案：<strong>当 PRD 同时被人类和机器执行，它不能再停留在"可读说明"，要升级为"可验证契约"——三个可直接采用的控制点：发布前找冲突、实现前回放意图、变更时生成影响账单。</strong></p>
+<p>关键分叉不在阅读能力，而在遇到歧义后的行为：人类读者把 PRD 当"待澄清的意图记录"，机器读者把它当"待执行的规格本身"。歧义本身的成本不高，高的是歧义被并行执行的成本。</p><a class="deep" href="?view=deep#s0">查看引子与两类读者行为对比表 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-split"><p class="kicker">案例</p><h2>一个歧义如何被三条链路放大</h2>
+<p>PRD 写"单次请求最多两项结果"；两个迭代后工程改成"一轮只允许唯一结果"，写进门禁代码、系统提示词、接口 schema——唯独没有回写 PRD。新会话里三个 Agent 并行开工：前端按 PRD 做双卡布局，后端按 schema 做单结果生命周期，测试按门禁生成"单轮输出数=1"断言。三个实现各自完全自洽，直到联调才炸——<strong>没有任何一处代码报错，因为每一处都符合它读到的那份规格</strong>。</p>
+<figure><div class="figure-top"><span>放大链路</span><b>图 01｜同一份文档，两种命运</b></div><div class="diagram-scroll"><img src="配图/03/fig01.svg" alt="人类读者问出来收敛，Agent 读者选一种解释写进四条链路" loading="lazy" decoding="async"></div><figcaption>如果是人类工程师，联调前问一句"以哪版为准"就能拦住；Agent 不问。三个 Agent 的并行速度意味着分叉从"一个问题"膨胀成"一次跨端返工"。</figcaption></figure>
+<p>同一结构还有六种变体（状态枚举、示例与规则、概率与安全约束……），全部共享同一个根因：<strong>决定落在了权威规格之外的地方</strong>。所以解法不是"更努力地写好 PRD"，而是给每个易变事实指定唯一权威位置。</p>
+<figure><div class="figure-top"><span>结构</span><b>图 02｜漂移 + 并行 = 跨端返工</b></div><div class="diagram-scroll"><img src="配图/03/fig02.svg" alt="起点漂移后三个 Agent 并行各自自洽实现，联调发现全局错误" loading="lazy" decoding="async"></div><figcaption>案例为构造的原型案例，抽象自真实 AI 功能评审；致命程度取决于功能风险等级，拍板永远是人（产品负责人）的工作。</figcaption></figure><a class="deep" href="?view=deep#s2">查看完整案例与六种冲突变体表 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-standards"><p class="kicker">方法主体</p><h2>四个可检查标准：口头合伙改造成书面合同</h2>
+<p><strong>① 内部一致</strong>：每个易变事实只有一个权威定义，其他材料只引用不复制——第二份副本是延迟生效的 bug；这正是规格驱动开发（Spec Kit）的核心主张 [公开方法]。<strong>② 意图明确</strong>："没有提到"不等于"不做"，非目标要正面写出。<strong>③ 可验收</strong>：每条关键需求都能判断真假，直接对应 BDD 可执行验收与 Pact 契约测试这两个行业对应物 [公开方法]。<strong>④ 机器友好</strong>：编号、字段表、状态机、正反例、条件—行为句式——When/While 写法即 EARS 模式的应用（IEEE 需求工程论文提出）[公开方法]。</p>
+<figure><div class="figure-top"><span>条款</span><b>图 03｜四个标准 = 四类合同条款</b></div><div class="diagram-scroll"><img src="配图/03/fig03.svg" alt="内部一致、意图明确、可验收、机器友好四栏对照" loading="lazy" decoding="async"></div><figcaption>前两个保证文档不自己打自己，后两个保证文档能被人和机器执行到同一个结果。</figcaption></figure>
+<p class="callout">示例值得单独强调：示例往往比抽象规则更容易被 Agent 模仿——"文字要求结论优先、示例却仍以系统状态开头"不是小问题，是直接冲突。</p><a class="deep" href="?view=deep#s3">查看四个标准的完整操作细节 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-gates"><p class="kicker">验收流程</p><h2>两道关卡：AI 检查，人拍板</h2>
+<p><strong>关卡一：一致性与完整性检查</strong>——AI 只找问题不重写：自相矛盾、信息缺口、术语漂移、示例违规、决策冲突五类输出。可行性有外部旁证：ALICE 研究表明自动发现需求矛盾可行，Kiro 已把 Agent 辅助规格检查产品化 [公开方法]。<strong>关卡二：意图回放</strong>——让 AI 复述目标用户、用户问题、行动与沉默的边界；复述偏离说明文档表达有问题，它提出的问题负责人也答不上，说明需求本身还没决定。</p>
+<figure><div class="figure-top"><span>关卡</span><b>图 04｜两道关卡 → 问题清单 → 人拍板</b></div><div class="diagram-scroll"><img src="配图/03/fig04.svg" alt="关卡一找矛盾，关卡二验意图，产出清单由人拍板" loading="lazy" decoding="async"></div><figcaption>AI 的报告可能漏报或误报；它是需求体检工具，不是权威来源。</figcaption></figure>
+<p>这套契约的每个控制点在工程实践里都有对应物——契约测试（Pact）、BDD、EARS、规格驱动开发——逐项对齐后可直接借用成熟工具。但对应物只解决半个问题：它们校验"是否遵守契约"，不校验"契约是否表达了正确的业务意图"。</p>
+<figure><div class="figure-top"><span>映射</span><b>图 05｜五个控制点 × 行业对应物</b></div><div class="diagram-scroll"><img src="配图/03/fig05.svg" alt="五个控制点与 Pact、BDD、EARS、规格驱动开发的对应及半个问题边界" loading="lazy" decoding="async"></div><figcaption>映射是作者归纳，各工具能力边界以实际版本为准。</figcaption></figure><a class="deep" href="?view=deep#s4">查看两道关卡与行业对应物映射表 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-extra"><p class="kicker">AI 功能增量</p><h2>AI 功能的 PRD 还要多写四类内容</h2>
+<p>生成式 AI 的不确定性在传统 PRD 里没有对应栏目：①<strong>数据来源和刷新语义</strong>——"使用最新数据"不可执行，要写清事件时间、入库时间还是抓取时间；②<strong>输出口径</strong>——原则 + 正例 + 反例，不留给工程人员写 Prompt 时顺手决定；③<strong>负面用例</strong>——没有证据不得补全事实、查询失败不得伪装无异常、只有明细不得描述趋势；④<strong>质量和失败策略</strong>——格式不合法、数据不足、语义风险、工具失败、价值不足是五种不同状态，各有产品行为。</p>
+<p class="closing">负面用例往往比理想示例更能定义产品边界；不确定性越大，失败行为越需要被当作一等需求来写。</p><a class="deep" href="?view=deep#s5">查看四类内容与失败状态表 ↗</a> <a class="md-source" href="{{MD_URL}}#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-change"><p class="kicker">变更管理</p><h2>需求变更必须带一张"影响账单"</h2>
+<p>PRD 质量经常不是初稿问题，而是后续修改只落在一个地方——"两轮 vs 一轮"正是这样发生的。每个重要决定记录：决定、原因、替代（废止什么旧规则）、影响范围（PRD、接口 schema、前端布局、Prompt、门禁、测试用例）、确认人。这张账单迫使团队回答：<strong>修改的是一句文字，还是一组跨系统契约？</strong></p>
+<figure><div class="figure-top"><span>变更</span><b>图 06｜影响账单是契约的变更记录页</b></div><div class="diagram-scroll"><img src="配图/03/fig05.svg" alt="控制点与行业对应物的映射，含变更治理" loading="lazy" decoding="async"></div><figcaption>合同改一条，所有引用该条款的附件都要同步；没有台账，第二份副本就会悄悄变成权威。</figcaption></figure>
+<p class="closing">AI 时代的 PRD 第一质量标准不只是"人读起来顺"，而是：不依赖会议记忆和作者脑补，不同读者仍能得到同一组可验证行为。规格越容易被自动执行，规格本身越需要成为工程资产。</p><a class="deep" href="?view=deep#s6">查看影响账单模板与契约骨架 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>

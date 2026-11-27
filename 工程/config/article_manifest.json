@@ -84,5 +84,31 @@
     "version": "0.1-review",
     "quick": "工程/scripts/articles/17-quick.html",
     "updated": "2026-11-24"
+  },
+  {
+    "n": "08",
+    "id": "show-08",
+    "title": "Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环",
+    "markdown": "原文/Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环.md",
+    "html": "阅读/讲解-08-Agent评测闭环.html",
+    "category": "Agent 可靠性研究",
+    "summary": "任务契约、离线评测、生产证据、审查与发布四节点闭环；评分器失效模式（位置/冗长/自增强偏差与断言过期/覆盖假象）；闭环自身的三种慢性失效及反制。",
+    "dateNote": "v2.1 加厚：案例换域退款、新增评分器失效与慢性失效两层；MT-Bench 与评审公平性引用为公开研究；其余证据姿态沿用 v2.0（构造示例声明）。核对日期：2026-11-27。",
+    "version": "2.1-review",
+    "quick": "工程/scripts/articles/08-quick.html",
+    "updated": "2026-11-27"
+  },
+  {
+    "n": "03",
+    "id": "show-03",
+    "title": "AI 时代，PRD 有了第二类读者：把需求文档变成可验证契约",
+    "markdown": "原文/AI 时代，PRD 有了第二类读者：把需求文档变成可验证契约.md",
+    "html": "阅读/讲解-03-PRD契约.html",
+    "category": "AI Native 工程方法",
+    "summary": "第二类读者定义、歧义三条链路放大案例、四个可检查标准、发布前两道关卡、控制点与行业对应物映射（Spec Kit/Pact/BDD/EARS/ALICE/Kiro）。",
+    "dateNote": "v3.1 证据层内联：正文接入 Spec Kit、BDD、Pact、EARS、ALICE、Kiro 六组公开方法锚点；证据姿态不变（外部资料均为方法与工具实践，不构成受控实验）。核对日期：2026-11-27。",
+    "version": "3.1-review",
+    "quick": "工程/scripts/articles/03-quick.html",
+    "updated": "2026-11-27"
   }
 ]

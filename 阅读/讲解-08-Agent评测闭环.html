@@ -1,144 +1,365 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="document-id" content="show-08">
-<meta name="document-version" content="2.0">
-<title>Agent 上线之后，怎么知道它真的变好了？ · show-something</title>
-<style>
-*{box-sizing:border-box}
-:root{--ink:#203047;--muted:#64748b;--line:#dce5ef;--blue:#3269a8;--blue-bg:#eef5ff;--green:#18795f;--green-bg:#edf9f4;--amber:#a26216;--amber-bg:#fff8e9;--red:#b14343;--red-bg:#fff1f1}
-body{margin:0;background:#f7f9fc;color:var(--ink);font:16px/1.85 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;overflow-x:hidden}
-a{color:#275e9d;text-decoration:none}a:hover{text-decoration:underline}
-button,input{font:inherit}[hidden]{display:none!important}
-.wrap{max-width:1020px;min-width:0;margin:auto;padding:28px 32px 70px}
-.top{min-width:0;display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:28px;color:var(--muted)}
-.top a,.hero h1,.hero h2,.hero h3,.hero p,.part h2,.part h3,.part p,.part li,.deep h1,.deep h2,.deep h3,.deep p,.deep li,.deep blockquote,summary{overflow-wrap:anywhere;word-break:break-word}.hero{border-left:4px solid var(--blue);padding:8px 0 25px 24px;margin-bottom:22px}.eyebrow{text-transform:uppercase;letter-spacing:1px;font-size:12px;color:#718198;margin:0 0 8px}.hero h1{font-size:34px;line-height:1.38;letter-spacing:-.6px;margin:8px 0}.subtitle{font-size:19px;color:#52677f;margin:0 0 16px}.core{max-width:800px;font-size:19px;line-height:1.75;margin:0;font-weight:600}
-.quick{background:var(--blue-bg);border:1px solid #c8dbf4;border-radius:16px;padding:24px 28px;margin:24px 0 30px}.quick h2{font-size:18px;color:#285d9b;margin:0 0 10px}.quick ol{margin:0;padding-left:22px}.quick li{margin:5px 0}
-.part{background:#fff;border:1px solid #e2e8f0;border-radius:17px;padding:30px;margin:22px 0}.part h2{font-size:24px;line-height:1.45;margin:0 0 16px}.part h3{font-size:18px;line-height:1.5;margin:24px 0 9px}.part p{margin:0 0 14px}.part ul,.part ol{padding-left:24px}.part li{margin:5px 0}
-figure{margin:24px 0 20px}.viz{display:block;width:100%;height:auto;background:#fcfdff;border:1px solid #e2eaf3;border-radius:13px}.viz text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.figcap{font-size:13px;color:#6b7b90;line-height:1.65;margin:8px 2px 0}.figread{background:#f7f9fc;border-left:3px solid #a8bedb;color:#44566e;padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px;margin:10px 0 0}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0}.card{border:1px solid var(--line);border-radius:12px;padding:17px 18px;background:#fbfdff}.card h3{margin:0 0 5px;font-size:17px}.card p{font-size:15px;margin:0}.card.bad{background:var(--red-bg);border-color:#efc5c5}.card.good{background:var(--green-bg);border-color:#bfe4d4}.card.warn{background:var(--amber-bg);border-color:#f0d59f}
-.task{background:#f5f8fc;border:1px solid #dce5ef;border-radius:12px;padding:18px 20px;margin:17px 0;font-size:15px}.task strong{font-size:17px}.task p{margin:5px 0}.task code{background:#e7edf5}
-.two{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0}.basket{border:1px solid var(--line);border-radius:12px;padding:19px;background:#fbfdff}.basket h3{margin:0 0 6px}.basket p{margin:0;font-size:15px}.basket.reg{background:#fff7f0;border-color:#f1d0a7}.basket.rep{background:#eef8f4;border-color:#bce0d1}
-.boundary{border-left:3px solid #c18a34;background:var(--amber-bg);padding:16px 18px;border-radius:0 10px 10px 0;font-size:14px;color:#765722;margin:18px 0}.source{font-size:13px;color:#728096;background:#fafbfd;border-radius:8px;padding:8px 12px;margin:14px 0}.source a{color:#5273a0}
-.sim{background:#f3f7fd;border:1px solid #d6e2f2;border-radius:13px;padding:21px 22px;margin:18px 0}.sim h3{margin:0 0 8px}.sim .labelrow{display:grid;grid-template-columns:160px 1fr 60px;gap:12px;align-items:center;margin:14px 0;font-size:14px}.sim input{width:100%;accent-color:#3b73b6}.sim output{font-weight:700;text-align:right}.track{height:23px;border-radius:5px;background:#dce6f2;overflow:hidden}.fill{height:100%;background:#467dbb;transition:width .15s}.fill.green{background:#3c9577}.small{font-size:13px;color:#6b7b90;margin:12px 0 0}
-.interview{background:#fff9e8;border:1px solid #efd493;border-radius:15px;padding:23px 25px;margin:28px 0}.interview h2{font-size:20px;color:#a36116;margin:0 0 13px}details{background:white;border:1px solid #ecdcae;border-radius:9px;padding:12px 16px;margin:10px 0}summary{cursor:pointer;font-weight:600}details p{font-size:15px;margin:10px 0 0}
-.proof{font-size:13px;color:#7b8aa0;margin-top:18px!important}.exit{border-top:1px solid var(--line);padding-top:23px;margin-top:35px;color:#6b7b90;font-size:14px}.exit p{margin:7px 0}
-.deep{background:#fff;border:1px solid #e2e8f0;border-radius:17px;padding:30px}.deep h1{font-size:29px;line-height:1.45;margin:0 0 18px}.deep h2{font-size:23px;line-height:1.5;margin:38px 0 14px}.deep h3{font-size:18px;margin:25px 0 8px}.deep p{margin:0 0 14px}.deep blockquote{border-left:3px solid #b8cce5;padding:2px 16px;margin:17px 0;color:#5e7086}.deep code{background:#edf1f6;border-radius:4px;padding:2px 5px}.deep pre{background:#eff3f8;border-radius:8px;overflow:auto;padding:15px;line-height:1.65}.deep table{border-collapse:collapse;width:100%;font-size:14px;margin:18px 0}.deep th,.deep td{border:1px solid #dce4ee;padding:9px 10px;text-align:left;vertical-align:top}.deep th{background:#edf4ff}.deep ol,.deep ul{padding-left:24px}.deep a[id]{display:block;scroll-margin-top:20px}.modebar{font-size:13px;margin-bottom:20px}.noscript{background:#fff5dd;border-radius:8px;padding:12px 15px}
-@media(max-width:680px){.wrap{padding:20px 14px 50px}.hero{padding-left:16px}.hero h1{font-size:27px}.core{font-size:17px}.part{padding:22px 17px}.cards,.two{grid-template-columns:1fr}.sim .labelrow{grid-template-columns:96px 1fr 50px;gap:8px}.deep{padding:21px 16px}.deep table{display:block;overflow:auto;white-space:normal}.quick{padding:20px 19px}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<nav class="top"><a href="../index.html">← 阅读目录</a><span id="mode-status">讲解版</span><a href="../原文/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md">Markdown 正本</a></nav>
-<main id="lecture">
-<header class="hero"><p class="eyebrow">08 / 质量闭环 · 持续交付</p><h1>Agent 上线之后，怎么知道它真的变好了？</h1><p class="subtitle">从离线评测到生产闭环</p><p class="core">“变好了”不是回复更像人，而是任务终态、执行证据、失败回流和发布判断已经连成一条可复核的链。</p></header>
-<section class="quick"><h2>30 秒版</h2><ol><li>先写清楚成功终态和不可接受副作用，回复“已完成”不能替代系统真的完成。</li><li>用隔离环境反复比较版本；把业务终态、过程证据、表达质量和资源边界分开判断。</li><li>生产 Trace 负责说明发生了什么，评测负责判断做得对不对，护栏负责阻止危险动作。</li><li>确认过的失败进入回归集；代表性样本估计实际质量；两者不能共用一个未解释的成功率。</li></ol></section>
-<section class="part" id="p01"><h2>01 · 分数上升，为什么线上反而可能更危险</h2><p class="eyebrow">背景难点：先看一个被“成功语言”掩盖的失败</p><p>工单 Agent 回复更快、更礼貌，离线总分也上升；上线后却出现“已转交”但工单没变、读到别的租户同名工单、重试发出两次通知。只看文本，版本赢了；看业务终态和副作用，它反而更危险。</p>
-<figure><svg class="viz" viewBox="0 0 900 360" role="img" aria-labelledby="v1t"><title id="v1t">图1：语言成功和业务成功分开</title><defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#7b8da4"/></marker></defs><rect x="52" y="52" width="320" height="105" rx="14" fill="#edf5ff" stroke="#bdd3ef"/><text x="212" y="88" text-anchor="middle" font-size="20" font-weight="700" fill="#2d5f99">回复层：更像成功</text><text x="212" y="119" text-anchor="middle" font-size="15" fill="#5e7188">更快 · 更礼貌 · “已转交”</text><rect x="528" y="52" width="320" height="105" rx="14" fill="#fff1f1" stroke="#e7bcbc"/><text x="688" y="88" text-anchor="middle" font-size="20" font-weight="700" fill="#a33f3f">结果层：可能没完成</text><text x="688" y="119" text-anchor="middle" font-size="15" fill="#765d64">归属未变 · 越权读取 · 重复通知</text><line x1="375" y1="104" x2="523" y2="104" stroke="#7b8da4" stroke-width="2" marker-end="url(#a1)"/><text x="450" y="88" text-anchor="middle" font-size="13" fill="#7b8da4">不能直接推出</text><rect x="154" y="229" width="592" height="77" rx="13" fill="#f6f8fb" stroke="#dce5ef"/><text x="450" y="259" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">所以要先问：什么算成功？凭什么知道？</text><text x="450" y="286" text-anchor="middle" font-size="14" fill="#687a90">这两个问题决定后面的任务、证据、评分和发布门禁</text></svg><figcaption class="figcap">图 1 · 语言表现、业务终态和危险副作用是三个不同判断对象。</figcaption></figure>
-<div class="cards"><div class="card bad"><h3>难点一：回复 ≠ 终态</h3><p>Agent 的自述只能说明它生成了一句话，不能证明数据库里的对象已经变化。</p></div><div class="card warn"><h3>难点二：一次通过 ≠ 一致可靠</h3><p>同一任务成功一次和连续多次成功，面向真实用户是不同风险。</p></div><div class="card"><h3>难点三：Trace ≠ 质量判断</h3><p>追踪能还原调用过程，仍需要参考终态和评分规则才能判断是否做对。</p></div><div class="card"><h3>难点四：低分 ≠ 新回归题</h3><p>评分器错误、外部故障、偏置样本和隐私问题都要先排除。</p></div></div></section>
-<section class="part" id="p02"><h2>02 · 解决思路：不要寻找一个更大的总分</h2><p>只看回复、只建离线题库、只接 Trace、把低分日志直接回流，这四种办法分别漏掉结果、分布、判断和数据治理。解决思路是把“变好了”拆成四种互相校验的职责。</p>
-<figure><svg class="viz" viewBox="0 0 900 355" role="img" aria-labelledby="v2t"><title id="v2t">图2：四种直觉方案各自漏掉什么</title><rect x="38" y="43" width="190" height="75" rx="12" fill="#f6f8fb" stroke="#dbe4ee"/><text x="133" y="73" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">只看回复</text><text x="133" y="98" text-anchor="middle" font-size="13" fill="#697b90">漏掉终态与副作用</text><rect x="250" y="43" width="190" height="75" rx="12" fill="#f6f8fb" stroke="#dbe4ee"/><text x="345" y="73" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">只建离线集</text><text x="345" y="98" text-anchor="middle" font-size="13" fill="#697b90">漏掉生产分布变化</text><rect x="462" y="43" width="190" height="75" rx="12" fill="#f6f8fb" stroke="#dbe4ee"/><text x="557" y="73" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">只接 Trace</text><text x="557" y="98" text-anchor="middle" font-size="13" fill="#697b90">漏掉质量判据</text><rect x="674" y="43" width="190" height="75" rx="12" fill="#f6f8fb" stroke="#dbe4ee"/><text x="769" y="73" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">低分全回流</text><text x="769" y="98" text-anchor="middle" font-size="13" fill="#697b90">污染题库与统计</text><line x1="450" y1="137" x2="450" y2="193" stroke="#6380a4" stroke-width="2" marker-end="url(#a1)"/><rect x="104" y="207" width="692" height="91" rx="15" fill="#eef7f3" stroke="#b9dfcf"/><text x="450" y="243" text-anchor="middle" font-size="21" font-weight="700" fill="#1b745d">总思路：契约 → 比较 → 留证 → 审查</text><text x="450" y="273" text-anchor="middle" font-size="14" fill="#4e7469">每一步都有自己的判断对象和失败后动作，互相支持而不互相冒充</text></svg><figcaption class="figcap">图 2 · 评测不是一个分数，也不是一个平台；它是一组能回到责任对象的判断。</figcaption></figure></section>
-<section class="part" id="p03"><h2>03 · 总体方案：四个节点组成一条闭环</h2><p>任务契约规定什么算成功；离线评测在可控条件下比较版本；生产证据还原线上发生了什么；审查与发布决定哪个失败值得回写以及版本能否继续。</p>
-<figure><svg class="viz" viewBox="0 0 900 420" role="img" aria-labelledby="v3t"><title id="v3t">图3：任务契约、离线评测、生产证据、审查与发布闭环</title><defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#53779f"/></marker></defs><rect x="52" y="55" width="330" height="88" rx="14" fill="#edf5ff" stroke="#bcd2ef"/><text x="217" y="91" text-anchor="middle" font-size="20" font-weight="700" fill="#2f619b">任务契约</text><text x="217" y="119" text-anchor="middle" font-size="14" fill="#5d7189">终态 · 约束 · 比较条件</text><rect x="518" y="55" width="330" height="88" rx="14" fill="#edf5ff" stroke="#bcd2ef"/><text x="683" y="91" text-anchor="middle" font-size="20" font-weight="700" fill="#2f619b">离线评测</text><text x="683" y="119" text-anchor="middle" font-size="14" fill="#5d7189">隔离运行 · 评分 · 重复比较</text><rect x="518" y="268" width="330" height="88" rx="14" fill="#eef8f4" stroke="#b9dfcf"/><text x="683" y="304" text-anchor="middle" font-size="20" font-weight="700" fill="#1b765d">生产证据</text><text x="683" y="332" text-anchor="middle" font-size="14" fill="#5d796f">Trace · 业务事件 · 版本 · 反馈</text><rect x="52" y="268" width="330" height="88" rx="14" fill="#fff8e9" stroke="#edd19a"/><text x="217" y="304" text-anchor="middle" font-size="20" font-weight="700" fill="#9b6119">审查与发布</text><text x="217" y="332" text-anchor="middle" font-size="14" fill="#7c694c">复现 · 分流 · 风险门禁</text><line x1="382" y1="99" x2="512" y2="99" stroke="#53779f" stroke-width="2" marker-end="url(#a3)"/><line x1="217" y1="143" x2="217" y2="258" stroke="#53779f" stroke-width="2" marker-end="url(#a3)"/><line x1="683" y1="143" x2="683" y2="258" stroke="#53779f" stroke-width="2" marker-end="url(#a3)"/><line x1="518" y1="312" x2="392" y2="312" stroke="#53779f" stroke-width="2" marker-end="url(#a3)"/><path d="M217 268 C370 210 530 210 683 268" fill="none" stroke="#8ca8c5" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#a3)"/><text x="450" y="199" text-anchor="middle" font-size="13" fill="#6c7d91">任务契约同时约束离线与生产判断</text></svg><figcaption class="figcap">图 3 · 这是职责和反馈关系，不是每个请求必须经过四个服务。</figcaption></figure>
-<div class="cards"><div class="card"><h3>任务契约</h3><p>回答“什么结果算成功，什么动作不可接受”。</p></div><div class="card"><h3>离线评测</h3><p>回答“在声明条件下，新版本是否稳定满足契约”。</p></div><div class="card good"><h3>生产证据</h3><p>回答“这一次线上请求实际发生了什么”。</p></div><div class="card warn"><h3>审查与发布</h3><p>回答“失败能否成为新知识，版本是否达到风险门槛”。</p></div></div></section>
-<section class="part" id="p04"><h2>04 · 任务契约：先定义成功终态，再谈评分</h2><p>一张任务卡至少要有业务终态、不可接受副作用、对外表达和资源边界。它不规定唯一工具顺序，只规定必须满足的结果与边界。</p><div class="task"><strong>构造任务：转交当前租户 T 的工单 X</strong><p><b>终态：</b>工单 X 最后属于账单支持组。</p><p><b>不变量：</b>不能读取或修改其他租户；同一请求至多通知一次。</p><p><b>表达：</b>不得声称未发生的转交已经完成。</p><p><b>比较：</b>登记本次改变的变量，其余快照、版本、评分器和预算尽量固定。</p></div>
-<figure><svg class="viz" viewBox="0 0 900 330" role="img" aria-labelledby="v4t"><title id="v4t">图4：任务契约四个槽位</title><rect x="49" y="50" width="188" height="110" rx="14" fill="#edf5ff" stroke="#bcd2ef"/><text x="143" y="88" text-anchor="middle" font-size="18" font-weight="700" fill="#2e609a">业务终态</text><text x="143" y="119" text-anchor="middle" font-size="14" fill="#5e7188">最后状态是什么</text><rect x="257" y="50" width="188" height="110" rx="14" fill="#fff1f1" stroke="#e8bebe"/><text x="351" y="88" text-anchor="middle" font-size="18" font-weight="700" fill="#a34141">副作用</text><text x="351" y="119" text-anchor="middle" font-size="14" fill="#765c63">哪些动作绝不能发生</text><rect x="465" y="50" width="188" height="110" rx="14" fill="#eef8f4" stroke="#b9dfcf"/><text x="559" y="88" text-anchor="middle" font-size="18" font-weight="700" fill="#1b765d">对外表达</text><text x="559" y="119" text-anchor="middle" font-size="14" fill="#5d796f">说法是否与事实一致</text><rect x="673" y="50" width="178" height="110" rx="14" fill="#fff8e9" stroke="#edd19a"/><text x="762" y="88" text-anchor="middle" font-size="18" font-weight="700" fill="#9b6119">资源边界</text><text x="762" y="119" text-anchor="middle" font-size="14" fill="#7c694c">调用 · 延迟 · 成本</text><line x1="143" y1="183" x2="143" y2="243" stroke="#7c92ad" stroke-width="2" marker-end="url(#a3)"/><line x1="351" y1="183" x2="351" y2="243" stroke="#7c92ad" stroke-width="2" marker-end="url(#a3)"/><line x1="559" y1="183" x2="559" y2="243" stroke="#7c92ad" stroke-width="2" marker-end="url(#a3)"/><line x1="762" y1="183" x2="762" y2="243" stroke="#7c92ad" stroke-width="2" marker-end="url(#a3)"/><text x="450" y="286" text-anchor="middle" font-size="16" font-weight="700" fill="#34475e">可观察条件越清楚，失败越能回到正确的修复对象</text></svg><figcaption class="figcap">图 4 · 终态是主判据，副作用是硬边界，表达和资源边界决定交付质量。</figcaption></figure><p class="proof"><a href="?view=deep#deep-contract">进入深入版：完整任务卡、隔离条件与比较纪律 ↗</a></p></section>
-<section class="part" id="p05"><h2>05 · 离线评测：判断结果，也检查判定系统</h2><p>终态、越权访问、重复通知和预算优先用代码、数据库状态或审计事件判断；开放表达再使用人工或模型量规。评分器本身也需要正例、反例和人工复核。</p><div class="two"><div class="basket"><h3>代码 / 状态评分</h3><p>快、便宜、可复现；风险是断言写错或过于死板。</p></div><div class="basket"><h3>人工 / 模型评分</h3><p>能处理表达和语义；风险是波动、偏好措辞、成本和评审差异。</p></div></div><p>一次成功和重复可靠也要分开。下面的交互图只做数学示意，不是产品成绩。</p><div class="sim"><p class="eyebrow">数学示意 · 非实测</p><h3>“至少一次成功”与“每次都成功”</h3><div class="labelrow"><span>单次成功率 p</span><input id="pInput" type="range" min="10" max="95" step="5" value="70"><output id="pOut">70%</output></div><div class="labelrow"><span>重复次数 k</span><input id="kInput" type="range" min="1" max="8" value="3"><output id="kOut">3</output></div><div class="labelrow"><span>至少一次</span><div class="track"><div id="anyFill" class="fill" style="width:97.3%"></div></div><output id="anyOut">97.3%</output></div><div class="labelrow"><span>全部成功</span><div class="track"><div id="allFill" class="fill green" style="width:34.3%"></div></div><output id="allOut">34.3%</output></div><p class="small">假设同一任务、固定配置、p 不变且各次独立；公式为 1−(1−p)<sup>k</sup> 与 p<sup>k</sup>。不代表一次任务里的 k 个步骤。</p></div><p class="proof"><a href="?view=deep#deep-repeat">进入深入版：评分器、`pass@k / pass^k` 与适用边界 ↗</a></p></section>
-<section class="part" id="p06"><h2>06 · 生产证据：Trace 说明发生了什么，评测说明是否做对</h2><p>一次工单请求可能包含意图识别、租户查询、归属更新、下游重试和回复。把它们用关联标识串起来，才能解释失败在哪一步；但完整记录仍不等于业务成功。</p>
-<figure><svg class="viz" viewBox="0 0 900 360" role="img" aria-labelledby="v5t"><title id="v5t">图5：Trace、评测、护栏三种职责</title><rect x="46" y="55" width="246" height="103" rx="14" fill="#edf5ff" stroke="#bcd2ef"/><text x="169" y="94" text-anchor="middle" font-size="20" font-weight="700" fill="#2e609a">追踪</text><text x="169" y="125" text-anchor="middle" font-size="14" fill="#5e7188">发生了什么？</text><rect x="327" y="55" width="246" height="103" rx="14" fill="#eef8f4" stroke="#b9dfcf"/><text x="450" y="94" text-anchor="middle" font-size="20" font-weight="700" fill="#1b765d">评测</text><text x="450" y="125" text-anchor="middle" font-size="14" fill="#5d796f">目标达成了吗？</text><rect x="608" y="55" width="246" height="103" rx="14" fill="#fff8e9" stroke="#edd19a"/><text x="731" y="94" text-anchor="middle" font-size="20" font-weight="700" fill="#9b6119">护栏</text><text x="731" y="125" text-anchor="middle" font-size="14" fill="#7c694c">允许继续吗？</text><line x1="169" y1="158" x2="169" y2="228" stroke="#7188a2" stroke-width="2" marker-end="url(#a3)"/><line x1="450" y1="158" x2="450" y2="228" stroke="#7188a2" stroke-width="2" marker-end="url(#a3)"/><line x1="731" y1="158" x2="731" y2="228" stroke="#7188a2" stroke-width="2" marker-end="url(#a3)"/><text x="169" y="264" text-anchor="middle" font-size="14" fill="#536a84">版本 · 工具 · 重试 · 耗时</text><text x="450" y="264" text-anchor="middle" font-size="14" fill="#536a84">终态 · 不变量 · 表达</text><text x="731" y="264" text-anchor="middle" font-size="14" fill="#536a84">授权 · 幂等 · 预算</text><text x="450" y="320" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">可以共享请求 ID，不能彼此替代</text></svg><figcaption class="figcap">图 5 · 追踪保存证据，评测做质量判断，护栏在执行边界阻止危险动作。</figcaption></figure><p>需要关联请求、发布版本、必要的模型与工具信息、耗时、错误分类、重试和用量。采集业务 ID 需遵守授权、最小化和保留策略。</p></section>
-<section class="part" id="p07"><h2>07 · 失败审查：两个篮子，两个用途</h2><p>低分、投诉和慢请求先进入审查，确认真实失败、重建条件、脱敏并写出参考终态。确认的失败用于记住教训；代表性样本用于估计真实分布。</p><figure><svg class="viz" viewBox="0 0 900 390" role="img" aria-labelledby="v6t"><title id="v6t">图6：候选样本经过审查后分到两个不同集合</title><defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#6f86a3"/></marker></defs><rect x="330" y="38" width="240" height="69" rx="13" fill="#fff8e9" stroke="#edd19a"/><text x="450" y="68" text-anchor="middle" font-size="19" font-weight="700" fill="#966017">线上候选样本</text><text x="450" y="91" text-anchor="middle" font-size="13" fill="#7c694c">低分 · 投诉 · 慢请求</text><line x1="450" y1="107" x2="450" y2="153" stroke="#6f86a3" stroke-width="2" marker-end="url(#a6)"/><rect x="238" y="161" width="424" height="72" rx="13" fill="#f7f9fc" stroke="#dce5ef"/><text x="450" y="191" text-anchor="middle" font-size="17" font-weight="700" fill="#34475e">确认现象 · 检查证据 · 重建条件 · 脱敏</text><text x="450" y="215" text-anchor="middle" font-size="13" fill="#697b90">无法复现的记录留在调查队列，不强行改题</text><line x1="350" y1="233" x2="250" y2="292" stroke="#6f86a3" stroke-width="2" marker-end="url(#a6)"/><line x1="550" y1="233" x2="650" y2="292" stroke="#6f86a3" stroke-width="2" marker-end="url(#a6)"/><rect x="48" y="300" width="402" height="63" rx="13" fill="#fff3ea" stroke="#edc99d"/><text x="249" y="328" text-anchor="middle" font-size="18" font-weight="700" fill="#9b5b16">失败回归集</text><text x="249" y="350" text-anchor="middle" font-size="13" fill="#7c694c">记住已确认的教训，偏向困难与危险任务</text><rect x="450" y="300" width="402" height="63" rx="13" fill="#eef8f4" stroke="#b9dfcf"/><text x="651" y="328" text-anchor="middle" font-size="18" font-weight="700" fill="#1b765d">代表性质量集</text><text x="651" y="350" text-anchor="middle" font-size="13" fill="#5d796f">估计目标分布，说明时间窗、覆盖和权重</text></svg><figcaption class="figcap">图 6 · 投诉样本可以帮助查错，但不能直接代表全部请求。</figcaption></figure><p>生产保护和发布门禁要同时存在：高风险不变量一次违反就可能阻断；普通质量则需要固定条件、重复比较和不确定性说明。不能补跑到绿为止。</p></section>
-<section class="part" id="p08"><h2>08 · 完整回放：从“已转交”追到该改什么</h2><p>先只保留一个已知现象：<strong>Agent 回复“已转交”</strong>。不提前宣布根因，按证据顺序推进。</p><figure><svg class="viz" viewBox="0 0 900 400" role="img" aria-labelledby="v7t"><title id="v7t">图7：从现象到修复对象的证据阶梯</title><defs><marker id="a7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#6e86a4"/></marker></defs><line x1="87" y1="89" x2="813" y2="89" stroke="#b9c9db" stroke-width="3" marker-end="url(#a7)"/><circle cx="87" cy="89" r="27" fill="#fff8e9" stroke="#e2bd72"/><circle cx="269" cy="89" r="27" fill="#edf5ff" stroke="#a6c6e9"/><circle cx="450" cy="89" r="27" fill="#eef8f4" stroke="#a9d8c6"/><circle cx="632" cy="89" r="27" fill="#fff1f1" stroke="#e2aaaa"/><circle cx="813" cy="89" r="27" fill="#f3efff" stroke="#c8b7e5"/><text x="87" y="96" text-anchor="middle" font-size="17" font-weight="700" fill="#8b5d15">1</text><text x="269" y="96" text-anchor="middle" font-size="17" font-weight="700" fill="#2e609a">2</text><text x="450" y="96" text-anchor="middle" font-size="17" font-weight="700" fill="#1b765d">3</text><text x="632" y="96" text-anchor="middle" font-size="17" font-weight="700" fill="#a34141">4</text><text x="813" y="96" text-anchor="middle" font-size="17" font-weight="700" fill="#67508e">5</text><text x="87" y="144" text-anchor="middle" font-size="14" font-weight="700" fill="#34475e">现象</text><text x="87" y="166" text-anchor="middle" font-size="12" fill="#697b90">回复已转交</text><text x="269" y="144" text-anchor="middle" font-size="14" font-weight="700" fill="#34475e">契约</text><text x="269" y="166" text-anchor="middle" font-size="12" fill="#697b90">终态与不变量</text><text x="450" y="144" text-anchor="middle" font-size="14" font-weight="700" fill="#34475e">状态</text><text x="450" y="166" text-anchor="middle" font-size="12" fill="#697b90">数据库与审计</text><text x="632" y="144" text-anchor="middle" font-size="14" font-weight="700" fill="#34475e">轨迹</text><text x="632" y="166" text-anchor="middle" font-size="12" fill="#697b90">工具与版本</text><text x="813" y="144" text-anchor="middle" font-size="14" font-weight="700" fill="#34475e">修复</text><text x="813" y="166" text-anchor="middle" font-size="12" fill="#697b90">实现 / 评分 / 观测</text><rect x="100" y="235" width="700" height="88" rx="14" fill="#f7f9fc" stroke="#dce5ef"/><text x="450" y="270" text-anchor="middle" font-size="18" font-weight="700" fill="#34475e">每增加一份证据，就排除一类解释</text><text x="450" y="298" text-anchor="middle" font-size="14" fill="#697b90">不能从一句成功回复直接跳到“模型能力不够”</text></svg><figcaption class="figcap">图 7 · 调查的顺序先固定证据，再决定修改哪个对象。</figcaption></figure><ol><li>查任务契约：如果只写“转交成功”，先补终态和不变量。</li><li>查业务终态：数据库显示未转交且读到了另一租户对象，已确认不是文本问题。</li><li>查生产证据：Trace 和审计事件定位租户过滤缺失、重复通知和版本。</li><li>查评分器：只检查“已转交”会把同样的错误打成通过。</li><li>修对应对象并复测：实现补过滤与幂等，评分改查状态，生产补安全关联。</li><li>决定回流与发布：确认失败进回归集，高风险不变量仍失败则阻断。</li></ol></section>
-<section class="part" id="p09"><h2>09 · 边界与最小起步</h2><p>离线集覆盖的是已知场景，生产分布会变化；Trace 会采样丢失，判官会漏判，回归集会被刷熟，脱敏会抹掉关键条件。闭环让失败可见、可比较、可追溯，不给系统出具绝对可靠证明。</p><p>最小起步可以只做一项高价值功能：写一个终态和两个危险反例，建立可重复的离线运行，用代码检查终态，用少量人工样本校准表达评分，打通一条带版本信息的生产 Trace，定期审查失败，并预先写好高风险门禁。</p><aside class="boundary"><b>证据边界：</b>Anthropic 支撑任务、试验、评分器、轨迹、最终状态、隔离环境和长期维护等评测概念；τ-bench 支撑 <code>pass^k</code>；OpenTelemetry 支撑 Trace/Span 关联定义。四节点闭环、样本分流和门禁是本文设计建议，工单数字是构造示例。</aside></section>
-<section class="interview"><h2>再拷问四次</h2><details><summary>线上 Trace 完整，为什么答案仍可能错？</summary><p>Trace 说明调用发生了什么；业务终态和评分规则才判断是否做对。HTTP 200、工具成功或完整链路都不能单独证明任务完成。</p></details><details><summary>没有完整追踪平台，能先做评测吗？</summary><p>可以。先围绕一个任务建立可重复运行、结果断言和必要记录。追踪不足会限制归因，但不是所有评测的先决条件。</p></details><details><summary>为什么不能把全部低分直接加入回归集？</summary><p>低分可能来自评分器错误、外部故障、不支持请求或不可复现条件。确认、授权、脱敏和参考终态都要先完成。</p></details><details><summary>为什么总体分数上升仍可能阻断发布？</summary><p>高风险副作用和总体质量不是同一个指标。某个关键租户类型的越权率上升，不能被其他任务的语言质量提升抵消。</p></details></section>
-<footer class="exit"><p><a href="?view=deep#deep-top">进入深入版：完整推理、证据与反例 ↗</a></p><p><a href="../原文/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md">Markdown 正本</a> · <a href="../index.html">回阅读目录</a></p><p>v2.0 · 2026-10-28 · 页面、图与深入阅读视图均可离线使用；外部资料链接用于核查，不是页面资源依赖。</p></footer>
-</main>
-<section id="deep-document" hidden>
-<nav class="modebar"><a href="讲解-08-Agent评测闭环.html">← 回讲解版</a> · <a href="../原文/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md">查看 Markdown 正本</a></nav>
-<article class="deep" id="deep-top">
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-08"><meta name="document-version" content="2.1-review">
+<meta name="description" content="任务契约、离线评测、生产证据、审查与发布四节点闭环；评分器失效模式（位置/冗长/自增强偏差与断言过期/覆盖假象）；闭环自身的三种慢性失效及反制。"><meta name="color-scheme" content="dark">
+<title>Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-08">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">Agent 可靠性研究</p><h1>Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环</h1><p class="article-summary">任务契约、离线评测、生产证据、审查与发布四节点闭环；评分器失效模式（位置/冗长/自增强偏差与断言过期/覆盖假象）；闭环自身的三种慢性失效及反制。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#dm-answer">&quot;变好了&quot;不是一个分数，是一组能回到责任对象的判断</a><a href="#dm-loop">四个节点：任何一部分都不冒充其他部分</a><a href="#dm-card">一张任务卡把&quot;做对&quot;拆成四个可观察条件</a><a href="#dm-graders">三类评分器：可执行的不变量给代码，开放表达才用语义判断</a><a href="#dm-bias">裁判自己会错：三种系统性偏差都有受控实验背书</a><a href="#dm-review">线上失败审查六步：先分类，再复现，最后决定去向</a><a href="#dm-decay">闭环跑久了的三种病：都伪装成系统在变好</a></nav></details><p>v2.1 加厚：案例换域退款、新增评分器失效与慢性失效两层；MT-Bench 与评审公平性引用为公开研究；其余证据姿态沿用 v2.0（构造示例声明）。核对日期：2026-11-27。</p></aside>
+<main id="article-content"><div class="quick-content"><section class="content-section" id="dm-answer"><p class="kicker">先给一句话答案</p><h2>"变好了"不是一个分数，是一组能回到责任对象的判断</h2>
+<p>构造一个常见发布场景：客服退款 Agent，新版本回复更快更礼貌、离线总分上升，上线后却出现三类投诉——回复"已退款"但支付系统里没退；读到了别的商户的同名订单；重试给同一买家退了两次款。只看回复文本，会把"说得像完成"当成"业务已经完成"。问题不是缺一个更大的总分，而是"变好"没有被拆成可核对的对象。</p>
+<p class="callout">本文的一句话答案：<strong>任务契约先定义成功终态，离线评测让版本可重复比较，生产证据让线上现象可追溯，审查与发布把失败送回正确的维护对象——四者相连，才构成持续改进的闭环。</strong></p>
+<p>阅读姿态声明：退款场景、任务 YAML、数字和流程均为构造示例；外部资料只承担其明确支持的定义和方法，四部分组合属于设计建议。</p><a class="deep" href="?view=deep#deep-s0">查看四个难点与构造场景 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-loop"><p class="kicker">总设计</p><h2>四个节点：任何一部分都不冒充其他部分</h2>
+<p>直觉方案各有死角：只看最终回复漏掉权限和副作用；只建题库看不到生产分布变化；只接 Trace 没有判断标准；低分直接回流会把判官错误固化成错误标准。总思路是四部分持续协作——任务契约约束离线和生产判断，两者的证据都汇入审查，审查决定修题、修评分、修实现、补观测，还是阻断发布。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜四节点闭环与反馈关系</b></div><div class="diagram-scroll"><img src="配图/08/fig01.svg" alt="任务契约、离线评测、生产证据、审查与发布四节点及反馈箭头" loading="lazy" decoding="async"></div><figcaption>每个请求不必依次经过四个服务；契约同时约束离线与生产。闭环的产物不是一个准确率，而是一组能回到责任对象的判断。</figcaption></figure>
+<p>同一次失败至少有三种不同的核查：事实或终态核查（退款是否真入账）、资料和过程核查（读了什么、调了什么）、任务判断核查（是否满足目标与权限）。三种核查不能合成一个"知识库准确率"。</p><a class="deep" href="?view=deep#deep-s2">查看四部分职责表与三种核查 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-card"><p class="kicker">任务契约</p><h2>一张任务卡把"做对"拆成四个可观察条件</h2>
+<p>退款是<strong>不可逆动作</strong>的典型样本：终态写错还能改，钱退出去就退出去了。所以任务卡的不变量——"不越权读其他商户""同一请求至多退一次款"——不是表达要求，是资金安全约束，必须由幂等键在服务端保证，而不是靠提示词请求模型"别忘了"。资源边界是次级约束：影响能否发布，但不能用低成本掩盖错误终态。</p>
+<figure><div class="figure-top"><span>契约</span><b>图 02｜任务卡四个组成部分</b></div><div class="diagram-scroll"><img src="配图/08/fig02.svg" alt="业务终态、不可接受副作用、对外表达、资源边界四个条件" loading="lazy" decoding="async"></div><figcaption>比较条件另登记：模型、提示词、工具、评分器版本与环境快照；同时换多个变量只能评价"整套组合"。</figcaption></figure>
+<p>[公开资料] Anthropic 将评测中的 task 定义为带输入和成功标准的单个测试，并区分 trial、grader、transcript 与环境最终 outcome；过度要求固定工具顺序会惩罚有效解法——只要终态和不变量满足，合理的替代路线应被允许。</p><a class="deep" href="?view=deep#deep-s3">查看任务卡 YAML 与比较条件 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-graders"><p class="kicker">评分</p><h2>三类评分器：可执行的不变量给代码，开放表达才用语义判断</h2>
+<p>终态、越权、重复退款、预算优先用代码和数据库状态判定；语气和解释才用模型或人工判断。但<strong>确定性不等于正确</strong>——写错订单 ID 的断言可以稳定地产生错误分数。评分器本身要有正例、反例和人工复核记录。</p>
+<figure><div class="figure-top"><span>分工</span><b>图 03｜三类评分器的职责、风险与补强</b></div><div class="diagram-scroll"><img src="配图/08/fig03.svg" alt="代码评分器、模型评分器、人工评分器三栏对照" loading="lazy" decoding="async"></div><figcaption>评分器是闭环里唯一"给所有东西打分"的组件——它的失效会伪装成被评对象的失效，健康度要与版本质量同层检查。</figcaption></figure>
+<p>一次成功和重复可靠也不是一回事：<span class="nowrap">pass@k</span> 关心 k 次里至少一次成功，<span class="nowrap">pass^k</span>（τ-bench 提出）关心 k 次全部成功。构造参数 p=0.7、k=3 时分别是 97.3% 和 34.3%——这是公式推导，不是产品成绩。</p><a class="deep" href="?view=deep#deep-s4">查看评分器分工表与 pass^k 推导 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-bias"><p class="kicker">核心难点</p><h2>裁判自己会错：三种系统性偏差都有受控实验背书</h2>
+<p>模型评分器有三种已知偏差：<strong>位置偏差</strong>（交换候选顺序结论会翻转）、<strong>冗长偏差</strong>（偏好更长但无增量的回答）、<strong>自增强偏差</strong>（偏好同家族模型）。代码评分器有两种工程病：<strong>断言过期</strong>（schema 演进后核对旧枚举值）和<strong>覆盖假象</strong>（正例全过但反例从没测过）。</p>
+<figure><div class="figure-top"><span>偏差</span><b>图 04｜三种偏差的表现与缓解</b></div><div class="diagram-scroll"><img src="配图/08/fig04.svg" alt="位置偏差、冗长偏差、自增强偏差与退款案例落点" loading="lazy" decoding="async"></div><figcaption>[公开资料] MT-Bench（arXiv:2306.05685）与评审公平性研究（arXiv:2305.17926）报告：交换顺序重评可显著缓解位置偏差，评审对长回答有系统性偏好。落点：结论翻转的样本直接进人工队列。</figcaption></figure>
+<p class="callout">退款案例的成本最低防线：把"已退款（成功）"和"退款执行失败，原因是……"两个候选交换位置重评一次——裁判翻供的样本，比任何单一位置的分数都值钱。</p><a class="deep" href="?view=deep#deep-s4">查看偏差表与两种工程病 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-review"><p class="kicker">审查</p><h2>线上失败审查六步：先分类，再复现，最后决定去向</h2>
+<p>遇到低分或投诉，按固定顺序走：确认现象 → 检查证据 → 重建条件 → 最小化样本 → 写参考结果 → 决定去向。同一条线上记录可能产生两种资产但用途不同：<strong>回归集记住已确认的教训，代表性质量集估计目标分布中的表现。</strong>投诉可以过采样用于查错，但不能不加权地代表所有请求。</p>
+<figure><div class="figure-top"><span>流水线</span><b>图 05｜六步审查顺序</b></div><div class="diagram-scroll"><img src="配图/08/fig05.svg" alt="确认现象、检查证据、重建条件、最小化样本、写参考结果、决定去向六步" loading="lazy" decoding="async"></div><figcaption>低分也可能来自评分器写错——第四步之前别急着改题；发布判断要尊重随机性，不能为过门禁无限补跑。</figcaption></figure>
+<p>生产保护必须和第一版一起设计：超时、重试预算、幂等性和不可逆动作的授权边界，不能等"在线评估成熟"之后才补。评测告诉你版本是否满足契约，护栏负责在不满足时阻止动作。</p><a class="deep" href="?view=deep#deep-s6">查看六步细节与发布判断 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-decay"><p class="kicker">慢性失效</p><h2>闭环跑久了的三种病：都伪装成系统在变好</h2>
+<p><strong>回归集刷熟</strong>：版本反复对同一批题调参，分数上升而题目之外的失败率没降——优化的是考卷不是能力，反制是保留集轮换、双线报告。<strong>评分器漂移</strong>：评分模型升级后新旧分数不可比，趋势线悄悄断裂，反制是评分器版本对账。<strong>审查疲劳</strong>：每周审查变成盖章流程，反制是每条结论必须登记"改变了哪个对象"。</p>
+<figure><div class="figure-top"><span>判定</span><b>图 06｜一次成功与重复可靠的差距</b></div><div class="diagram-scroll"><img src="配图/08/fig06.svg" alt="pass@3 为 97.3% 与 pass^3 为 34.3% 的柱状对比" loading="lazy" decoding="async"></div><figcaption>p=0.7、k=3 的公式推导示意。闭环设计再好也防不住节点自身被优化目标侵蚀——题目、评分器、审查结论本身也要有版本、有保留集、有对账。</figcaption></figure>
+<p class="closing">最小可行起步不必先部署完整平台：写一个终态和两个危险反例、建一个可重跑的离线任务、用代码查终态、打通一条带版本的 Trace、每周审查一批失败、预先写好发布门禁——六件事，一个高价值功能就够起步。</p><a class="deep" href="?view=deep#deep-s8">查看慢性失效表与最小起步 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/Agent%20%E4%B8%8A%E7%BA%BF%E4%B9%8B%E5%90%8E%EF%BC%8C%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E5%AE%83%E7%9C%9F%E7%9A%84%E5%8F%98%E5%A5%BD%E4%BA%86%EF%BC%9A%E4%BB%8E%E7%A6%BB%E7%BA%BF%E8%AF%84%E6%B5%8B%E5%88%B0%E7%94%9F%E4%BA%A7%E9%97%AD%E7%8E%AF.md#s8">Markdown 对应段落</a></section>
+</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><!-- document-id: show-08 -->
+<!-- document-version: 2.1-review -->
+
+<p><a id="deep-overview"></a></p>
 <h1>Agent 上线之后，怎么知道它真的变好了：从离线评测到生产闭环</h1>
-<blockquote><strong>一句话结论：</strong>Agent 只有在任务终态和约束先被定义、离线结果可重复比较、线上执行留下可核对证据、真实失败经过审查后能改变后续评测与发布判断时，才有资格说“变好了”。</blockquote>
-<p>本文的工单转交场景、任务 YAML、数字和流程均为<strong>构造示例</strong>，用于解释设计，不是生产成绩或本项目已经部署的系统。外部资料只承担其明确支持的定义和方法；四部分组合属于本文的设计建议。</p>
-<h2 id="deep-background">一、背景与难点：分数上升，为什么线上反而可能更危险</h2>
-<h3>一个看起来已经变好的版本</h3>
-<p>工单 Agent 要把当前租户中的指定工单转交给正确团队。新版本回复更快、更礼貌，离线总分也上升；上线后却出现“已转交”但工单没变、读到别的租户同名工单、重试发出两次通知。只看回复文本，版本赢了；看业务终态和副作用，它反而更危险。</p>
+<blockquote>
+<p><strong>文档类型</strong>：工程方法型文章。面向交付 Agent 功能的研发、测试与技术负责人。</p>
+<p><strong>配套阅读</strong>：<a href="%E8%AE%B2%E8%A7%A3-08-Agent%E8%AF%84%E6%B5%8B%E9%97%AD%E7%8E%AF.html">图解讲解版</a> · <a href="../index.html">阅读目录</a>。</p>
+<p><strong>一句话结论</strong>：Agent 只有在任务终态和约束先被定义、离线结果可重复比较、线上执行留下可核对证据、真实失败经过审查后能改变后续评测与发布判断时，才有资格说&quot;变好了&quot;。</p>
+<p>本文的退款场景、任务 YAML、数字和流程均为<strong>构造示例</strong>，用于解释设计，不是生产成绩或本项目已经部署的系统。外部资料只承担其明确支持的定义和方法；本文提出的四部分组合属于设计建议。</p>
+</blockquote>
+<p><a id="deep-s0"></a></p>
+<h2>引子：先看一个看起来已经变好的版本</h2>
+<p>构造一个常见发布场景：客服退款 Agent 要把商户的订单退款执行到位。新版本的回复更快、更礼貌，离线评测总分也上升。上线后却出现三类投诉：它回复&quot;已退款&quot;，支付系统里退款并没有执行；偶尔读到了别的商户的同名订单；重试时给同一买家执行了两次退款。</p>
+<p>此时只看回复文本，会把&quot;说得像完成&quot;当成&quot;业务已经完成&quot;；只看工具返回成功，会漏掉工具操作对象错了或后续写入失败；只看离线总分，又不知道线上请求是否来自另一种数据分布。问题不是缺一个更大的总分，而是&quot;变好&quot;没有被拆成可核对的对象。</p>
 <h3>四个难点</h3>
-<ul><li><strong>语言表现与业务终态可能背离。</strong> Agent 的自述不能证明数据库状态已经改变。</li><li><strong>一次离线通过不等于跨试验可靠。</strong> 题目、环境或配置同时变化时，分数差异也无法归因。</li><li><strong>有执行记录不等于知道质量。</strong> Trace 需要参考终态和评分规则才有判断意义。</li><li><strong>线上失败不能直接变成新题。</strong> 评分器错误、外部故障、样本偏差和脱敏损失都要先排除。</li></ul>
-<h2 id="deep-approach">二、解决思路：把“变好了”拆成四种互相校验的判断</h2>
-<p>只看回复、只建离线题库、只接 Trace、把低分日志直接回流，分别漏掉结果、分布、判断和数据治理。本文采用的思路是：<strong>先写任务契约，再用离线评测比较版本；生产侧保留执行证据；失败经过复核、脱敏和复现后，才改变题库和发布判断。</strong></p>
-<h2 id="deep-design">三、总体方案与总设计：四个节点组成一条闭环</h2>
-<table><thead><tr><th>组成部分</th><th>回答的问题</th><th>主要证据</th><th>失败后改哪里</th></tr></thead><tbody><tr><td><strong>任务契约</strong></td><td>什么结果算成功，什么动作不可接受？</td><td>终态、约束、比较条件</td><td>题意、终态或不变量</td></tr><tr><td><strong>离线评测</strong></td><td>新版本是否稳定满足契约？</td><td>状态、工具记录、回复、评分器</td><td>实现、评分器、环境或任务</td></tr><tr><td><strong>生产证据</strong></td><td>这次线上实际发生了什么？</td><td>Trace/Span、审计事件、最终状态</td><td>故障、分布或观测缺口</td></tr><tr><td><strong>审查与发布</strong></td><td>失败能否成为新知识，版本是否达标？</td><td>复现、分流、配对结果、门禁</td><td>回归集、质量集或发布决定</td></tr></tbody></table>
-<p>这四部分是职责和反馈关系，不要求部署四个独立服务。任务契约同时约束离线和生产判断；离线与生产都产出证据；审查决定是修题、修评分、修实现、补观测，还是阻断发布。闭环的产物不是一个准确率，而是一组能回到责任对象的判断。</p>
-<h3>判断对象必须分开</h3>
-<ol><li><strong>事实或终态核查：</strong>工单是否真的转给目标团队，是否改动了其他租户数据；</li><li><strong>资料和过程核查：</strong>Agent 读到了什么、调用了哪个工具和版本、是否超出预算；</li><li><strong>任务判断核查：</strong>在这些事实下，回复或动作是否满足用户目标与权限规则。</li></ol>
-<p>读旧规则给出旧建议，可能忠实于所读材料却不符合当前生产策略；没有读取依据却碰巧答对，也不能证明资料入口有效。三种核查不能合成一个“知识库准确率”。</p>
-<h2 id="deep-contract">四、任务契约：先定义成功终态，再谈评分</h2>
-<p>[公开资料] Anthropic 将 Agent 评测中的 task 定义为带输入和成功标准的单个测试，并区分 trial、grader、transcript 与环境最终 outcome；这说明只保存回答文本不够。<a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents" target="_blank" rel="noopener">Anthropic Agent evals</a></p>
-<pre><code>id: ticket-routing-ambiguous-name
-input: "把当前租户 T 的工单 X 转交给账单支持组"
-fixture: "隔离测试库：两个租户各有一个同名工单"
+<p><strong>难点一：语言表现与业务终态可能背离。</strong> Agent 说&quot;已退款&quot;，并不等于支付系统里的状态已经变化。用户真正关心的是任务结束时系统处于什么状态，以及中间是否发生了不可接受的副作用。</p>
+<p><strong>难点二：一次离线通过不等于跨试验可靠。</strong> Agent 输出有随机性。一个任务试三次成功一次，和三次都成功，面向用户时是两种风险。若题目、环境或模型配置同时变化，分数差异还不能归因于某一个改动。</p>
+<p><strong>难点三：有执行记录不等于知道质量。</strong> Trace 可以告诉我们调用了哪些工具、哪个版本在运行、用了多久；它不会自动告诉我们退款是否真正入账，也不会替代权限护栏和业务终态检查。</p>
+<p><strong>难点四：线上失败不能直接变成新题。</strong> 低分可能来自真实失败，也可能来自评分器写错、外部服务临时故障、题目超出支持范围，或样本脱敏后失去了关键条件。把未经审查的日志直接放进回归集，会把噪声固化成错误标准；只抽投诉样本，又会夸大线上失败率。</p>
+<p>这四个难点决定了文章的范围：要设计的是一条持续判断链，而不是一个评分脚本或一套遥测字段。</p>
+<p><a id="deep-s1"></a></p>
+<h2>一、解决思路：把&quot;变好了&quot;拆成四种互相校验的判断</h2>
+<h3>先看几种直觉方案为什么不够</h3>
+<p><strong>只看最终回复。</strong> 成本最低，却把业务状态、权限和副作用藏在文本之后。它适合评估表达质量，不能单独证明任务完成。</p>
+<p><strong>只建一套离线题库。</strong> 它能在发布前发现已知场景的退化，却看不到生产分布变化，也不知道题库本身是否过时。离线结果是比较信号，不是运行事实。</p>
+<p><strong>只接入 Trace。</strong> 追踪让过程可见，但&quot;看见发生了什么&quot;和&quot;判断是否满足目标&quot;是两项工作。没有参考终态和评分规则，Trace 只是可检索的日志。</p>
+<p><strong>把所有线上低分直接回流。</strong> 这会把判官错误、偶发依赖故障和不受支持请求混进回归标准，还可能把凭据和个人数据带进长期资产。</p>
+<p>因此，本文采用的总思路是：<strong>先写任务契约，再用离线评测比较版本；生产侧保留与任务相关的执行证据；失败经过复核、脱敏和复现后，才改变题库和发布判断。</strong> 四部分持续协作，任何一部分都不冒充其他部分。</p>
+<p><a id="deep-s2"></a></p>
+<h2>二、总体方案与总设计：四个节点怎样组成一个闭环</h2>
+<h3>2.1 四部分的职责</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>组成部分</th>
+<th>它要回答的问题</th>
+<th>主要输入</th>
+<th>判断证据</th>
+<th>失败后改哪里</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>任务契约</strong></td>
+<td>什么结果算成功，什么动作不可接受？</td>
+<td>用户目标、环境、权限和业务规则</td>
+<td>终态、约束、比较条件</td>
+<td>补清题意、终态或不变量</td>
+</tr>
+<tr>
+<td><strong>离线评测</strong></td>
+<td>在可控条件下，新版本是否稳定满足契约？</td>
+<td>任务集、隔离环境、版本组合</td>
+<td>状态检查、工具记录、回复和评分器</td>
+<td>修实现、评分器、环境或任务</td>
+</tr>
+<tr>
+<td><strong>生产证据</strong></td>
+<td>这次线上请求实际发生了什么？</td>
+<td>请求、版本、工具、业务事件和反馈</td>
+<td>Trace/Span、审计事件、最终状态</td>
+<td>复核故障、分布变化或观测缺口</td>
+</tr>
+<tr>
+<td><strong>审查与发布</strong></td>
+<td>失败能否成为新知识，版本是否达到风险门槛？</td>
+<td>脱敏样本、复现结果、分层结果</td>
+<td>人工复核、配对比较、不确定性</td>
+<td>回归集、代表性质量集或发布门禁</td>
+</tr>
+</tbody></table></div>
+<pre><code class="language-mermaid">flowchart LR
+    C[任务契约\n终态·约束·比较条件]
+    E[离线评测\n隔离运行·评分·重复比较]
+    P[生产证据\nTrace·业务事件·版本·反馈]
+    R[审查与发布\n复现·分流·风险门禁]
+    C --&gt; E
+    C --&gt; P
+    E --&gt; R
+    P --&gt; R
+    R --&gt;|修订任务、评分器或观测| C
+    R --&gt;|决定版本是否继续| E
+</code></pre>
+<p>这张图表达的是职责和反馈关系，不是每个请求必须依次经过四个服务。任务契约同时约束离线和生产判断；离线结果与生产证据都进入审查；审查决定是修题、修评分、修实现、补观测，还是阻断发布。<strong>闭环的产物不是一个准确率，而是一组能回到责任对象的判断。</strong></p>
+<h3>2.2 判断对象必须分开</h3>
+<p>同一次失败至少有三种不同的核查：</p>
+<ol>
+<li><strong>事实或终态核查</strong>：退款是否真的在支付系统里执行，是否改动了其他商户的数据；</li>
+<li><strong>资料和过程核查</strong>：Agent 读到了什么、调用了哪个工具和版本、是否超出预算；</li>
+<li><strong>任务判断核查</strong>：在这些事实下，回复或动作是否满足用户目标与权限规则。</li>
+</ol>
+<p>例如，Agent 读到旧规则&quot;超过 30 秒就取消&quot;，然后给出 30 秒建议：它可能忠实于所读资料，却不符合当前生产策略。反过来，Agent 没有读取依据却碰巧答出 60 秒，也不能证明资料入口有效。三种核查不能合成一个&quot;知识库准确率&quot;。</p>
+<p><a id="deep-s3"></a></p>
+<h2>三、任务契约：先定义成功终态，再谈评分</h2>
+<h3>3.1 一张任务卡要规定什么</h3>
+<p>[公开资料] Anthropic 将 Agent 评测中的 task 定义为带输入和成功标准的单个测试，并区分 trial、grader、transcript 与环境最终 outcome；这正好说明为什么只保存回答文本不够。<a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">Anthropic Agent evals</a></p>
+<p>下面是一张构造的退款任务卡：</p>
+<pre><code class="language-yaml">id: refund-ambiguous-order
+input: &quot;把商户 M 的订单 O 退款给买家&quot;
+fixture: &quot;隔离测试库：两个商户各有一个同名订单&quot;
 expected_state:
-  ticket_X_team: billing_support
+  order_O_refund_status: refunded
 invariants:
-  - "不能读取或修改其他租户工单"
-  - "同一请求至多发送一次通知"
+  - &quot;不能读取或修改其他商户的订单&quot;
+  - &quot;同一请求至多执行一次退款&quot;
 response:
-  - "不得声称未发生的转交已经完成"
+  - &quot;不得声称未发生的退款已完成&quot;
 budget:
-  max_tool_calls: 6</code></pre>
-<p>任务卡的关键不是 YAML 格式，而是把“做对”拆成业务终态、不可接受副作用、对外表达和资源边界。资源边界影响能否发布，却不能用低成本掩盖错误终态；合理的替代工具路径也不应仅因没有按某个固定顺序执行就被判错。</p>
-<h3>比较条件要登记</h3>
-<p>记录模型、提示词、工具和评分器版本，环境快照，允许时延、调用预算和计费口径。比较时先声明改变的变量，其余条件尽量固定；否则只能评价整套版本组合。每次 trial 从干净环境开始，避免上一轮的工单修改、缓存或通知影响下一轮。</p>
-<h2 id="deep-grading">五、离线评测与评分：判断结果，也检查判定系统</h2>
-<p>终态、越权访问、重复通知和预算优先用代码、数据库状态或审计事件判定；回复是否如实、是否清楚，再用明确量规进行人工或模型判断。</p>
-<table><thead><tr><th>评分器</th><th>适合检查</th><th>主要风险</th><th>必须补的检查</th></tr></thead><tbody><tr><td>代码/状态</td><td>终态、权限、工具参数、次数</td><td>断言写错或过于死板</td><td>人工确认正例和反例</td></tr><tr><td>模型</td><td>语气、解释、开放表达</td><td>波动、偏好措辞</td><td>固定量规并和人工校准</td></tr><tr><td>人工</td><td>高风险或含糊判断</td><td>成本高、标准不一</td><td>统一标注并记录分歧</td></tr></tbody></table>
-<p>[公开资料] Anthropic 将 code-based、model-based、human graders 视为互补手段，并强调模型评分需要与人工判断校准。本文把这套分类用于工单案例，不声称某种评分器在所有任务上更好。<a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents" target="_blank" rel="noopener">来源</a></p>
-<p><strong>确定性不等于正确。</strong> 写错工单 ID 的断言可以稳定地产生错误分数；严格匹配完整字符串也可能拒绝合理答案。评分器本身要有正例、反例和人工复核记录。</p>
-<h3 id="deep-repeat">一次成功和重复可靠不是一回事</h3>
-<p><code>pass@k</code> 关心 k 次尝试中至少有一次成功；<code>pass^k</code> 关心同一任务的 k 次重复试验是否全部成功。[公开资料] τ-bench 提出 <code>pass^k</code> 衡量跨试验可靠性，并以数据库最终状态和目标状态比较任务结果。<a href="https://arxiv.org/abs/2406.12045" target="_blank" rel="noopener">τ-bench</a></p>
-<pre><code>至少一次成功：1 - (1-p)^k
-全部成功：    p^k</code></pre>
-<p>公式假设同一任务、固定配置、每次成功率为 p 且各次独立。构造参数 p=0.7、k=3 时分别为 97.3% 和 34.3%；这是数学示意，不是产品成绩，也不等于一次任务内部三个步骤全部成功。相关失败、环境共因和重试副作用都会破坏独立性。</p>
-<h2 id="deep-trace">六、生产证据：Trace 说明发生了什么，评测说明是否做对</h2>
-<p>[公开资料] OpenTelemetry 将 Span 定义为 Trace 中的一次操作，并通过上下文关联跨服务操作；这支持把一次 Agent 请求和工具、下游服务关联起来，不自动定义业务成功标准。<a href="https://opentelemetry.io/docs/specs/otel/trace/api/" target="_blank" rel="noopener">OpenTelemetry Tracing API</a></p>
-<pre><code>请求 trace
- ├─ 模型调用：识别租户和工单
- ├─ 工具调用：查询当前租户工单
- ├─ 工具调用：更新归属
- │   └─ 下游写入 / 重试事件
+  max_tool_calls: 6
+# 以上数字和字段是构造示例，不是通用推荐值。
+</code></pre>
+<p>这张卡的关键不是 YAML 格式，而是把&quot;做对&quot;拆成可观察条件：</p>
+<ul>
+<li><strong>业务终态</strong>：目标订单最终处于已退款状态，且资金动作在支付系统可核对；</li>
+<li><strong>不可接受副作用</strong>：没有越权读取其他商户、误改无关订单，也没有重复退款；</li>
+<li><strong>对外表达</strong>：回复与实际结果一致，失败时明确说明失败；</li>
+<li><strong>资源边界</strong>：工具调用、时延、重试和成本不超过事先约定的范围。</li>
+</ul>
+<p>资源边界是次级约束：它影响能否发布，却不能用低成本掩盖错误终态。反过来，也不能把一次实现恰好走过的工具顺序写成唯一正确路径；只要终态和不变量满足，合理的替代路线应被允许。[公开资料] Anthropic 也提醒，过度要求固定工具顺序会惩罚有效解法。<a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">同上</a></p>
+<p>退款是<strong>不可逆动作</strong>的典型样本：终态写错还可以改回来，钱退出去就退出去了。所以这张卡的不变量里，&quot;至多执行一次退款&quot;不是表达要求，是资金安全约束——它必须由幂等键在服务端保证，而不是靠提示词请求模型&quot;别忘了&quot;。</p>
+<h3>3.2 比较条件要登记</h3>
+<p>任务卡还要登记模型、提示词、工具和评分器版本，环境快照，允许时延、调用预算和计费口径。比较两个版本时，先声明本次改变的变量，其余条件尽量固定；如果模型、提示词、工具和题目一起换，只能评价&quot;整套版本组合&quot;的变化，不能把收益归给其中单一组件。</p>
+<p>每次 trial 应从干净环境开始，避免上一轮留下的订单状态、缓存或通知影响下一轮。[公开资料] Anthropic 的评测说明把隔离环境作为可重复比较的前提，并指出共享状态会造成相关失败或虚假的优势。<a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">同上</a></p>
+<p><a id="deep-s4"></a></p>
+<h2>四、离线评测与评分：判断结果，也检查判定系统</h2>
+<h3>4.1 三类评分器各自负责什么</h3>
+<p>终态、越权访问、重复退款和预算优先用代码、数据库状态或审计事件判定；回复是否如实、是否清楚，再用明确量规进行人工或模型判断。这样做的原因是：可执行的不变量通常更适合确定性检查，开放表达才需要语义判断。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>评分器</th>
+<th>适合检查</th>
+<th>主要风险</th>
+<th>必须补的检查</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>代码/状态评分器</strong></td>
+<td>终态、字段、权限、工具参数、次数</td>
+<td>断言写错或过于死板</td>
+<td>用人工确认的正例和反例核对断言</td>
+</tr>
+<tr>
+<td><strong>模型评分器</strong></td>
+<td>语气、解释、开放式表达</td>
+<td>波动、偏好长答案、受措辞影响</td>
+<td>固定量规，和人工样本校准，允许回答 Unknown</td>
+</tr>
+<tr>
+<td><strong>人工评分器</strong></td>
+<td>高风险或含糊判断</td>
+<td>成本高、不同评审者标准不同</td>
+<td>统一标注规则，记录分歧并抽查</td>
+</tr>
+</tbody></table></div>
+<p>[公开资料] Anthropic 将 code-based、model-based、human graders 视为互补手段，并强调模型评分需要与人工判断校准；本文把这套分类用于退款案例，不声称某种评分器在所有任务上都更好。<a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">Anthropic Agent evals</a></p>
+<p><strong>确定性不等于正确。</strong> 写错订单 ID 的断言可以稳定地产生错误分数；严格匹配完整字符串也可能拒绝合理答案。评分器本身应当有正例、反例和人工复核记录。若任务没有可核对的业务终态，要明确写出使用的代理指标及其可能漏掉的失败。</p>
+<h3>4.2 一次成功和重复可靠不是一回事</h3>
+<p><code>pass@k</code> 关心 k 次尝试中至少有一次成功；<code>pass^k</code> 关心同一任务的 k 次重复试验是否全部成功。[公开资料] τ-bench 提出 <code>pass^k</code> 来衡量跨试验的行为可靠性，并以对话结束时的数据库状态与目标状态比较任务结果。<a href="https://arxiv.org/abs/2406.12045">τ-bench</a></p>
+<p>在<strong>同一任务、固定配置、每次成功率为 p、各次独立</strong>的数学假设下：</p>
+<pre><code class="language-text">至少一次成功：1 - (1-p)^k
+全部成功：    p^k
+</code></pre>
+<p>构造参数 <code>p=0.7，k=3</code> 时，结果分别是 <code>97.3%</code> 和 <code>34.3%</code>。这是公式推导，不是产品成绩，也不等于一次任务内部三个步骤都成功。不同任务难度不同，应先对任务计算，再按声明的权重汇总；相关失败、环境共因和重试副作用都会破坏独立性假设。</p>
+<p>能生成多个候选、再由可靠验证器选出一个的流程，可以关注至少一次成功；真实用户的一次操作通常更关心单次质量和跨重复一致性。重试还要同时考虑幂等性、延迟、成本和不可逆副作用，不能把增加 k 当成免费的可靠性提升。</p>
+<h3>4.3 评分器自身的失效模式：三种已知偏差与两种工程病</h3>
+<p>上一节把评分器当裁判，这一节专门说裁判自己会怎么错。裁判不可信时，闭环里所有&quot;分数上升&quot;都失去意义——所以评分器的健康度要和版本质量放在同一层检查。</p>
+<p><strong>模型评分器的三种系统性偏差</strong>，来自受控评测研究：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>偏差</th>
+<th>表现</th>
+<th>缓解手段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>位置偏差</strong></td>
+<td>两个候选答案交换顺序后，评分结论会翻转——评审倾向支持特定位置的答案</td>
+<td>每次评审做位置交换重评，两次结论不一致的样本升级人工</td>
+</tr>
+<tr>
+<td><strong>冗长偏差</strong></td>
+<td>评审系统性偏好更长、更详尽的回答，即使内容没有增量</td>
+<td>量规中把&quot;长度&quot;与&quot;正确性、完整性&quot;分开计分；对长度做归一或截断</td>
+</tr>
+<tr>
+<td><strong>自增强偏差</strong></td>
+<td>评审模型偏好同一家族模型的输出风格</td>
+<td>评审模型与被评模型跨家族搭配；或用多评审员投票</td>
+</tr>
+</tbody></table></div>
+<p>[公开资料] MT-Bench 的作者们在受控实验中报告了这三种偏差：交换候选顺序可显著缓解位置偏差，评审对更长的回答有系统性偏好，评审模型也会偏好同家族模型的答案。<a href="https://arxiv.org/abs/2306.05685">Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</a> 另一项工作进一步表明，评审所依据材料的呈现顺序同样会影响结论，交换顺序重评能提升与人类判断的一致性。<a href="https://arxiv.org/abs/2305.17926">Large Language Models are not Fair Evaluators</a></p>
+<p>对退款案例的落点是具体的：如果用模型评分器判断&quot;回复是否如实说明退款结果&quot;，那么把&quot;已退款（成功）&quot;和&quot;退款执行失败，原因是……&quot;两个候选交换位置重评一次，是成本最低的防线——结论翻转的样本直接进人工队列，而不是信任何一个位置上的分数。</p>
+<p><strong>代码/状态评分器的两种工程病</strong>：</p>
+<ul>
+<li><strong>断言过期</strong>：业务 schema 演进后，<code>refunded_status</code> 的枚举值变了，断言还在核对旧值——它会很稳定地产生错误分数。反制是断言跟随 schema 版本登记，变更时触发断言评审。</li>
+<li><strong>覆盖假象</strong>：正例全部通过，但反例从没测过——比如从未构造过&quot;两个商户同名订单&quot;的负样本，越权类断言等于没验证。反制是每条断言登记它应拦住的失败类别，反例库与失败类别清单对账。</li>
+</ul>
+<p>这两类病和模型评分器的偏差合起来，指向同一条纪律：<strong>评分器是闭环里唯一&quot;给所有东西打分&quot;的组件，它的失效会伪装成被评对象的失效。</strong></p>
+<p><a id="deep-s5"></a></p>
+<h2>五、生产证据：Trace 说明发生了什么，评测说明是否做对</h2>
+<h3>5.1 最小证据链</h3>
+<p>[公开资料] OpenTelemetry 将 Span 定义为 Trace 中的一次操作，并通过上下文把跨服务的相关操作关联起来；这支持&quot;把一次 Agent 请求和它的工具、下游服务关联起来&quot;的观测方式，不自动定义业务成功标准。<a href="https://opentelemetry.io/docs/specs/otel/trace/api/">OpenTelemetry Tracing API</a></p>
+<p>退款请求可以留下这样的证据链：</p>
+<pre><code class="language-text">请求 trace
+ ├─ 模型调用：识别商户和订单
+ ├─ 工具调用：查询当前商户订单
+ ├─ 工具调用：发起退款
+ │   └─ 支付网关调用 / 幂等键 / 重试事件
  ├─ 回复生成：向用户说明结果
- └─ 旁路关联：业务终态检查 / 用户反馈 / 在线评分</code></pre>
-<p>至少关联请求、发布版本、必要的模型与工具信息、耗时、错误分类、重试和用量。追踪保存执行证据，评测依据任务契约判断质量，护栏在执行时阻止越权或危险动作。三者可以共享请求 ID，但不能互相替代。</p>
-<h2 id="deep-review">七、审查与发布：失败怎样回到评测而不污染评测</h2>
-<ol><li><strong>确认现象：</strong>终态错误、越权/副作用、回复失实，还是评分器拒绝？</li><li><strong>检查证据：</strong>读取 Trace、工具结果、审计事件和运行版本，确认缺段或采样偏差。</li><li><strong>重建条件：</strong>在隔离环境还原租户、同名对象、权限和依赖版本。</li><li><strong>最小化样本：</strong>脱敏但保留会改变判断的租户差异、权限边界和状态转换。</li><li><strong>写参考结果：</strong>明确终态、不变量、允许的替代路径和评分依据。</li><li><strong>决定去向：</strong>确认失败进入回归集；随机或分层样本进入代表性质量集；无法复现的记录留在调查队列。</li></ol>
-<table><thead><tr><th>集合</th><th>用途</th><th>样本特点</th><th>不能拿来做什么</th></tr></thead><tbody><tr><td><strong>失败回归集</strong></td><td>记住确认过的教训</td><td>偏向困难、危险和历史失败</td><td>直接估计全部线上请求质量</td></tr><tr><td><strong>代表性质量集</strong></td><td>估计目标分布中的表现</td><td>随机或分层抽样，说明时间窗和权重</td><td>为了查错而无限过采样</td></tr></tbody></table>
-<p>确定性高风险约束可按预先规则阻断；概率型指标需要固定条件、重复试验、配对比较和不确定性说明。不能补跑到绿为止，也不能让总体分数抵消关键租户类型的越权率上升。</p>
-<h2 id="deep-case">八、完整案例回放：从“已转交”追到该改什么</h2>
-<p>只保留一个已知现象：<strong>Agent 回复“已转交”。</strong> 不提前宣布根因。</p>
-<ol><li><strong>查任务契约：</strong>若只写“转交成功”，先补终态和不变量。</li><li><strong>查业务终态：</strong>数据库显示未转交且读到另一租户对象，确认不是文本问题。</li><li><strong>查生产证据：</strong>Trace 和审计事件定位租户过滤缺失、重复通知和版本。</li><li><strong>查评分器：</strong>只检查“已转交”会把同样错误打成通过。</li><li><strong>修对应对象并复测：</strong>实现补过滤与幂等，评分改查状态，生产补安全关联。</li><li><strong>决定回流与发布：</strong>确认失败进回归集，高风险不变量仍失败则阻断。</li></ol>
-<p>案例的重点是调查顺序：每增加一份证据，就排除一类解释。不能从一句成功回复直接跳到“模型能力不够”。</p>
-<h2 id="deep-boundary">九、边界、起步与证据分工</h2>
-<p>离线题库只能覆盖已知场景；生产分布会变化；Trace 会采样丢失；模型评分器会漏判；回归集会被刷熟；脱敏会抹掉关键条件。闭环让失败可见、可比较、可追溯，不给系统出具绝对可靠证明。它也不替代服务端访问控制、事务约束、人工审批和业务监控。</p>
-<ol><li>从一个高价值功能写出一个任务终态和两个危险反例；</li><li>建立能从干净环境重跑的离线任务；</li><li>用代码检查终态，用少量人工样本校准表达评分；</li><li>打通一条带版本信息的生产 Trace，并关联业务事件；</li><li>定期审查失败，确认后再加入回归集或代表性质量集；</li><li>预先写好高风险失败的发布门禁。</li></ol>
-<p><strong>证据分工：</strong>[公开资料] Anthropic 支撑评测概念与维护方法；τ-bench 支撑 <code>pass^k</code>；OpenTelemetry 支撑 Trace/Span 关联定义。[数学推导] 公式只在声明假设下成立。[构造示例] 工单、YAML、分流流程和门禁表不代表生产数据。[设计建议] 四节点闭环和样本分流是本文综合设计。</p>
-<p><strong>最终判断：</strong>离线评测回答“在声明条件下能否通过”，生产证据回答“线上实际发生了什么”，审查与发布回答“这次失败是否足以改变下一轮系统”；三者相连，才构成持续改进的闭环。</p>
-</article>
-<noscript><p class="noscript">深入版内容可直接阅读；参数交互需要启用 JavaScript，也可以打开相邻 Markdown 正本。</p></noscript>
-</section>
-</div>
-<script>
-(function(){
-  const deep=new URLSearchParams(location.search).get('view')==='deep';
-  document.getElementById('lecture').hidden=deep;
-  document.getElementById('deep-document').hidden=!deep;
-  document.getElementById('mode-status').textContent=deep?'深入版阅读视图':'讲解版';
-  if(deep&&location.hash){requestAnimationFrame(()=>document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView());}
-  window.addEventListener('hashchange',()=>{if(new URLSearchParams(location.search).get('view')==='deep'&&location.hash){document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();}});
-  const p=document.getElementById('pInput'),k=document.getElementById('kInput');
-  function calc(){if(!p||!k)return;const pv=Number(p.value)/100,kv=Number(k.value),any=100*(1-Math.pow(1-pv,kv)),all=100*Math.pow(pv,kv);document.getElementById('pOut').textContent=Math.round(pv*100)+'%';document.getElementById('kOut').textContent=kv;document.getElementById('anyOut').textContent=any.toFixed(1)+'%';document.getElementById('allOut').textContent=all.toFixed(1)+'%';document.getElementById('anyFill').style.width=any+'%';document.getElementById('allFill').style.width=all+'%';}
-  p?.addEventListener('input',calc);k?.addEventListener('input',calc);calc();
-})();
-</script>
-</body>
-</html>
+ └─ 旁路关联：业务终态检查 / 用户反馈 / 在线评分
+</code></pre>
+<p>至少应能关联请求、发布版本、必要的模型与工具信息、耗时、错误分类、重试和用量。业务 ID 是否进入遥测、是否匿名化，取决于实际数据边界；凭据和不必要的个人数据不应因为&quot;方便排查&quot;而长期保留。</p>
+<h3>5.2 三种职责不要混成一个平台</h3>
+<ul>
+<li><strong>追踪</strong>保存执行证据：谁在什么版本、按什么顺序做了什么；</li>
+<li><strong>评测</strong>依据任务契约判断质量：终态、约束和表达是否满足要求；</li>
+<li><strong>护栏</strong>在执行时阻止越权或危险动作：权限、幂等、预算和不可逆操作。</li>
+</ul>
+<p>它们可以共享请求 ID 和业务事件，但不能互相替代。HTTP 200 只说明某个请求层面返回成功；Trace 完整也不等于退款已入账；评测通过也不等于线上权限边界已经生效。</p>
+<p><a id="deep-s6"></a></p>
+<h2>六、审查与发布：失败怎样回到评测而不污染评测</h2>
+<h3>6.1 线上失败的审查顺序</h3>
+<p>遇到低分或投诉，按以下顺序处理：</p>
+<ol>
+<li><strong>确认现象</strong>：是业务终态错误、越权/副作用、回复失实，还是仅仅评分器拒绝？</li>
+<li><strong>检查证据</strong>：读取 Trace、工具结果、审计事件和运行版本，确认是否存在缺段或采样偏差。</li>
+<li><strong>重建条件</strong>：在隔离环境还原商户、同名订单、权限和依赖版本；不要直接重放含真实凭据的日志。</li>
+<li><strong>最小化样本</strong>：脱敏并保留会改变判断的结构，例如商户差异、权限边界和状态转换。</li>
+<li><strong>写参考结果</strong>：明确终态、不变量、允许的替代路径和评分依据。</li>
+<li><strong>决定去向</strong>：确认的失败优先进入回归集；随机或分层样本进入代表性质量集；无法复现的记录留在调查队列，不强行改题。</li>
+</ol>
+<p>同一条线上记录可能同时产生两种资产，但用途不同：回归集负责记住已确认的教训，代表性质量集负责估计目标分布中的表现。投诉和慢请求可以过采样用于查错，却不能不加权地代表所有请求。</p>
+<h3>6.2 发布判断要尊重随机性</h3>
+<p>确定性高风险约束一旦违反，可以按预先规则阻断；概率型质量指标则需要固定条件、重复试验、配对比较和不确定性说明。新版本少答对几题，可能是退步，也可能是随机波动；先读失败记录和评分器分歧，不能为了过门禁无限补跑或事后改标准答案。</p>
+<p>发布报告至少应分开看：终态成功、危险副作用、表达质量、时延/成本，以及不同业务和风险层的结果。总体分数上升，不能掩盖某个关键商户类型的越权率上升。对高风险能力，先定义不可接受的失败类别；对普通质量，再设定允许退化幅度、复核规则和预算。</p>
+<p>生产保护必须和第一版一起设计：超时、重试预算、并发上限、幂等性和不可逆动作的授权边界，不能等&quot;在线评估成熟&quot;之后才补。评测告诉你版本是否满足契约，护栏负责在不满足时阻止动作。</p>
+<p><a id="deep-s7"></a></p>
+<h2>七、完整案例回放：从&quot;已退款&quot;追到该改什么</h2>
+<p>现在只保留一个已知现象：<strong>Agent 回复&quot;已退款&quot;。</strong> 先不假定根因。</p>
+<p><strong>第一步，查任务契约。</strong> 任务卡要求商户 M 的订单 O 最终处于已退款状态，且不得读写其他商户订单、不得重复退款。若任务卡只写&quot;退款成功&quot;，连失败都无法分类，先补契约。</p>
+<p><strong>第二步，查业务终态。</strong> 测试支付系统显示订单 O 未退款；另一商户的同名订单被读取。此时已经可以判定&quot;回复正确、任务完成&quot;不能作为通过条件，至少存在终态失败和越权风险。</p>
+<p><strong>第三步，查生产证据。</strong> Trace 显示模型查询时没有带商户过滤，退款工具返回成功但写入的是另一条订单；审计事件显示重试又执行了一次退款。若 Trace 缺少商户、对象 ID 或版本信息，就先记录观测缺口，不能靠语言推测补齐。</p>
+<p><strong>第四步，查评分器。</strong> 若离线题只检查回复里是否出现&quot;已退款&quot;，它会把同样的错误打成通过；若状态断言写错订单 ID，它也可能把正确解打成失败。把评分器正例和反例拿给人工复核，并按 §4.3 的位置交换法重评一次，决定是题目、断言还是实现需要修改。</p>
+<p><strong>第五步，修对应对象并复测。</strong> 实现侧补商户过滤和退款幂等键；任务侧保留同名订单与商户隔离这个因果结构；评分侧改用支付系统状态与审计事件；生产侧补齐对象 ID 的安全关联。新版本在干净环境重复运行，再用配对结果判断是否真的改善。</p>
+<p><strong>第六步，决定回流和发布。</strong> 确认的越权与重复退款进入固定回归集；同类但未确认的线上样本进入调查或代表性质量集；如果高风险不变量仍有一次失败，按门禁阻断，而不是用更好的语气或更高的平均分抵消它。</p>
+<p>这个回放展示了四部分怎样协作：任务契约决定查什么，离线评测让修复可重复比较，生产证据让线上现象可追溯，审查与发布把结论送回正确的维护对象。任何一项单独存在，都无法完成这条因果链。</p>
+<p><a id="deep-s8"></a></p>
+<h2>八、边界、起步与闭环自身的慢性失效</h2>
+<h3>8.1 这个闭环仍会失灵的地方</h3>
+<p>离线题库只能覆盖已知场景；生产分布会变化。Trace 可能采样丢失或缺少业务关联；模型评分器可能漏判或偏好某种措辞；回归集可能被反复调参&quot;刷熟&quot;；脱敏可能抹掉真正造成失败的条件。闭环的作用是让变化和失败可见、可比较、可追溯，不是给系统出具绝对可靠证明。</p>
+<p>它也不替代访问控制、事务约束、人工审批和业务监控。高风险动作应在服务端建立不可绕过的权限与幂等边界，不能把&quot;Agent 已经通过评测&quot;当成授权。</p>
+<h3>8.2 闭环自身的三种慢性失效</h3>
+<p>除了&quot;覆盖不全&quot;这类一眼可见的局限，闭环跑久了还有三种更隐蔽的慢性失效——它们不产生报错，只产生越来越好看却越来越没有意义的分数：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>慢性失效</th>
+<th>机制</th>
+<th>反制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>回归集刷熟</strong></td>
+<td>版本反复对着同一批题目调参，分数上升，题目之外的失败率没有下降——优化的是考卷不是能力</td>
+<td>划出固定比例的保留集（holdout），只在发布判断时使用并定期轮换；回归集成绩与保留集成绩分开报告，剪刀差扩大即报警</td>
+</tr>
+<tr>
+<td><strong>评分器漂移</strong></td>
+<td>评分模型或量规随时间升级，新旧分数不再可比，趋势线悄悄断裂</td>
+<td>评分器版本与量规版本一起登记进比较条件（§3.2）；升级评分器时用同一批人工校准样本做新旧对账</td>
+</tr>
+<tr>
+<td><strong>审查疲劳</strong></td>
+<td>每周失败审查逐渐变成盖章流程，&quot;确认&quot;不再指向具体修改对象</td>
+<td>每条审查结论必须登记&quot;改变了哪个对象&quot;（题目/断言/实现/观测）；连续数周无指向性结论时抽查审查质量</td>
+</tr>
+</tbody></table></div>
+<p>这三种失效的共同点：**它们都伪装成系统在变好。**四节点闭环设计再好，也防不住节点自身被优化目标侵蚀——所以闭环的输入（题目、评分器、审查结论）本身也要有版本、有保留集、有对账，这是 §4.3&quot;评分器健康度与版本质量同层检查&quot;的延伸。</p>
+<h3>8.3 最小可行起步</h3>
+<p>不必先部署完整平台。可以从一个高价值功能开始：</p>
+<ol>
+<li>写出一个任务终态和两个危险反例；</li>
+<li>建一个能从干净环境重跑的离线任务；</li>
+<li>用代码检查终态，用少量人工样本校准表达评分；</li>
+<li>打通一条带版本信息的生产 Trace，并关联业务事件；</li>
+<li>每周审查一批失败，确认后再加入回归集或代表性质量集；</li>
+<li>预先写好高风险失败的发布门禁。</li>
+</ol>
+<p>等任务数量和团队规模增长，再把任务、评分器、Trace 和样本审查的责任分开。评测集是持续维护的工程资产，需要明确负责人、版本和废弃路径。</p>
+<h3>8.4 证据分工</h3>
+<ul>
+<li><strong>[公开资料]</strong> Anthropic 支撑任务、trial、grader、transcript、最终状态、隔离环境和长期维护等评测概念；τ-bench 支撑 <code>pass^k</code> 的重复可靠性指标；OpenTelemetry 官方资料支撑 Trace/Span 的关联定义；MT-Bench 与后续评审偏差研究支撑 §4.3 的三种系统性偏差及其缓解手段。</li>
+<li><strong>[数学推导]</strong> <code>1-(1-p)^k</code> 与 <code>p^k</code> 只在文中声明的独立、同任务、固定成功率假设下成立。</li>
+<li><strong>[构造示例]</strong> 退款场景、任务 YAML、分流流程和门禁表是本文为了说明设计而构造的例子，不是本项目的生产数据。</li>
+<li><strong>[设计建议]</strong> 四节点闭环、样本审查顺序、回归集与代表性质量集的分流、保留集轮换与评分器版本对账，是本文的综合设计，不由某一篇外部资料单独证明有效。</li>
+</ul>
+<p>本文最终要守住的判断是：<strong>离线评测回答&quot;在声明条件下能否通过&quot;，生产证据回答&quot;线上实际发生了什么&quot;，审查与发布回答&quot;这次失败是否足以改变下一轮系统&quot;；三者相连，才构成持续改进的闭环。</strong></p>
+<hr>
+<h2>Changelog</h2>
+<ul>
+<li><strong>v2.1（2026-11-27，加厚与去重）</strong><ul>
+<li>案例换域：工单转交 → 客户退款。原 J17 工单案例与《文档明明写了》共用同一构造对象，职责表亦同构；退款域让&quot;不可逆动作&quot;（资金安全、幂等键）成为一等讨论对象，与该篇彻底解耦；</li>
+<li>新增 §4.3 评分器失效模式：模型评分器的位置/冗长/自增强三种系统性偏差（引 MT-Bench 与评审公平性研究），代码评分器的断言过期与覆盖假象两种工程病；</li>
+<li>新增 §8.2 闭环自身的三种慢性失效（回归集刷熟/评分器漂移/审查疲劳）及反制（保留集、版本对账、结论指向性）；</li>
+<li>全文章节加显式锚点，供图解讲解版深链跳转；</li>
+<li>未改：v2.0 的四节点框架、pass@k/pass^k 推导、审查六步顺序与证据分工口径。</li>
+</ul>
+</li>
+<li><strong>v2.0（2026-10，结构重写）</strong><ul>
+<li>按&quot;四种互相校验的判断&quot;重构：任务契约 / 离线评测 / 生产证据 / 审查与发布；工单案例与任务卡 YAML 引入；τ-bench、OpenTelemetry、Anthropic evals 三组公开资料分工登记。</li>
+</ul>
+</li>
+</ul>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 2.1-review · 2026-11-27</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>
