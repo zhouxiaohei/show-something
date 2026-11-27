@@ -26,7 +26,7 @@ COVERS = {
     "trends": "工程/assets/covers/world.svg",
     "practice": "工程/assets/covers/code.svg",
 }
-POST_COVERS = {"04": "工程/assets/covers/boundary.svg", "11": "工程/assets/covers/loop.svg", "12": "工程/assets/covers/world.svg", "13": "工程/assets/covers/boundary.svg", "14": "工程/assets/covers/code.svg", "15": "工程/assets/covers/work-organization.svg"}
+POST_COVERS = {"04": "工程/assets/covers/boundary.svg", "11": "工程/assets/covers/loop.svg", "12": "工程/assets/covers/world.svg", "13": "工程/assets/covers/boundary.svg", "14": "工程/assets/covers/code.svg", "15": "工程/assets/covers/work-organization.svg", "17": "工程/assets/covers/decision-brain.svg"}
 
 
 def esc(value):
