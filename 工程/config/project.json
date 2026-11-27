@@ -119,6 +119,18 @@
       "last_paired_version": "1.6-review",
       "specification": "SHOW v3.3（2026-10-29）",
       "stage_note": "2026-11-23：同步研究版15.0；按v13恢复五个实例章节，保留文件表与生命周期，删除低层实现细节并补OpenClaw/ReMe大白话对比；研究版与站内版完成结构、展示、构建和回归检查。"
+    },
+    {
+      "id": "show-17",
+      "version": "0.1-review",
+      "status": "local-review",
+      "markdown": "原文/把判断从思考里剥出来：9B 决策模型的分工、链路与训练——以 Agnes Harness 为例.md",
+      "html": "阅读/讲解-10-决策小脑.html",
+      "markdown_version": "0.1-review",
+      "html_version": "0.1-review",
+      "last_paired_version": "0.1-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-24：初稿 0.1-review。MD 九节加术语表，8 幅配图与图解片段同版；未核对 Agnes 源码，数字按官方自评登记，见文末证据边界声明。"
     }
   ],
   "markdown_reader": "新增讲解页内置由完整正本生成的深入版，?view=deep#deep-锚点用于浏览器精确定位；保留Markdown源文及显式锚点。",

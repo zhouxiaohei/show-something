@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-17"><meta name="document-version" content="0.1-review">
+<meta name="description" content="代码、9B 小脑与大模型的三分法判据；置信度分档与三层兜底链路；训练五步闭环；校准的核心难点与五个训练点；该训与不该训的五条件表。以 Agnes Harness 为案例，数字按官方自评处理。"><meta name="color-scheme" content="dark">
+<title>把判断从思考里剥出来：9B 决策模型的分工、链路与训练——以 Agnes Harness 为例 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-17">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">Agent 引擎与记忆</p><h1>把判断从思考里剥出来：9B 决策模型的分工、链路与训练——以 Agnes Harness 为例</h1><p class="article-summary">代码、9B 小脑与大模型的三分法判据；置信度分档与三层兜底链路；训练五步闭环；校准的核心难点与五个训练点；该训与不该训的五条件表。以 Agnes Harness 为案例，数字按官方自评处理。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#dm-answer">9B 决策模型不是更小的大模型，而是&quot;判断&quot;的专用件</a><a href="#dm-division">代码、9B 小脑、大模型各干什么</a><a href="#dm-agnes">Agnes Harness：照着人的结构搭的四层</a><a href="#dm-difference">大模型能做 9B 的一切，但工程上不等价</a><a href="#dm-chain">置信度不是玄学，是概率本身；错了怎么重新分</a><a href="#dm-training">像带一个新员工的五步闭环</a><a href="#dm-calibration">要调的不是准确率，是分数的&quot;诚实度&quot;</a><a href="#dm-when">什么场景该训、什么场景不该训</a></nav></details><p>依据 2026-11 公开报道与官方自述汇总；未核对源码、未复现评测，性能数字未独立验证；机制框架为作者归纳。核对日期：2026-11-24。</p></aside>
+<main id="article-content"><div class="quick-content"><section class="content-section" id="dm-answer"><p class="kicker">先给一句话答案</p><h2>9B 决策模型不是更小的大模型，而是"判断"的专用件</h2>
+<p>大模型越来越强之后，一个自然的追问是：还要小模型干什么？2026 年下半年，开源智能体运行底座 Agnes Harness 把另一个方向做成了产品：在 LLM 旁边放一个 9B 参数的"决策模型"，专管高频、机械的判断。官方自评的数字是：快决策 0.53 秒 vs 纯大模型 7.6 秒，单次成本差约 27 倍——数字真假暂且不论，思路值得认真对待。</p>
+<p class="callout">本文的一句话答案：<strong>9B 决策模型不是更小的大模型，而是把"判断"从"思考"里剥出来的专用件——80% 的机械判断用 1/27 的成本和 1/15 的延迟消化掉，大模型只处理真正需要"想"的 20%。</strong></p>
+<p>需要先声明阅读姿态：本文没有核对 Agnes 的源码——框架 2026 年 11 月才开源，所有性能数字按"官方自评"处理；本文的价值在方法论框架，不在为产品背书。</p><a class="deep" href="?view=deep#deep-s0">查看引子与阅读姿态声明 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-division"><p class="kicker">三分法</p><h2>代码、9B 小脑、大模型各干什么</h2>
+<p>一次请求进来，活儿分三层。判据只有一句话：<strong>凡能写成 if-else 的交给代码，答案落在有限集合内的判断交给 9B，有限选项装不下的思考交给大模型。</strong>分流时问三个问题：答案是不是从有限选项里挑？挑错了能不能被代码兜住？需不需要世界知识和长上下文理解？前两问成立给 9B，第三问成立才给大模型。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜一次请求进来，每层只接自己那一段活</b></div><div class="diagram-scroll"><img src="配图/17/fig01.svg" alt="代码层做确定性逻辑，9B 小脑做有限选项判断，大模型做开放性思考，三层各带判据" loading="lazy" decoding="async"></div><figcaption>三层按动作性质分，不按部署位置分；9B 和大模型可以部署在同一台机器上，边界依然存在。</figcaption></figure>
+<p class="callout">9B 的优点是快、便宜、窄域内可微调到高准确率、行为可锁定；缺点是只会收敛不会发散——遇到训练分布之外的输入会"自信地错"。所以置信度阈值和回退机制不是可选优化，是它的生命线。</p><a class="deep" href="?view=deep#deep-s2">查看三分法判据、优缺点表与分流三问 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-agnes"><p class="kicker">案例样本</p><h2>Agnes Harness：照着人的结构搭的四层</h2>
+<p>Agnes AI 的产品线有三块：对话模型、9B 决策模型 Agnes Sys1、开源运行框架 Agnes Harness（Apache-2.0）。Harness 照人的结构分四层：大脑（LLM）只干"需要想"的活；小脑（9B）把条件明确的高频判断直接拍板；记忆（Harness 本体）把跑通的流程沉淀成 Skills 与 Playbook；身体（MHS 硬件标准）统一协议接机械臂和传感器——最后一层是一般 Harness 没有的。</p>
+<figure><div class="figure-top"><span>结构</span><b>图 02｜四层结构与自进化闭环</b></div><div class="diagram-scroll"><img src="配图/17/fig02.svg" alt="大脑对应大模型，小脑对应9B决策模型，记忆对应事件账本与经验沉淀，身体对应统一设备协议，外部是复盘自进化闭环" loading="lazy" decoding="async"></div><figcaption>四层是按职责分的讲解框架，不等于代码里恰好四个模块；TTT/RSI 自进化效率数字均为厂商自述，未独立验证。</figcaption></figure>
+<p>先分清三个容易混的名字：Codex 是具体产品（OpenAI 的编码 Agent）；Harness 是"套在模型外、调度工具和执行流程"这一层的技术类目（社区戏称"爱马仕"，因 Harness 本义是马具）；AgentScope 是阿里开源的多智能体开发框架。Agnes Harness 选的赛道是 Harness 这一层。</p><a class="deep" href="?view=deep#deep-s1">查看公司背景、四层职责表与生态位 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-difference"><p class="kicker">能力边界</p><h2>大模型能做 9B 的一切，但工程上不等价</h2>
+<p>差异不止时效，有五层：时效（秒级 vs 亚秒级）；成本（约 1/27，官方自评口径）；确定性（大模型同输入两次跑可能不同、行为随版本漂移，9B 任务窄、输出空间被约束、可回归测试）；可控性（大模型会编造不存在的工具，9B 被锁死在 N 个选项里挑）；可专精（单一窄任务微调后，9B 准确率可反超通用大模型）。另有一个方向相反的差异：9B 量化后单卡就能跑，数据不出域、断网可用。</p>
+<p class="callout">9B 小脑的四条原则：只做选择题不做问答题；输出必须带置信度；窄而深不广而浅；错误可兜底。能力边界的正确画法不是"9B 是弱化版大模型"，而是——<strong>9B 管的是"大模型降级去干纯属浪费"的那一段。</strong></p><a class="deep" href="?view=deep#deep-s3">查看五层差异表、四条原则与能力边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-chain"><p class="kicker">链路</p><h2>置信度不是玄学，是概率本身；错了怎么重新分</h2>
+<p>9B 做选择题，每个选项都有概率：用户说"帮我退了昨天的订单"，模型打分"退款 0.87 / 查物流 0.08 / 其他 0.05"——置信度就是最高选项的分数，不是额外算的指标。训练时专门加一个"我不知道"选项，教材里故意放模糊 case、标准答案就是"上交"，让模型自己学会交卷。阈值按动作代价切三档：≥0.95 直接办；0.70~0.95 便宜动作办了加抽检、贵动作出拟办单复核；&lt;0.70 上交——这不算错，是交卷。</p>
+<figure><div class="figure-top"><span>完整链路</span><b>图 03｜置信度分档 + 三层保险</b></div><div class="diagram-scroll"><img src="配图/17/fig03.svg" alt="请求经9B打分后按置信度三档处理，执行后有结果校验，失败升级大模型，旁路有熔断降级和错案回流" loading="lazy" decoding="async"></div><figcaption>三档处理 + 结果校验 + 大模型值班主管 + 熔断降级 + 错案回流构成完整闭环；兜底档次跟着动作代价走，不是全局一刀切。</figcaption></figure>
+<p>错了分三种：自己没把握，事前上交，判断根本没出门；有把握但真错了，置信度骗不过，只能靠执行结果校验抓——工具报错、重试一次、升级大模型，错案自动进教材；贵动作错了赔不起，不搞事后补救，直接改流程：拟办单加大模型复核签字后才准执行。判断对不对模型自己说了不算，<strong>"动作办没办成"是代码说了算。</strong></p>
+<figure><div class="figure-top"><span>兜底</span><b>图 04｜三种错误的处理路径</b></div><div class="diagram-scroll"><img src="配图/17/fig04.svg" alt="没把握靠阈值事前上交，有把握错了靠结果校验抓出后重试升级，贵动作靠事前复核" loading="lazy" decoding="async"></div><figcaption>三种错的兜底手段完全不同；退款、付款、部署这类不可逆动作，哪怕 0.97 的高分也只准出拟办单。</figcaption></figure>
+<p class="callout">可用性靠熔断降级：9B 挂了或超时，开关弹开，全量流量降级走大模型——业务不断，只是慢和贵。确定性靠三件套：温度设 0、输出锁死 JSON 枚举、版本锁定加考卷回归。<strong>把 9B 拔掉系统照样转，这是它敢进生产的前提。</strong></p><a class="deep" href="?view=deep#deep-s4">查看三档分档表、可用性与确定性机制 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-training"><p class="kicker">训练</p><h2>像带一个新员工的五步闭环</h2>
+<p>通用 9B 直接拿来当决策模型，效果未必比一段写死的 if-else 好——它的本事全在业务数据喂出来的那一层。五步：①攒教材，让大模型先干一到三个月业务，把每次判断记进日志，教材自动攒出来，训练便宜、攒干净数据才是真成本；②照着答案学，LoRA 单卡几小时到几天，几千条就能教会；③考试，除了正常题还要考陷阱题，看它会不会瞎猜，置信度阈值在这一步校准；④上岗带兜底，大模型降级当值班主管；⑤复盘回流，大模型纠正过的、用户改判的案例定期回炉重训。</p>
+<figure><div class="figure-top"><span>闭环</span><b>图 05｜五步训练闭环</b></div><div class="diagram-scroll"><img src="配图/17/fig05.svg" alt="攒教材、SFT微调、考试校准、带兜底上岗、错案回流重训的五步循环" loading="lazy" decoding="async"></div><figcaption>五步是一根循环链：第⑤步的回流箭头指回第①②步，闭环转起来模型才持续变准。Agnes 官方所说 RSI 的实际含义就是"错案回流 + 定期重训"的工程闭环。</figcaption></figure>
+<p class="closing">三个月后你会得到一个比初始大模型还懂你家业务的判断器——不是模型自己进化，是训练闭环在转。</p><a class="deep" href="?view=deep#deep-s5">查看五步细节与成本口径 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-calibration"><p class="kicker">核心难点</p><h2>要调的不是准确率，是分数的"诚实度"</h2>
+<p>校准的定义很朴素：<strong>模型报 0.9 的那些判断里，真实正确率就得是 90%。</strong>这和准确率高是两码事——一个准确率 95% 的模型，报 0.95 的判断可能实际只有 80% 对。分档机制全押在分数诚实上：分数虚高，阈值就是摆设，错案全从"直接办"那档漏出去。9B 微调后最常见的病恰恰是盲目自信：教材全是标准答案，模型没见过"答错是什么体验"，学成了永远拍胸脯。</p>
+<figure><div class="figure-top"><span>校准</span><b>图 06｜校准前后对比：报分要等于实际正确率</b></div><div class="diagram-scroll"><img src="配图/17/fig07.svg" alt="校准前模型报分普遍高于实际正确率，高分段差距最大；校准后报分与实际正确率对齐" loading="lazy" decoding="async"></div><figcaption>左图红柱是报的分、蓝柱是实际对的比例，差距就是盲目自信；图示为示意分布，非实测数据。</figcaption></figure>
+<p>四个难点：教材太干净（好学生病，校准只能缓解、根治靠掺脏数据）；分数没被校零（训练目标从来不是"把把握度报准"）；考卷和教材是一家人（校准集必须独立）；业务会漂移（上线三个月新话术涌入，高分段盲区扩大）。五个训练点：改数据配方（掺模糊题、陷阱题、真实错案）；温度缩放（调一个参数，先做它）；训练时直接教"不知道"（上交做成正式选项）；考卷按分桶验收（逐桶对账，行话叫 ECE）；线上持续对账（每档实际正确率掉三个点就报警）。</p>
+<figure><div class="figure-top"><span>配方</span><b>图 07｜教材配方：往标准答案里掺"脏东西"</b></div><div class="diagram-scroll"><img src="配图/17/fig06.svg" alt="常规题约七成，模糊题一成半标签是上交，陷阱题一成，罕见题半成；错例来自真实错案、对抗样本和历史捞底" loading="lazy" decoding="async"></div><figcaption>四种题各教一件事；占比是工程经验值，按业务流量分布调整。错例最值钱的来源是回流闭环里被纠正的真实错案。</figcaption></figure>
+<p class="callout">一句话总结：准确率靠"多喂好数据"，置信度的诚实靠"喂错的和模糊的 + 给分数对零 + 持续对账"。好学生是天生的，<strong>知道自己在什么时候会错的学生是教出来的——教法就是往教材里掺失败。</strong></p><a class="deep" href="?view=deep#deep-s6">查看四个难点、五个训练点与对账例子 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-when"><p class="kicker">选型</p><h2>什么场景该训、什么场景不该训</h2>
+<p>五个条件全中才训：高频（一天几千上万次同一类判断）；窄（选项就那十几个且很少变）；等不起或贵不起；有数据（日志、工单里现成有输入加正确结果）；错得起（错了能检测、重试、回滚）。三种不该训的反例：规则老变（模型刚训完就过期，写规则更快）；判断本身开放（9B 装不下，硬训只会自信地错）；量太小（27 倍成本差摊不平一次训练的钱）。</p>
+<figure><div class="figure-top"><span>判定</span><b>图 08｜该训与不该训：五条件判定与三种反例</b></div><div class="diagram-scroll"><img src="配图/17/fig08.svg" alt="五个条件全中才训，三个反例覆盖最常见的冲动立项，底部是客服分流、工厂验收、风控初审、内容审核、机器人抓取五个场景对照" loading="lazy" decoding="async"></div><figcaption>记忆法：9B 决策模型是给高频、选项有限、错得起的判断工序买的专用机床——活儿又多又固定才值得开一台模具。</figcaption></figure>
+<p class="closing">对 Agnes Harness 本身，态度应当是"框架值得学，数字待验证"：评测是厂商自评、公司很年轻、自进化能力未经时间检验；但"9B + LLM 分层"这个方向，值得任何团队用五条件表核对一次自己的业务。</p><a class="deep" href="?view=deep#deep-s7">查看五条件表、三种反例与五个真实场景 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E6%8A%8A%E5%88%A4%E6%96%AD%E4%BB%8E%E6%80%9D%E8%80%83%E9%87%8C%E5%89%A5%E5%87%BA%E6%9D%A5%EF%BC%9A9B%20%E5%86%B3%E7%AD%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B7%A5%E3%80%81%E9%93%BE%E8%B7%AF%E4%B8%8E%E8%AE%AD%E7%BB%83%E2%80%94%E2%80%94%E4%BB%A5%20Agnes%20Harness%20%E4%B8%BA%E4%BE%8B.md#s7">Markdown 对应段落</a></section>
+</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><h1>把判断从思考里剥出来：9B 决策模型的分工、链路与训练——以 Agnes Harness 为例</h1>
+<p><a id="deep-overview"></a></p>
+<blockquote>
+<p><strong>讲解版入口</strong>：配套图文版在 <code>阅读/讲解-10-决策小脑.html</code>；三层分工对应本文 §二，Agnes Harness 结构对应 §一，决策链路对应 §四，训练闭环对应 §五，校准难点对应 §六，该训不该训对应 §七。</p>
+</blockquote>
+<blockquote>
+<p><strong>断言标注约定</strong>：本文框架性判断按三分法标注——<code>[经验]</code>（作者工程实践经验与行业常见做法归纳，样本有限）、<code>[推测]</code>（本文提出的机制假设）。凡来自 Agnes 官方或媒体的数据均标注&quot;官方自评&quot;，未经独立验证，汇总依据见文末证据边界声明。</p>
+</blockquote>
+<p><a id="deep-s0"></a></p>
+<h2>引子：一句话答案与一个真实产品</h2>
+<p>大模型越来越强之后，一个自然的追问是：还要小模型干什么？过去两年的主流答案是&quot;不用了，一个模型管到底&quot;。但 2026 年下半年，一个叫 <strong>Agnes Harness</strong> 的开源智能体运行底座把另一个方向做成了产品：<strong>在 LLM 旁边放一个 9B 参数的&quot;决策模型&quot;，专管高频、机械的判断</strong>。官方给出的一组数字是：快决策 0.53 秒 vs 纯大模型 7.6 秒，单次决策成本差约 27 倍——均为官方自评，未独立验证。</p>
+<p>这组数字真假暂且不论，它背后的思路值得认真对待，本文的一句话答案是：</p>
+<blockquote>
+<p><strong>9B 决策模型不是更小的大模型，而是把&quot;判断&quot;从&quot;思考&quot;里剥出来的专用件——80% 的机械判断用 1/27 的成本和 1/15 的延迟消化掉，大模型只处理真正需要&quot;想&quot;的 20%。</strong></p>
+</blockquote>
+<p>围绕这句话，本文回答六个问题：Agnes Harness 到底是什么；代码、9B、大模型三者的分工判据；9B 的原则和能力边界；一次判断的完整链路（置信度怎么用、错了怎么重新分、可用性怎么保）；9B 怎么训练、难点和训练点在哪；什么场景该训、什么场景不该训。</p>
+<p>需要先声明阅读姿态：本文与仓库内其他文章不同，<strong>没有核对 Agnes 的源码</strong>——它的框架 2026 年 11 月才开源，本文依据公开报道与厂商自述写成，所有性能数字都按&quot;官方自评&quot;处理；本文的价值在方法论框架，不在为该产品背书。</p>
+<p><a id="deep-s1"></a></p>
+<h2>一、Agnes Harness：一家公司把&quot;判断&quot;做成了产品</h2>
+<p>先交代背景。Agnes AI 是一家中国的 AI 公司（GitHub 组织 AgnesAI-Labs），产品线有三块：对话模型 Agnes 3.0 Flash、9B 参数的决策模型 Agnes Sys1、以及 2026 年 11 月开源的智能体运行框架 Agnes Harness（Apache-2.0 协议，可商用）。创始团队与融资情况无公开报道，这是信息缺口，不编。公开的合作方包括心玮医疗、埃斯顿、天创机器人等，覆盖医疗、制造、具身智能场景——商业模式是典型的&quot;开源底座 + 模型 API 收费 + FDE（前线部署工程师）交付&quot;。</p>
+<p>Harness 本义是&quot;马具&quot;——套在马身上、让马拉车的整套装置。社区把 Codex、Claude Code 这类&quot;套在模型外面、负责调度工具和执行流程&quot;的层戏称为&quot;爱马仕&quot;，缘由即此。所以先分清三个容易混的东西：<strong>Codex 是一个具体产品（OpenAI 的编码 Agent）；Harness 是这一层的技术类目；AgentScope 是阿里开源的多智能体开发框架（Python 库）</strong>。Agnes Harness 选择的赛道，就是 Harness 这一层。</p>
+<p>它照着人的结构搭了四层：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层</th>
+<th>对应</th>
+<th>职责</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>大脑</td>
+<td>LLM</td>
+<td>理解意图、规划、处理异常、生成表达</td>
+<td>只干&quot;需要想&quot;的活</td>
+</tr>
+<tr>
+<td>小脑</td>
+<td>Agnes Sys1（9B）</td>
+<td>条件明确的高频判断直接拍板：选工具、走分支、抽参数</td>
+<td>官方自评：0.53 秒 vs 7.6 秒</td>
+</tr>
+<tr>
+<td>记忆</td>
+<td>Harness 本体</td>
+<td>事件账本记执行轨迹；跑通的流程沉淀成 Skills 与带版本号的 Playbook</td>
+<td>跨项目复用</td>
+</tr>
+<tr>
+<td>身体</td>
+<td>MHS 硬件标准</td>
+<td>统一协议接机械臂、机器人、传感器</td>
+<td>一般 Harness 不做这层</td>
+</tr>
+</tbody></table></div>
+<p>外加一个自进化闭环：官方称 TTT（小脑在单次请求内临时适应材料）与 RSI（复盘失败、验证新策略、沉淀成手册），并给出&quot;设备入库验收首次 30 分钟超时、复盘后第二次 8 分钟结案&quot;的自述案例。<strong>这些能力听起来性感，但都没有第三方验证，本文只把它当作&quot;该产品宣称的设计意图&quot;来引用。</strong></p>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig02.svg" alt="图 1：Agnes Harness 的四层结构与自进化闭环"></p>
+<p><strong>图 1</strong>　四层是按职责分的讲解框架，不等于代码里恰好四个模块；自进化闭环的效率数字均为厂商自述。</p>
+<p>Agnes Harness 真正值得拆的，是&quot;小脑&quot;这个位置——它是 9B 决策模型这类思路的完整样本。下文就从它展开，但框架本身不绑定这家产品：任何团队都可以用大模型 + 微调过的小模型自己搭这套结构。</p>
+<p><a id="deep-s2"></a></p>
+<h2>二、三分法：代码、9B 小脑、大模型各干什么</h2>
+<p>一次请求进来，活儿分三层。分层的判据只有一句话：<strong>凡能写成 if-else 的交给代码，答案落在有限集合内的判断交给 9B，有限选项装不下的思考交给大模型。</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层</th>
+<th>干什么</th>
+<th>典型工作</th>
+<th>延迟</th>
+<th>成本</th>
+<th>判据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>代码</td>
+<td>确定性逻辑</td>
+<td>Schema 校验、权限检查、幂等控制、重试超时、状态机、审计日志</td>
+<td>0</td>
+<td>0</td>
+<td>能写成 if-else</td>
+</tr>
+<tr>
+<td>9B 小脑</td>
+<td>有限选项内的判断</td>
+<td>意图分类、工具选择、流程分支、参数抽取、敏感内容拦截、请求路由</td>
+<td>亚秒级</td>
+<td>约大模型 1/27（官方自评）</td>
+<td>答案在有限集合内 + 错了有兜底</td>
+</tr>
+<tr>
+<td>大模型</td>
+<td>开放性思考</td>
+<td>理解模糊意图、长上下文推理、多步规划、内容生成、接住小脑上交的判断</td>
+<td>秒级</td>
+<td>高</td>
+<td>有限选项装不下</td>
+</tr>
+</tbody></table></div>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig01.svg" alt="图 2：一次请求进来，每层只接自己那一段活"></p>
+<p><strong>图 2</strong>　三层是按&quot;动作性质&quot;分的，不是按部署位置分的；9B 和大模型可能部署在同一台机器上，边界也依然存在。</p>
+<p>分流时问三个问题 <code>[经验]</code>：① 答案是不是从有限选项里挑？② 挑错了能不能被代码兜住？③ 需不需要世界知识和长上下文理解？——①②成立给 9B，③成立或①不成立给大模型。</p>
+<p>三层的优缺点各自对应：</p>
+<p><strong>代码</strong>——优点是零成本、零延迟、行为完全确定、可审计；缺点是只覆盖&quot;答案可枚举、规则可枚举&quot;的问题，语义理解完全缺位。它是对抗不确定性的地基，不是全部。</p>
+<p><strong>9B 小脑</strong>——优点是快、便宜、窄域内可微调到高准确率、行为可锁定（详见 §四）；缺点是<strong>只会收敛不会发散</strong>：遇到训练分布之外的输入，它会&quot;自信地错&quot;，而且不会像大模型那样表达不确定——所以置信度阈值和回退机制不是可选优化，是它的生命线（§四、§六）。</p>
+<p><strong>大模型</strong>——优点是开放推理、知识广、没有&quot;没见过&quot;的硬边界；缺点是慢、贵、同输入两次跑可能给不同答案（采样随机性）、行为随版本升级悄悄漂移。它的贵不只在单价，还在&quot;每次判断都要过一遍全部参数和长上下文&quot;。</p>
+<p>这段分工与仓库另一篇《Agent 系统可靠性：提示词、模型与代码的边界》一脉相承——那篇论证了&quot;提示词降低失败率，代码消除可计算的失败&quot;的边界划分；本文在其&quot;代码层&quot;和&quot;模型层&quot;之间插入了第三个位置：<strong>窄域判断层</strong>。旧文讲边界怎么划，本文讲插进来的这一层怎么建、怎么训、怎么兜。</p>
+<p><a id="deep-s3"></a></p>
+<h2>三、9B 小脑的原则与能力边界</h2>
+<h3>3.1 大模型能做 9B 的一切吗</h3>
+<p>能——<strong>能力上覆盖，工程上不等价</strong>。差异不止时效，有五层：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>大模型</th>
+<th>9B 决策模型</th>
+<th>差异本质</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>时效</td>
+<td>秒级，受排队限流影响</td>
+<td>亚秒级</td>
+<td>最表层的差异</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>每次判断都过全部参数 + 长上下文 token</td>
+<td>约为 1/27（官方自评口径）</td>
+<td>高频场景账单差两个数量级</td>
+</tr>
+<tr>
+<td>确定性</td>
+<td>同输入两次跑可能不同答案；行为随版本漂移</td>
+<td>任务窄、输出空间被约束，同样输入倾向同样输出，可回归测试</td>
+<td>工程上最要紧的差异</td>
+</tr>
+<tr>
+<td>可控性</td>
+<td>会自由发挥：编造不存在的工具、给出选项外的答案</td>
+<td>被训练成只会从给定 N 个选项里挑，越界输出可压到极低</td>
+<td>大模型是&quot;能做对&quot;，小模型是&quot;被锁死做不错&quot;</td>
+</tr>
+<tr>
+<td>可专精</td>
+<td>通用，窄域未必精——容量被几千个任务摊薄</td>
+<td>单一窄任务微调后，准确率可反超通用大模型</td>
+<td>专精碾压通用是常态 <code>[经验]</code></td>
+</tr>
+</tbody></table></div>
+<p>另有一个方向相反的差异：<strong>部署形态</strong>。9B 量化后单卡甚至笔记本就能跑，数据不出域、断网可用；大模型要么走云 API（数据出域），要么重金私有化部署。</p>
+<h3>3.2 四条原则</h3>
+<p>把上面五层差异收敛成设计 9B 小脑时的四条原则 <code>[经验]</code>：</p>
+<ol>
+<li><strong>只做选择题，不做问答题。</strong> 输出是有限集合里的一个选择（选哪个工具/走哪条分支/要不要拦截）加结构化参数槽位。一旦任务要求生成内容或开放推理，就出了它的管辖范围。</li>
+<li><strong>输出必须带置信度。</strong> 没有回退机制的 9B 是定时炸弹；有回退机制的 9B 是省钱加速器。</li>
+<li><strong>窄而深，不广而浅。</strong> 一个场景微调一个版本，用复盘回流持续喂数据。它的价值在&quot;越用越准&quot;，不在&quot;天生什么都会&quot;。</li>
+<li><strong>错误可兜底。</strong> 交给 9B 的判断，错了要能被代码检测、重试或回滚；兜不住的高风险判断（付款、部署）不给它——这直接决定 §四 的链路形状。</li>
+</ol>
+<h3>3.3 能力边界：它管不了什么</h3>
+<p>9B 小脑装不下三类东西 <code>[经验]</code>：<strong>需要世界知识的判断</strong>（&quot;这个需求值不值得做&quot;）、<strong>需要长上下文理解的判断</strong>（跨三十轮会话归纳矛盾点）、<strong>答案开放的判断</strong>（生成一段话、设计方案）。硬塞给它的结果是&quot;自信地错&quot;——比大模型的错更危险，因为大模型错得犹疑、可追问，小模型错得斩钉截铁。</p>
+<p>所以能力边界的正确画法不是&quot;9B 是弱化版大模型&quot;，而是：<strong>9B 管的是&quot;大模型降级去干纯属浪费&quot;的那一段</strong>。让一个几百 B 参数的模型花 7 秒回答&quot;这句话该路由到退款组还是物流组&quot;，不是能力浪费，是结构性浪费。</p>
+<p><a id="deep-s4"></a></p>
+<h2>四、一次判断的完整链路：置信度分档与三层保险</h2>
+<p>这一节回答三个具体问题：置信度怎么&quot;看&quot;出来；错了怎么重新分；可用性和确定性靠什么保障。</p>
+<h3>4.1 置信度不是玄学，是概率本身</h3>
+<p>9B 做的是选择题，每个选项都有一个概率。用户说&quot;帮我退了昨天的订单&quot;，模型内部打分：</p>
+<pre><code class="language-text">退款   0.87
+查物流 0.08
+其他   0.05
+</code></pre>
+<p>它选中&quot;退款&quot;的同时，把 0.87 一起吐出来——<strong>置信度就是最高选项的分数，不是额外算出来的指标</strong>。工程上有个关键设计：<strong>训练时专门加一个&quot;我不知道&quot;选项</strong>，教材里故意放进模糊 case、标准答案就是&quot;上交&quot;，让模型自己学会什么时候交卷（这个设计如何做出来，见 §六）。</p>
+<h3>4.2 分档：阈值把流量切成三段</h3>
+<p>阈值不是一刀切，而是按<strong>动作代价</strong>分三档 <code>[经验]</code>：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>档位</th>
+<th>处理</th>
+<th>适合的动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>≥ 0.95</td>
+<td>直接执行，事后按比例抽检</td>
+<td>查物流、改地址、分流会话——便宜且可回滚</td>
+</tr>
+<tr>
+<td>0.70 ~ 0.95</td>
+<td>便宜动作办了加抽检；<strong>贵动作出&quot;拟办单&quot;，大模型复核后才准动</strong></td>
+<td>介于两者之间</td>
+</tr>
+<tr>
+<td>&lt; 0.70</td>
+<td>上交大模型——这不算错，是交卷</td>
+<td>一切拿不准的；常见约占 5~15% 流量</td>
+</tr>
+</tbody></table></div>
+<p><strong>兜底方案的档次跟着动作的代价走，不是全局一个数。</strong> 查物流分错了重新分就是了；退款分错了是真金白银。所以退款、付款、部署这类不可逆动作，哪怕 9B 打出 0.97 的高分，也只准出拟办单——事前复核永远比事后补救便宜。</p>
+<h3>4.3 错了怎么重新分：三种错，三条路</h3>
+<p><strong>错一：它自己没把握。</strong> 分数低于阈值，事前转大模型——判断根本没出门，这是最干净的兜底。</p>
+<p><strong>错二：它有把握，但真错了。</strong> 置信度骗不过，只能靠<strong>执行结果校验</strong>抓：工具返回报错、参数不符、业务复验不过 → 代码自动重试 1 次 → 还败 → 升级大模型 → 大模型读上下文办完 → <strong>这条错案自动记进教材</strong>。判断对不对模型自己说了不算，&quot;动作办没办成&quot;是代码说了算——这就是每个判断后面必须跟结果校验的原因。</p>
+<p><strong>错三：贵动作，错了赔不起。</strong> 不搞&quot;错了再补救&quot;，直接改流程：出拟办单，大模型复核签字后才准执行（见 4.2 黄档）。</p>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig03.svg" alt="图 3：一次判断的完整链路——置信度分档与三层保险"></p>
+<p><strong>图 3</strong>　三档处理 + 结果校验 + 大模型值班主管 + 熔断降级 + 错案回流，构成完整闭环；三条错误路径见图 4。</p>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig04.svg" alt="图 4：三种错误的处理路径"></p>
+<p><strong>图 4</strong>　三种错的兜底手段完全不同：没把握靠阈值、有把握错了靠结果校验、贵动作靠事前复核。</p>
+<h3>4.4 可用性：9B 是加速器，不是必需品</h3>
+<p>链路里最容易被忽略的是&quot;9B 自己挂了怎么办&quot;。答案是<strong>熔断降级</strong>：GPU 宕机、超时 200 毫秒没回话，熔断开关自动弹开，全量流量降级走大模型——业务不断，只是慢 7 倍、贵 27 倍，用户无感。大模型 API 也挂时，再降级到排队重试、写死的规则、人工队列。</p>
+<p><strong>设计哲学一句话：把 9B 拔掉，系统照样转。</strong> 这是整套架构敢上生产的前提 <code>[经验]</code>——任何&quot;加速器&quot;型组件，都必须在失效时不阻塞主链路。</p>
+<h3>4.5 确定性三件套</h3>
+<p>确定性不靠口号，靠三个可执行的机制：</p>
+<ol>
+<li><strong>温度设 0</strong>——模型不&quot;发挥&quot;，同输入永远同输出；</li>
+<li><strong>输出锁死 JSON 枚举</strong>——只准从给定清单里挑，想编造&quot;第 21 个工具&quot;都编不出来；</li>
+<li><strong>版本锁定</strong>——模型文件和它的考卷成绩单一起归档，升级新版必须先过全部考卷（回归测试），防止&quot;悄悄变笨&quot;。</li>
+</ol>
+<p>这与仓库《Agent 系统可靠性》一文&quot;生产环境钉模型版本，不静默使用 latest&quot;的结论完全同构——只不过 9B 把这条从&quot;运维纪律&quot;变成了&quot;物理可能&quot;。</p>
+<p><a id="deep-s5"></a></p>
+<h2>五、9B 怎么训练：像带一个新员工的五步闭环</h2>
+<p>9B 决策模型不是买来就能用的——<strong>通用 9B 直接拿来当决策模型，效果未必比一段写死的 if-else 好</strong>，它的全部本事都在业务数据喂出来的那一层。训练流程五步，就像带新人：</p>
+<p><strong>第①步：攒教材（最花功夫，但不用手写）。</strong> 最常见的做法是&quot;大模型当老师，边干边留作业答案&quot;：上线初期先让大模型带着长 prompt 干业务，把每次的判断记进日志——用户说了什么、上下文是什么、它选了哪个工具、抽了什么参数。跑一两个月，几千到几万条&quot;输入→标准答案&quot;自动攒出来；工单系统、客服记录里的历史数据也能捞一批。<strong>训练本身便宜，攒干净数据才是真成本</strong> <code>[经验]</code>。</p>
+<p><strong>第②步：照着答案学（SFT 微调）。</strong> 工程上已高度成熟：拿现成开源 9B（如 Qwen 系），LoRA 方法微调，单卡几小时到几天，成本几千到几万块级。窄任务几千条就能教会——它不是在学全世界，只是在学&quot;你家业务的判断习惯&quot;，就像新人不必通晓百科，只需背熟你们公司的 SOP。</p>
+<p><strong>第③步：考试（决定敢不敢上线）。</strong> 留一成数据当考卷测准确率——这不够，<strong>关键是考&quot;陷阱题&quot;</strong>：故意出模糊的、边界外的输入，看它是老实说&quot;我不确定&quot;，还是瞎猜一个。9B 的毛病是错得自信，所以置信度阈值在这一步校准：正常题准确率 98% 以上、陷阱题知道上交，才准上岗。</p>
+<p><strong>第④步：上岗带兜底。</strong> 不是替换大模型，是大模型降级当&quot;值班主管&quot;：9B 高置信度直接办，拿不准的转交，前面再挡一道代码校验。用户无感，账单腰斩以上。</p>
+<p><strong>第⑤步：复盘回流（越用越准）。</strong> 每天把&quot;大模型纠正过的&quot;&quot;用户改判的&quot;案例攒成新教材，每两四周回炉重训一次。这就是 Agnes 官方所说 RSI 的实际含义——<strong>不是模型自己进化，是训练闭环在转</strong> <code>[推测→对官方机制的解释]</code>。三个月后你会得到一个比初始大模型还懂你家业务的判断器。</p>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig05.svg" alt="图 5：9B 决策模型的训练闭环"></p>
+<p><strong>图 5</strong>　五步是一根循环链，不是流水线；第⑤步的回流箭头指回第①②步，闭环转起来模型才持续变准。</p>
+<p><a id="deep-s6"></a></p>
+<h2>六、核心难点与核心训练点：置信度的&quot;诚实度&quot;</h2>
+<p>你可以把准确率调高，但如果<strong>置信度分数本身不诚实</strong>，整套分档机制都是摆设。这一节是全文最要紧的一节。</p>
+<h3>6.1 先把&quot;准&quot;定义清楚：要调的不是准确率，是校准</h3>
+<p>校准（calibration）的定义非常朴素：</p>
+<blockquote>
+<p><strong>模型报 0.9 的那些判断里，真实正确率就得是 90%。</strong></p>
+</blockquote>
+<p>注意这和&quot;准确率高&quot;是两码事。一个准确率 95% 的模型，可能报 0.95 的判断实际只有 80% 对——它答得不错，但它<strong>不知道自己什么时候会错</strong>。而&quot;0.95 直接办 / 0.7 上交&quot;的分档全押在分数诚实上：分数虚高，阈值就是摆设，错案全从&quot;直接办&quot;那档漏出去。</p>
+<p><strong>9B 微调后最常见的病恰恰是&quot;盲目自信&quot;</strong>：SFT 教材里几乎全是标准答案，模型从头到尾没见过&quot;答错是什么体验&quot;，学成了永远拍胸脯。像一支永远显示 36.5 度的体温计——不是它准，是它坏了。</p>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig07.svg" alt="图 6：校准前后对比——校准的目标是报分等于实际正确率"></p>
+<p><strong>图 6</strong>　左图红柱是模型报的分、蓝柱是实际对的比例，差距就是盲目自信；右图校准后两者对齐。图示为示意分布，非实测数据。</p>
+<h3>6.2 四个核心难点</h3>
+<p><strong>难点①：教材太干净——&quot;好学生病&quot;。</strong> 训练数据全是&quot;输入→正确答案&quot;，模型学到的不是判断，是&quot;永远自信地选 A&quot;。这是最大的坑，且校准动作只能缓解、不能根治——根治要靠教材里主动掺&quot;脏东西&quot;（见 6.3 第①招）。</p>
+<p><strong>难点②：分数从来没被&quot;校零&quot;。</strong> 模型的训练目标从头到尾是&quot;选对&quot;，从来不是&quot;把把握度报准&quot;。新体温计有出厂偏差，上线前必须拿一批数据对零点——这步很多团队直接跳过，然后奇怪为什么错案专挑高分段漏。</p>
+<p><strong>难点③：考卷和教材是一家人。</strong> 校准用的数据和训练数据高度重合，模型在&quot;见过的题&quot;上当然又准又自信——校准测出来漂亮，上线就露馅。校准集必须是从头到尾没参与训练的独立数据，且要专门构造业务里&quot;难而少见&quot;的题。</p>
+<p><strong>难点④：业务会漂移（分布漂移）。</strong> 校准做得再好也是&quot;上线那天&quot;的好。三个月后新促销、新话术、第六条流程分支上线——教材外的输入悄悄变多，高分段盲区扩大，系统毫无察觉，直到客诉爆炸。<strong>校准不是一次性动作，是持续监控。</strong></p>
+<h3>6.3 五个核心训练点</h3>
+<p><strong>第①招：改数据配方（治本，最重要）。</strong> 教材不能全是标准答案，按比例掺四类题：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>题型</th>
+<th>占比（示例）</th>
+<th>标准答案</th>
+<th>教会什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>常规题</td>
+<td>~70%</td>
+<td>正确选项</td>
+<td>怎么做对</td>
+</tr>
+<tr>
+<td>模糊题（表述含糊、缺上下文）</td>
+<td>~15%</td>
+<td><strong>&quot;上交&quot;</strong></td>
+<td>什么时候说不知道</td>
+</tr>
+<tr>
+<td>陷阱题（看着像 A 其实是 B）</td>
+<td>~10%</td>
+<td>正确选项 B</td>
+<td>不被表面相似骗到</td>
+</tr>
+<tr>
+<td>罕见题（长尾场景）</td>
+<td>~5%</td>
+<td>正确选项或上交</td>
+<td>少见场景不乱猜</td>
+</tr>
+</tbody></table></div>
+<p>占比是工程经验值 <code>[经验]</code>，按业务流量分布调整。错例和陷阱题的来源：<strong>真实错案</strong>（回流那批，最值钱）+ <strong>对抗样本</strong>（让大模型当出题人，批量造&quot;我不想要了但过了 7 天&quot;这类边界表述）+ <strong>历史捞底</strong>（工单、客服记录里现成的&quot;输入+正确结果&quot;配对）。</p>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig06.svg" alt="图 7：教材配方——往标准答案里掺脏东西"></p>
+<p><strong>图 7</strong>　四种题各教一件事；占比是起点不是教条。</p>
+<p><strong>第②招：温度缩放（性价比之王，先做这个）。</strong> 模型吐分数前除一个温度参数 T，T 在独立校准集上搜出来——<strong>就调一个数字</strong>，通常能把校准误差砍掉一半以上 <code>[经验]</code>。不用改体温计内部结构，只要出厂时对零点。代价几乎为零，永远先做它。</p>
+<p><strong>第③招：训练时直接教&quot;不知道&quot;。</strong> 把&quot;上交&quot;做成第 N+1 个正式选项参与训练，配合 label smoothing（正确答案的标签打成 90% 而非 100%，留一点不确定的余地）。比温度缩放重，但治&quot;盲目自信&quot;的根。</p>
+<p><strong>第④招：考卷按&quot;分桶&quot;验收。</strong> 校准不是看总准确率，是把判断按报分分桶、逐桶对账：报 0.9<del>1.0 的那批实际对了多少？报 0.7</del>0.8 的呢？每桶&quot;报分 vs 实际&quot;的差距就是校准误差（行话叫 ECE）。验收线举例：0.95 分桶实际正确率 ≥ 93%、漏网率（该上交却自信答错的占比）&lt; 1% <code>[经验]</code>。</p>
+<p><strong>第⑤招：线上持续对账（防漂移）。</strong> 上线后每周统计&quot;报分分布 vs 实际正确率&quot;，某一档实际正确率掉 3 个点就报警——要么重新校零（几分钟），要么攒新数据重训（回流闭环第⑤步）。<strong>校准是仪表盘上的仪表，仪表本身也要定期校。</strong></p>
+<h3>6.4 一个例子串起来</h3>
+<p>客服退款模型上线前：拿 5000 条从未参与训练的历史会话当考卷，分桶对账发现&quot;报 0.9 分桶实际只有 0.77&quot;——典型盲目自信 → 先做温度缩放，误差从 13 分压到 6 分 → 再掺 15% 模糊题重训，压到 2 分 → 上线后第 8 周监控报警：&quot;0.9 分桶实际正确率掉到 0.85&quot;，一查是大促新话术涌入 → 快速重新校零 + 新话术进教材 → 下周恢复。</p>
+<p><strong>一句话总结</strong>：准确率靠&quot;多喂好数据&quot;，置信度的诚实靠&quot;喂错的和模糊的 + 给分数对零 + 持续对账&quot;。好学生是天生的，知道自己在什么时候会错的学生是教出来的——教法就是往教材里掺失败。</p>
+<p><a id="deep-s7"></a></p>
+<h2>七、何时该训、何时不该训</h2>
+<h3>7.1 五个条件，全中才训</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>条件</th>
+<th>大白话</th>
+<th>反面即信号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>高频</td>
+<td>一天几千上万次同一类判断</td>
+<td>一天几十次，摊不平训练成本</td>
+</tr>
+<tr>
+<td>窄</td>
+<td>选项就那十几个，且很少变</td>
+<td>选项常增删，模型刚训完就过期</td>
+</tr>
+<tr>
+<td>等不起 / 贵不起</td>
+<td>用户在盯着屏幕等，或量大成本爆炸</td>
+<td>离线任务，慢点无所谓</td>
+</tr>
+<tr>
+<td>有数据</td>
+<td>日志、工单里现成有&quot;输入+正确答案&quot;</td>
+<td>冷启动无积累，标注要手工</td>
+</tr>
+<tr>
+<td>错得起</td>
+<td>判断错了能被检测、重试、回滚</td>
+<td>错了赔不起且无法事前复核</td>
+</tr>
+</tbody></table></div>
+<p><strong>正面例子</strong>：电商客服里&quot;我要退款&quot;→ 判断是否符合 7 天无理由、选退款工具、抽订单号。高频、窄、有海量历史数据、错了可回滚——教科书级的该训场景，训完每次判断从约 0.5 元降到约 0.02 元（按典型 API 价目估算 <code>[推测]</code>）。</p>
+<h3>7.2 三种不该训的反例</h3>
+<p><strong>规则老变</strong>：促销季审批口径每月换——模型刚训完就过期，直接写规则或 prompt，改起来比重训快。<strong>判断本身开放</strong>：&quot;这个需求值不值得做&quot;&quot;客户这句话是不是在生气&quot;——需要长上下文理解和世界知识，9B 装不下，硬训只会自信地错。<strong>量太小</strong>：一天几十次判断，27 倍的成本差都摊不平一次训练的钱，直接用大模型凑合。</p>
+<h3>7.3 五个真实场景对照</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>9B 判断什么</th>
+<th>错了怎么办</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>电商客服分流</td>
+<td>会话归退款/物流/投诉/咨询哪组</td>
+<td>坐席手动改派——改派数据自动回流当教材</td>
+</tr>
+<tr>
+<td>工厂设备入库验收（Agnes 自述案例）</td>
+<td>扫码后走哪条 SOP 分支（带质检单/不带/进口件）</td>
+<td>走错分支卡在&quot;缺少质检单&quot;报错 → 重试失败升级大模型；官方称复盘后 30 分钟超时变 8 分钟结案（自评）</td>
+</tr>
+<tr>
+<td>金融风控初审</td>
+<td>交易标不标可疑</td>
+<td>0.97 高分也不自动冻结——拟办单给大模型/风控员复核；误判回流</td>
+</tr>
+<tr>
+<td>内容审核快筛</td>
+<td>明显违规（0.99）直接拦，灰色地带转大模型细审</td>
+<td>漏网的被复审抓到 → 进教材；9B 扛约 95% 流量</td>
+</tr>
+<tr>
+<td>机器人/机械臂</td>
+<td>抓取动作选哪个分支（吸盘/夹爪/视觉引导）</td>
+<td>动作失败传感器立刻反馈 → 换分支重试 → 反复失败停下叫人——物理世界错不起，重试上限卡得极死</td>
+</tr>
+</tbody></table></div>
+<p><img src="%E9%85%8D%E5%9B%BE/17/fig08.svg" alt="图 8：该训与不该训——五条件判定与三种反例"></p>
+<p><strong>图 8</strong>　五条件全中才训；三个反例覆盖了最常见的冲动立项。</p>
+<p><strong>记忆法</strong>：9B 决策模型是给&quot;高频、选项有限、错得起&quot;的判断工序买的<strong>专用机床</strong>——活儿又多又固定才值得开一台模具；活儿杂、活儿少、规矩常改，就继续用通用大模型这台&quot;万能但贵的手&quot;。</p>
+<p><a id="deep-s8"></a></p>
+<h2>八、术语表</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Harness</td>
+<td>&quot;马具&quot;。套在模型外、负责调度工具和执行流程的那一层；Codex、Claude Code 都属于这一层</td>
+</tr>
+<tr>
+<td>9B 决策模型</td>
+<td>约 90 亿参数、经业务数据微调、只做有限选项判断的小模型</td>
+</tr>
+<tr>
+<td>SFT</td>
+<td>监督微调。拿&quot;输入→标准答案&quot;的教材直接教模型照着学</td>
+</tr>
+<tr>
+<td>LoRA</td>
+<td>低秩适配微调方法。不重训全部参数，单卡可跑，成本几千到几万块级</td>
+</tr>
+<tr>
+<td>TTT</td>
+<td>Test-Time Training。模型在单次请求内临时适应材料，官方称 Agnes 小脑具备此能力（自评）</td>
+</tr>
+<tr>
+<td>RSI</td>
+<td>复盘-验证-沉淀的自进化机制；本文认为其实际含义是&quot;错案回流 + 定期重训&quot;的工程闭环</td>
+</tr>
+<tr>
+<td>置信度</td>
+<td>模型输出中最高选项的概率，不是额外算的指标</td>
+</tr>
+<tr>
+<td>校准（Calibration）</td>
+<td>让报分与真实正确率对齐：报 0.9 的那批判断，实际正确率就是约 90%</td>
+</tr>
+<tr>
+<td>温度缩放</td>
+<td>校准手段之一：报分除一个在独立校准集上搜出的参数 T</td>
+</tr>
+<tr>
+<td>ECE</td>
+<td>期望校准误差。把判断按报分分桶、逐桶比较&quot;报分 vs 实际正确率&quot;的差距</td>
+</tr>
+<tr>
+<td>幂等性</td>
+<td>同一操作执行一次和多次效果相同；代码层重试兜底的前提</td>
+</tr>
+<tr>
+<td>FDE</td>
+<td>前线部署工程师。替企业现场装 AI 的交付角色，Agnes 的商业模式一环</td>
+</tr>
+</tbody></table></div>
+<p><a id="deep-s9"></a></p>
+<h2>九、总结</h2>
+<p>回到引子那句话：<strong>9B 决策模型不是更小的大模型，而是把&quot;判断&quot;从&quot;思考&quot;里剥出来的专用件。</strong> 全文可收敛成四条带判断的结论：</p>
+<ol>
+<li><strong>三分法是这套架构的地基</strong>：能写成 if-else 的给代码，有限选项内、错得起的判断给 9B，装不下的思考给大模型。多数&quot;要不要上 9B&quot;的争论，源于没先做这一步分流。</li>
+<li><strong>置信度链路是 9B 敢上岗的全部底气</strong>：三档分档跟着动作代价走、结果校验抓&quot;自信的错&quot;、不可逆动作加复核、熔断降级保可用——9B 随时可以拔掉，这才是它敢进生产的前提。</li>
+<li><strong>训练的难点不在调参，在数据配方和分数的诚实度</strong>：教材里掺失败（模糊题、陷阱题、真实错案），上线前给分数对零，上线后持续对账——好学生是天生的，知道自己什么时候会错的学生是教出来的。</li>
+<li><strong>对 Agnes Harness 本身，态度应当是&quot;框架值得学，数字待验证&quot;</strong>：它的评测是厂商自评、公司很年轻、RSI 沉淀能力未经时间检验；但&quot;9B + LLM 分层&quot;这个方向，与仓库一贯的&quot;把确定性还给代码、把概率留给模型&quot;立场同构，值得任何团队在自己的业务里做一次 §七 那张五条件表的核对。</li>
+</ol>
+<p>延伸阅读：《Agent 系统可靠性：提示词、模型与代码的边界》讲边界怎么划（本文的三分法是它的下游）；《Agent 赛道与语言选型》讲买、改、自建怎么定（本文的&quot;训一个 9B&quot;属于自建路线里最重的一档投入，先过那张五条件表再动手）。</p>
+<hr>
+<h2>证据边界声明</h2>
+<ul>
+<li>本文与仓库其他文章的<strong>关键差异</strong>：未核对 Agnes Harness 源码、未复现其评测、未部署实测。Agnes AI 的公司背景、四层架构、TTT/RSI 机制、合作方名单均来自 2026 年 11 月的官方公众号、媒体报道（新智元、量子位等）与技术社区文章的汇总，属<strong>厂商自述与二手报道</strong>；文中所有性能数字（0.53 秒、7.6 秒、1/27 成本、30 分钟→8 分钟）均标注&quot;官方自评&quot;，<strong>未独立验证</strong>，读者不应直接引用为结论；</li>
+<li>三分法判据、四条原则、置信度三档分档、确定性三件套、训练五步闭环、教材配方占比、五个训练点、五条件表，均为作者归纳的<strong>框架性方法论</strong> <code>[经验]</code>，样本有限，未经系统化实验验证，应结合自身业务校准；</li>
+<li>&quot;专精碾压通用&quot;&quot;盲目自信是 SFT 的常见病&quot;为工程共识的定性表述 <code>[经验]</code>；温度缩放的量化效果（&quot;砍掉一半以上&quot;）来自业界常见报告量级 <code>[推测]</code>，具体数字因模型与任务而异；</li>
+<li>客服退款的成本估算（0.5 元→0.02 元）按 2026 年典型 API 价目量级推算 <code>[推测]</code>，非实测；</li>
+<li>8 幅配图为讲解示意，其中图 6 的校准曲线为示意分布，非实测数据；</li>
+<li>本文不含真实事故复盘，§七 场景表中除 Agnes 自述案例外均为常见行业做法的归纳，个别细节（如重试上限、抽检比例）为构造示例。</li>
+</ul>
+<h2>Changelog</h2>
+<ul>
+<li><strong>v1（2026-11-24，初稿）</strong><ul>
+<li>初版：以 Agnes Harness 为案例的 9B 决策模型方法论长文；九节 + 术语表；8 幅配图（配图/17/fig01~08.svg）；</li>
+<li>证据姿态：全文数字按&quot;官方自评&quot;处理，与仓库源码核对型文章明确区分（见证据边界声明第一条）；</li>
+<li>与《Agent 系统可靠性》（show-04）交叉引用：三分法作为其&quot;代码/模型&quot;边界的下游扩展。</li>
+</ul>
+</li>
+</ul>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 0.1-review · 2026-11-24</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>

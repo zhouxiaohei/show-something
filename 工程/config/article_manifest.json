@@ -71,5 +71,18 @@
     "version": "1.6-review",
     "quick": "工程/scripts/articles/16-quick.html",
     "updated": "2026-11-20"
+  },
+  {
+    "n": "17",
+    "id": "show-17",
+    "title": "把判断从思考里剥出来：9B 决策模型的分工、链路与训练——以 Agnes Harness 为例",
+    "markdown": "原文/把判断从思考里剥出来：9B 决策模型的分工、链路与训练——以 Agnes Harness 为例.md",
+    "html": "阅读/讲解-10-决策小脑.html",
+    "category": "Agent 引擎与记忆",
+    "summary": "代码、9B 小脑与大模型的三分法判据；置信度分档与三层兜底链路；训练五步闭环；校准的核心难点与五个训练点；该训与不该训的五条件表。以 Agnes Harness 为案例，数字按官方自评处理。",
+    "dateNote": "依据 2026-11 公开报道与官方自述汇总；未核对源码、未复现评测，性能数字未独立验证；机制框架为作者归纳。核对日期：2026-11-24。",
+    "version": "0.1-review",
+    "quick": "工程/scripts/articles/17-quick.html",
+    "updated": "2026-11-24"
   }
 ]
