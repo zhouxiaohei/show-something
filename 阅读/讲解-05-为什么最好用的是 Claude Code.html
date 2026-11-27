@@ -1,356 +1,456 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>讲解 · 为什么最好用的是 Claude Code：分数打平之后，赢在协作可靠性</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
-  }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
-  a { color: #3b82f6; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
-  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
-  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
-  .hero .why { color: #6b7280; font-size: 15px; }
-  .hero .why strong { color: #1f2328; }
-  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
-  .quick { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
-  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
-  .quick ol { padding-left: 22px; }
-  .quick li { margin-bottom: 8px; }
-  .quick li:last-child { margin-bottom: 0; }
-  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
-  h2.sec .back { float: right; font-size: 12px; font-weight: 400; color: #9ca3af; padding-top: 8px; }
-  h3 { font-size: 17px; margin: 26px 0 10px; }
-  p { margin-bottom: 12px; }
-  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
-  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
-  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
-  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
-  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
-  .analogy.green { background: #ecfdf5; border-color: #86efac; }
-  .analogy h3 { margin-top: 0; }
-  .analogy .row { margin-bottom: 8px; }
-  .analogy .row:last-child { margin-bottom: 0; }
-  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
-  .blue .label  { color: #3b82f6; }
-  .yellow .label{ color: #f59e0b; }
-  .green .label { color: #10b981; }
-  .edge { font-size: 14px; color: #6b7280; }
-  .edge strong { color: #1f2328; }
-  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
-  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
-  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
-  ul.plain { padding-left: 22px; margin-bottom: 12px; }
-  ul.plain li { margin-bottom: 6px; }
-  .plain b, .ans b { color: #1f2328; }
-  ol.steps { padding-left: 22px; margin-bottom: 12px; }
-  ol.steps li { margin-bottom: 8px; }
-  table.tbl { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14.5px; }
-  table.tbl th { background: #f9fafb; text-align: left; font-weight: 600; }
-  table.tbl th, table.tbl td { border: 1px solid #e5e7eb; padding: 8px 12px; vertical-align: top; }
-  table.tbl td.n { text-align: right; font-variant-numeric: tabular-nums; }
-  table.tbl .good { color: #047857; font-weight: 600; }
-  table.tbl .bad  { color: #b91c1c; font-weight: 600; }
-  figure { margin: 24px 0; }
-  figure svg { width: 100%; height: auto; display: block; }
-  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
-  .figread { font-size: 14px; color: #374151; background: #f9fafb; border-radius: 6px; padding: 10px 14px; margin-top: -8px; }
-  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
-  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
-  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
-  .interview details:last-of-type { margin-bottom: 0; }
-  .interview summary { cursor: pointer; font-weight: 600; }
-  .interview details[open] summary { margin-bottom: 8px; }
-  .interview .ans { font-size: 15px; color: #374151; }
-  .interview .ref { display: block; margin-top: 8px; font-size: 13px; color: #9ca3af; }
-  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
-  .exit strong { color: #1f2328; }
-</style>
-</head>
-<body>
-<div class="wrap">
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-05"><meta name="document-version" content="4.1-review">
+<meta name="description" content="分数打平之后赢在协作可靠性：SWE-Together、TraceProbe、用户人设四类证据与边界。"><meta name="color-scheme" content="dark">
+<title>为什么最好用的是 Claude Code · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-05">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">评测与证据</p><h1>为什么最好用的是 Claude Code</h1><p class="article-summary">分数打平之后赢在协作可靠性：SWE-Together、TraceProbe、用户人设四类证据与边界。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#cc-answer">单次通过率衡量终点，协作可靠性衡量到达终点的成本</a><a href="#cc-frame">比的不是任务难度，是协作不确定性</a><a href="#cc-evidence1">SWE-Together：把&quot;用户纠正几次&quot;变成了指标</a><a href="#cc-evidence2">TraceProbe：同一终点可以有两条完全不同的路径</a><a href="#cc-evidence3">七个 issue 证明&quot;累计约束碎裂&quot;是真实失败模式</a><a href="#cc-evidence4">把用户放成变量：用户是谁，比模型多强更能决定成败</a><a href="#cc-limits">六条外推全部挡掉，四类证据各测到哪一环</a><a href="#cc-gaps">两个指标和一份能自己做的成对实验</a><a href="#cc-conclusion">体验是五项相乘，不是峰值能力</a></nav></details><p>2026-11-27 讲解版升级：md 正文未改（仅加导航锚点），新增新标准配图与图解片段，讲解版由构建器重建；证据姿态沿用各文自述声明。核对日期：2026-11-27。</p></aside>
+<main id="article-content"><div class="quick-content"><section class="content-section" id="cc-answer"><p class="kicker">先给一句话答案</p><h2>单次通过率衡量终点，协作可靠性衡量到达终点的成本</h2>
+<p>只看排行榜选工具，会遇到一个解释不了的矛盾：Codex 和 Claude Code 的解决率几乎一样（78.4% vs 77.4%），用起来却像两种不同的东西。一个让它改按钮文案，它顺手把后端也重构了；另一个你只说了一半，它把剩下的一半猜对了——两者最终都能"做完"，但你要拦它、纠正它、检查它的力气差得很远。</p>
+<p class="callout">本文的一句话答案：<strong>单次通过率衡量的是终点对不对；协作可靠性衡量的是到达终点的路上你要付出什么、以及失败后爬出来的成本。分数打平之后，赢的是后者。</strong></p>
+<p>本文不是"我用过觉得好"，按证据评审的路子走：先立比较框架（§一），再看四类证据各自测到了什么（§二至§五），然后说清这些证据不能证明什么（§六），最后指出还缺哪些指标、以及一个能自己动手的成对实验（§七）。</p><a class="deep" href="?view=deep#deep-s0">查看引子与全文路线图 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s0">Markdown 对应段落</a></section>
 
-  <div class="toplink"><a href="../index.html">← 阅读目录</a>　｜　<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md" target="_blank" rel="noopener">深入版（含完整证据链与边界）→</a></div>
+<section class="content-section" id="cc-frame"><p class="kicker">比较框架</p><h2>比的不是任务难度，是协作不确定性</h2>
+<p>把任务分成"简单"和"复杂"信息量很低：跨几十个文件的机械迁移可能几乎没有业务判断，只改五行的需求可能依赖隐含产品语义和历史否决过的方案。真正决定协作难度的是：初始表达多完整、需求多歧义、约束怎么累积、反馈可不可观察、人要介入几次、搞乱了能不能恢复。本文用三条主线评价：<strong>任务模型的建立与持续稳定性；总人类协作成本（需求显式化、过程监督、纠偏、恢复四类）；失败的可解释性与可恢复性。</strong></p>
+<figure><div class="figure-top"><span>挂点</span><b>图 01｜真实协作链条：六环，断一环全歪</b></div><div class="diagram-scroll"><img src="配图/05/fig01.svg" alt="从理解模糊表达到持续迭代的六个环节依次相连，任何一环损坏都会导致高度自洽但整体错误" loading="lazy" decoding="async"></div><figcaption>链条上任何一环损坏，后面都可能是"高度自洽但整体错误"——每一步单独看都合理，连起来离目标越来越远。四类证据测的都是这条链的不同环节。</figcaption></figure>
+<p class="callout">任务模型是代理执行时实际依赖的内部工作表示：用户真正想要的结果、当前代码事实、已确认与未确认的假设、必须保留的约束、明确排除的范围、新消息改了旧目标的哪一部分、当前完成状态与验证标准。</p><a class="deep" href="?view=deep#deep-s1">查看三条主线、任务模型定义与协作链条全文 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s1">Markdown 对应段落</a></section>
 
-  <header class="hero">
-    <h1>为什么最好用的是 Claude Code？分数打平之后，赢在协作可靠性</h1>
-    <p class="core">两个工具的解决率只差 1 个百分点（78.4% 对 77.4%），但同一个数据集里，其中一个的失败动作是另一个的 2.4 倍——差的不是终点，是你到终点要花多少力气把它拉回来。</p>
-    <p class="why"><strong>为什么值得读：</strong>挑 AI 编码工具时，几乎所有人都在看排行榜。这篇是一份证据评审：四类公开证据分别测到了什么、它们合起来能支持多强的结论、还缺哪块、以及你可以怎么做一个不被自己骗的实验。<strong>不用懂模型细节也能读完</strong>——每个数字都会配一句"它到底意味着什么"。</p>
-  </header>
+<section class="content-section" id="cc-evidence1"><p class="kicker">证据一</p><h2>SWE-Together：把"用户纠正几次"变成了指标</h2>
+<p>SWE-Together 从 11,260 条真实会话筛出 109 个可复现任务（0.97%），用用户模拟器按原始会话的意图锚点逐步释放澄清、纠正和新增要求；统一 OpenCode 框架，每个模型独立跑两次。它同时测最终正确性与用户纠正度——"体验差"第一次变成可数的量。</p>
+<figure><div class="figure-top"><span>受控评测</span><b>图 02｜纠正量成为独立指标，与 pass@1 相关 −0.92</b></div><div class="diagram-scroll"><img src="配图/05/fig02.svg" alt="统一框架下各模型 pass@1 与用户纠正量对比：Opus 4.8 纠正最少且质量与稳定率最高；少纠正不等于便宜" loading="lazy" decoding="async"></div><figcaption>[模型证据]（预印本，方法与代码公开）。纠正量与 pass@1 相关 −0.92、与稳定解决率 −0.84；但 Opus 4.6 与 GPT-5.5 纠正量相同，不支持品牌决定论。</figcaption></figure>
+<p class="callout">三处克制：差距不是数量级（0.21 次）；"Claude 系列必然更少纠正"不成立；<strong>少纠正不等于便宜</strong>——GPT-5.5 约 29.9k token 全场最省，Opus 4.8 约 74.0k。协作成本必须同时算纠偏劳动和运行成本。另记样本偏差：0.97% 筛选偏向"可恢复、目标清晰、结果可观察"的任务，对协作全谱系是有偏样本。</p><a class="deep" href="?view=deep#deep-s2">查看完整数据表与三处克制的展开 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s2">Markdown 对应段落</a></section>
 
-  <section class="quick">
-    <h2>30 秒版</h2>
-    <ol>
-      <li><strong>先看矛盾：</strong>Codex 解决率 78.4%，Claude Code 77.4%，统计上不可区分。分数相同，体验却常常一头一尾。</li>
-      <li><strong>路径不一样：</strong>2,500 条轨迹里，Codex 失败动作占比 8.0%，Claude Code 3.3%（约 2.4 倍）；工具成功率 91.9% 对 96.7%。</li>
-      <li><strong>把"纠正"变成指标：</strong>109 个多轮任务中，Opus 4.8 质量最高、用户纠正最少（1.38 次）；纠正次数与通过率的相关是 −0.92。</li>
-      <li><strong>把用户当变量：</strong>13 家模型的人设均值从架构师 78.5% 跌到非开发者 23%；多数模型主动提问不到 20%。协作能力才是主要矛盾。</li>
-      <li><strong>结论只到"初步支持"：</strong>四类证据是预印本、公开案例和自愿调查，都在测别的维度，没有一项是成对实验。第八节给了能自己做的版本。</li>
-    </ol>
-  </section>
+<section class="content-section" id="cc-evidence2"><p class="kicker">证据二</p><h2>TraceProbe：同一终点可以有两条完全不同的路径</h2>
+<p>TraceProbe 把 2500 条轨迹规范化为九类动作，用确定性规则检测搜索循环、验证遗漏、重复读取、修改回滚等反模式。Claude Code + Opus 4.6 与 Codex + GPT-5.4 的解决率只差 1 个百分点，但过程指标拉开了。</p>
+<figure><div class="figure-top"><span>过程诊断</span><b>图 03｜解决率打平，路径成本结构完全不同</b></div><div class="diagram-scroll"><img src="配图/05/fig03.svg" alt="解决率 77.4% 对 78.4%，但工具调用 25 对 41、成功率 96.7% 对 91.9%、失败动作占比 3.3% 对 8.0%" loading="lazy" decoding="async"></div><figcaption>[框架与模型混合证据]（模型与 scaffold 同时变化，只能支持组合层面比较）。数据与代码公开（Zenodo DOI 10.5281/zenodo.20789918）。</figcaption></figure>
+<p class="callout">一幅画面：<strong>Codex 用更多试错换到了同等结果</strong>。说法要收窄——能说的是"失败动作更多、有害动作更多、工具成功率更低"三个可测维度，不能说成笼统的"Codex 更乱"；Codex 解决率最高、保留动作占比也最大。过程结构也不测用户纠偏的认知成本和失败解释好不好用——那恰好是人最累的地方。</p><a class="deep" href="?view=deep#deep-s3">查看完整九项指标表与过度归因的收窄 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s3">Markdown 对应段落</a></section>
 
-  <main>
-    <div class="sqa">
-      <p><span class="tag">情境</span>你让 AI 改一个按钮的文案，它顺手把后端也重构了；或者你只说了一半，它把另一半猜对了。两个工具都能"做完"，你要花的力气却差得很远。</p>
-      <p><span class="tag">冲突</span>打开排行榜一看：解决率 78.4% 对 77.4%，1 个百分点，几乎一样。</p>
-      <p><span class="tag">问题</span>排行榜漏掉了什么？</p>
-      <p><span class="tag">答案</span>漏掉了路径。单次通过率只测终点对不对；协作可靠性测的是到终点花了多少次试错、多少次纠正，以及搞乱之后爬出来的成本。</p>
-    </div>
+<section class="content-section" id="cc-evidence3"><p class="kicker">证据三</p><h2>七个 issue 证明"累计约束碎裂"是真实失败模式</h2>
+<p>GitHub issue 能证明的是：某类失败确实发生过、发生在产品哪一层、有没有复现步骤、多个用户是否独立描述了相似症状。它不能证明发生概率——没有"总使用次数"这个分母。所以 issue 在本文里是<strong>失败模式的存在性证据</strong>，不是失败率排行榜。</p>
+<p>七个 2026-10-16 逐一核实的 Codex issue 覆盖：累计约束丢失、重复读取、交接后提前停止、缺少原子化 rollover、长会话上下文失控、过期消息重新执行、声称恢复但未真正继续。最典型的是长会话压缩后遗漏"先文档后代码"这类强制规则、重新引入已明确排除的工作——用户多次重述完整契约，执行仍像只保留了最新一条消息。</p>
+<p class="callout">两个诚实注记：#33398 讨论里"94 个长任务 27.8% 压缩丢失"是单用户自报、未经官方裁定，只作案例背景；Claude Code 也有同类问题（compact 崩溃、resume 保护未触发、hooks 未加载等）。所以立场不是"一个稳一个不稳"，而是：<strong>两者都会失败，现有证据更支持 Claude 的协作错误分布较温和、纠偏成本较低；Codex 更容易出现隐式任务模型损坏并继续执行。</strong>[综合推断]</p><a class="deep" href="?view=deep#deep-s4">查看七个 issue 对照表与 Claude Code 侧问题入口 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s4">Markdown 对应段落</a></section>
 
-    <h2 class="sec">先换一把尺子：比的不是难度，是"协作不确定性"<span class="back">深入版 §一</span></h2>
-    <p>把任务分成"简单"和"复杂"，几乎没用。一个跨几十个文件的机械迁移可以很长，却不需要任何业务判断；一个只改五行的需求可能依赖半年前被否决的方案，反而更难。</p>
-    <div class="analogy yellow">
-      <div class="row"><span class="label">生活类比：</span>两个司机都在晚上七点整到你家楼下。一个全程匀速、提前十分钟到、在车里等你；另一个一路急刹、绕了两条错路、倒了三次车，最后一分钟冲进来。到达时间一样，你敢把后排交给谁？</div>
-      <div class="row"><span class="label">工程锚点：</span>假设两个服务的成功率都是 78%：一个是请求一次成功，一个是靠反复重试撞出来的。重试会带副作用——重复下单、重复发消息——你得额外写一套补偿逻辑来擦屁股。失败动作占比就是这层"擦屁股成本"的计数器。</div>
-      <div class="row edge"><span class="label">类比的边界：</span>别把"反复试错"当态度问题——模型没有态度，坏的是它心里那版"你要什么"（<strong>任务模型</strong>）。另外这不是"一个稳一个不稳"：两边都会失败，差别在错误分布和爬出来的成本。</div>
-    </div>
-    <p>所以这篇不看"谁更聪明"，只看三件事：<strong>它心里那版目标稳不稳、你要纠正几次、失败了能不能便宜地爬出来。</strong>后面四类证据，测的其实就是这三件事的不同侧面。</p>
+<section class="content-section" id="cc-evidence4"><p class="kicker">证据四</p><h2>把用户放成变量：用户是谁，比模型多强更能决定成败</h2>
+<p>SWE-Journey 把"对面坐的是谁"变成实验变量：30 个长任务实例、四种用户人设驱动平均 18.28 轮的多轮会话。同一批模型，用户从架构师换成非开发者，通过率从 78.50% 掉到 23.00%——落差 55.5 个百分点，远大于模型之间的差距。</p>
+<figure><div class="figure-top"><span>交互侧</span><b>图 04｜四种用户人设的通过率阶梯与方向印证</b></div><div class="diagram-scroll"><img src="配图/05/fig04.svg" alt="架构师 78.50%、新人开发 35.57%、产品经理 30.48%、非开发者 23.00%；多数模型主动提问轮次占比不到 20%" loading="lazy" decoding="async"></div><figcaption>[模型证据]（预印本，模拟用户，任务集仅 30 个实例）。另一侧：ZDNet 调查 138 名开发者，约 75% 在用 Claude Code；自发理由前两条恰好落在受控评测测出的两个维度上——方向印证，不做性能结论。[用户侧调查证据]</figcaption></figure>
+<p class="callout">这张表是对所有编码 Agent 都成立的结论：协作可靠性由"代理能不能从能力弱的表达里恢复意图"决定，而现有主流 Agent 在这个维度上<strong>集体不及格</strong>（主动提问轮次占比不到 20%）。谁在澄清与纠偏上更好，谁就握住了真实协作的主要矛盾。</p><a class="deep" href="?view=deep#deep-s5">查看人设表、调查理由分布与两条边界 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s5">Markdown 对应段落</a></section>
 
-    <h2 class="sec">证据一：把"用户纠正几次"变成指标<span class="back">深入版 §二</span></h2>
-    <p>SWE-Together 从 11,260 条真实用户会话里筛出 109 个可复现的仓库级任务（转化率约 0.97%），用模拟用户按原始会话的节奏逐步放出澄清和纠正，统一跑在同一个框架上，然后同时测两件事：<strong>做对了没有</strong>，以及<strong>用户纠正了几次</strong>（明确纠正记 1 分，软性提醒记 0.2 分）。</p>
-    <table class="tbl">
-      <tr><th>模型（同一框架）</th><th style="text-align:right">pass@1</th><th style="text-align:right">稳定解决率</th><th style="text-align:right">平均质量</th><th style="text-align:right">用户纠正（越少越好）</th></tr>
-      <tr><td>Claude Opus 4.8</td><td class="n good">63%</td><td class="n">59%</td><td class="n good">0.801</td><td class="n good">1.38</td></tr>
-      <tr><td>GPT-5.5</td><td class="n">58%</td><td class="n">55%</td><td class="n">0.763</td><td class="n">1.59</td></tr>
-      <tr><td>Claude Opus 4.6</td><td class="n">58%</td><td class="n">58%</td><td class="n">0.755</td><td class="n">1.59</td></tr>
-      <tr><td>DeepSeek V4 Pro</td><td class="n">48%</td><td class="n">38%</td><td class="n">0.679</td><td class="n bad">1.76</td></tr>
-      <tr><td>MiniMax 2.7</td><td class="n">40%</td><td class="n">34%</td><td class="n">0.630</td><td class="n bad">2.17</td></tr>
-    </table>
-    <p>这张表真正的贡献不是排名，是它证明了一件事：<strong>"让人陪跑几次"是可以数的，而且能上主表。</strong>纠正次数与 pass@1 的相关是 −0.92——能力强的人确实少让人纠正，所以这个数不是坏脾气指数，是能力指标。</p>
-    <p>但读它要克制三处。第一，差距不是数量级：Opus 4.8 和 GPT-5.5 只差 0.21 次纠正，值得看的是"更少纠正的同时质量更高、稳定率更高"这三项同向。第二，品牌决定论不成立：Opus 4.6 和 GPT-5.5 的纠正量完全相同（1.59）。第三，<strong>少纠正不等于便宜</strong>：GPT-5.5 每任务约 29.9k token、10.7 分钟，全场最省；Opus 4.8 约 74.0k token、23.3 分钟。你省下的是纠正的力气，多花的是 token 和时间，这是真实的交换，不是可以藏起来的一栏。</p>
-    <div class="evidence">还有一层偏差要说：0.97% 的筛选率意味着这批任务都"目标清晰、结果可观察、仓库状态可恢复"。真实工作里大量任务并不满足这三条，所以这张表对协作全谱系是有偏样本。</div>
+<section class="content-section" id="cc-limits"><p class="kicker">证据边界</p><h2>六条外推全部挡掉，四类证据各测到哪一环</h2>
+<p>四类证据各有明确的能力范围：受控评测测模型层、过程诊断只能比组合、失败案例无分母、使用面调查是自愿应答。把外推挡掉，这些说法不能站住：失败率排行、模型优势等于产品优势、解决率等同协作质量、明确任务的高分外推为擅长模糊协作、调查分布当因果、综合推断当已验证结论。</p>
+<figure><div class="figure-top"><span>地图</span><b>图 05｜四类证据：各测到哪一环，外推到哪要停</b></div><div class="diagram-scroll"><img src="配图/05/fig05.svg" alt="四类证据各自能支持的判断与不能证明的判断；挡掉外推后剩失败模式存在、组合层面比较、方向印证" loading="lazy" decoding="async"></div><figcaption>跨层引用就是过度归因：issue 说了不算概率，调查说了不算性能，评测说了不算产品。</figcaption></figure>
+<p class="callout">第 6 条不是免责声明，是本文的产出之一：<strong>知道证据停在哪，才知道下一个实验该测什么。</strong>"Claude 系更适合协商型协作"是多类证据共同指向的当前最优假设 [综合推断]，尚无同时覆盖模糊意图、纠正吸收、失败解释与多轮迭代的成对实验直接验证。</p><a class="deep" href="?view=deep#deep-s6">查看六条不能证明的展开与来源对照表 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s6">Markdown 对应段落</a></section>
 
-    <h2 class="sec">证据二：同一终点，两条完全不同的路径<span class="back">深入版 §三</span></h2>
-    <p>TraceProbe 换了问法：不看谁赢，看赢的过程长什么样。它把 2,500 条轨迹切成九类动作，用固定规则挑出"搜索循环、重复读取、改完又回滚、跳过验证"这些反模式。</p>
-    <table class="tbl">
-      <tr><th>指标</th><th style="text-align:right">Claude Code + Opus 4.6</th><th style="text-align:right">Codex + GPT-5.4</th><th>含义</th></tr>
-      <tr><td>解决率</td><td class="n">77.4%</td><td class="n">78.4%</td><td>终点几乎打平</td></tr>
-      <tr><td>工具调用（中位）</td><td class="n good">25</td><td class="n bad">41</td><td>同一个任务，多调 16 次</td></tr>
-      <tr><td>工具成功率</td><td class="n good">96.7%</td><td class="n">91.9%</td><td>动作更容易落空</td></tr>
-      <tr><td>失败动作占比</td><td class="n good">3.3%</td><td class="n bad">8.0%</td><td>约 2.4 倍</td></tr>
-      <tr><td>有害动作比例</td><td class="n good">0.07</td><td class="n bad">0.10</td><td>更可能真把东西弄坏</td></tr>
-      <tr><td>保留动作占比</td><td class="n">27.6%</td><td class="n">36.2%</td><td>Codex 最终留下的改动更多</td></tr>
-    </table>
+<section class="content-section" id="cc-gaps"><p class="kicker">还缺什么</p><h2>两个指标和一份能自己做的成对实验</h2>
+<p>现有研究测了"纠正了几次"，没测"纠正之后发生了什么"。要补两个量：<strong>纠正吸收率</strong>——一次纠正之后，既修复了指定问题、又没有破坏其他仍有效约束的比例；<strong>恢复成本</strong>——跑偏之后需要多少用户 token、多少分钟、多少轮才能回到正确方向。这两个指标合起来，才分得清"每次都做对"和"错了能便宜地爬出来"两种能力——后者正是本文主张的核心。</p>
+<p class="callout">想验证个人体感有没有统计稳定性，最小可做版本：同一真实项目、成对任务、固定 commit 权限工具与时间预算，每个任务独立跑至少 10 次；<strong>不把一方的澄清答案复制给另一方</strong>；保存完整轨迹，交给不知情的评审者盲评。任务覆盖七种类型（模糊口语需求、上下文恢复、局部纠正、冲突约束、跨压缩长会话、连续追加需求、故意给做不了的任务）；指标别只报平均分——同时报中位数、90 分位监督成本、最坏 10% 的失败、同任务方差和失败类型分布。盲评是最容易被省掉、也最不能省的一步。</p><a class="deep" href="?view=deep#deep-s7">查看两个指标定义、七类任务与完整指标清单 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s7">Markdown 对应段落</a></section>
 
-    <figure>
-      <svg viewBox="0 0 900 360" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="同一解决率下的两种路径形态：平稳收敛与反复试错">
-        <defs>
-          <marker id="arw05a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/>
-          </marker>
-        </defs>
-        <line x1="70" y1="300" x2="845" y2="300" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arw05a)"/>
-        <line x1="70" y1="300" x2="70" y2="36" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arw05a)"/>
-        <text x="845" y="322" font-size="13" fill="#6b7280" text-anchor="end">任务进度 →</text>
-        <text x="58" y="42" font-size="13" fill="#6b7280" text-anchor="end">离正确目标</text>
-        <text x="58" y="60" font-size="13" fill="#6b7280" text-anchor="end">的距离</text>
-
-        <rect x="70" y="240" width="760" height="60" fill="#fef2f2"/>
-        <text x="86" y="262" font-size="12" fill="#b91c1c">失败动作密集区（Codex 8.0%，Claude Code 3.3%）</text>
-
-        <path d="M 88 286 C 210 240, 330 165, 470 122 C 600 92, 710 80, 812 74" fill="none" stroke="#2563eb" stroke-width="3.5"/>
-        <path d="M 88 290 L 145 196 L 200 278 L 258 178 L 315 272 L 372 162 L 432 258 L 492 146 L 556 240 L 620 136 L 690 200 L 812 74" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linejoin="round"/>
-        <circle cx="812" cy="74" r="6" fill="#10b981"/>
-        <text x="806" y="56" font-size="13" font-weight="700" fill="#047857" text-anchor="end">终点：78.4% 与 77.4%</text>
-
-        <line x1="120" y1="112" x2="156" y2="112" stroke="#2563eb" stroke-width="3.5"/>
-        <text x="164" y="117" font-size="13" fill="#1f2328">Claude Code：越走越近，几乎不回头</text>
-        <line x1="470" y1="112" x2="506" y2="112" stroke="#ef4444" stroke-width="2.2"/>
-        <text x="514" y="117" font-size="13" fill="#1f2328">Codex：反复靠近又退回</text>
-      </svg>
-      <figcaption>图 1 · 曲线形状是按机制示意，纵向不加刻度；三条数字（78.4% / 77.4% / 8.0% 对 3.3%）是 TraceProbe 实测</figcaption>
-    </figure>
-    <p class="figread">先看绿点再回头走一遍红线：<strong>同样的终点，红线多爬了十几次</strong>。落在红色区里的每一段，都是白跑的工具调用——在真实项目里，它们对应你的等待时间、token 账单，以及"再检查一下它到底改了什么"的焦虑。</p>
-
-    <p>这里必须收窄说法，否则就成了过度归因。论文自己指出：<strong>Codex 解决率最高，保留动作占比也最大</strong>。所以能说的是"失败动作更多、有害动作更多、工具成功率更低"这三个可测维度，不能说成笼统的"Codex 更乱"。而且这个对比里模型和代理框架是同时变的，无法分离各自贡献——它能支持"这套组合更稳"，不能支持"是模型的功劳"或"是框架的功劳"。</p>
-
-    <h2 class="sec">证据三：碎裂长什么样——七个可点开的 issue<span class="back">深入版 §四</span></h2>
-    <p>统计告诉你"路径不同"，issue 告诉你"路径是怎么坏掉的"。GitHub issue 能证明这类失败真实发生过、能定位到哪一层、别人能不能复现；它<strong>不能</strong>证明发生概率——因为没有"总使用次数"这个分母。所以这里只当"失败模式存在性证据"用，不当失败率排行榜。</p>
-
-    <figure>
-      <svg viewBox="0 0 900 420" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="任务模型在长会话中逐步碎裂的路径">
-        <defs>
-          <marker id="arw05b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
-          </marker>
-          <marker id="arw05b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/>
-          </marker>
-        </defs>
-        <rect x="300" y="20" width="290" height="44" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="445" y="47" font-size="14" fill="#1f2328" text-anchor="middle">第 1 轮：完整初始目标</text>
-        <line x1="445" y1="64" x2="445" y2="80" stroke="#93c5fd" stroke-width="1.5"/>
-        <rect x="270" y="84" width="350" height="44" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="445" y="111" font-size="14" fill="#1f2328" text-anchor="middle">第 2~5 轮：目标 + 约束 + 已否决方案</text>
-        <line x1="445" y1="128" x2="445" y2="144" stroke="#93c5fd" stroke-width="1.5"/>
-        <rect x="300" y="148" width="290" height="44" rx="8" fill="#f9fafb" stroke="#d1d5db"/>
-        <text x="445" y="175" font-size="14" fill="#1f2328" text-anchor="middle">工具输出不断涌入，窗口变长</text>
-        <line x1="445" y1="192" x2="445" y2="208" stroke="#d1d5db" stroke-width="1.5"/>
-        <rect x="320" y="212" width="250" height="44" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="445" y="239" font-size="14" fill="#1f2328" text-anchor="middle">自动压缩 / 任务交接</text>
-
-        <line x1="430" y1="256" x2="255" y2="298" stroke="#10b981" stroke-width="3" marker-end="url(#arw05b1)"/>
-        <line x1="460" y1="256" x2="645" y2="298" stroke="#b91c1c" stroke-width="3" marker-end="url(#arw05b2)"/>
-        <rect x="60" y="304" width="320" height="62" rx="8" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="220" y="328" font-size="13" font-weight="600" fill="#047857" text-anchor="middle">理想：累计契约完整，继续正确执行</text>
-        <text x="220" y="350" font-size="12" fill="#6b7280" text-anchor="middle">纠正被叠加进已有理解，不覆盖旧约束</text>
-        <rect x="520" y="304" width="320" height="62" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="680" y="328" font-size="13" font-weight="600" fill="#b91c1c" text-anchor="middle">风险：只剩不完整摘要</text>
-        <text x="680" y="350" font-size="12" fill="#6b7280" text-anchor="middle">能说"大概要做什么"，但丢硬规则、复活已否决方案</text>
-        <text x="450" y="400" font-size="12" fill="#6b7280" text-anchor="middle">这条路径对应 issue #33262：用户反复重述完整契约，后续执行仍像只看见最后一句</text>
-      </svg>
-      <figcaption>图 2 · 碎裂发生在压缩与交接之后，且此后的每一次纠正都要重新猜一次"是修复还是覆盖"</figcaption>
-    </figure>
-    <p class="figread">关键在红色箭头的分叉点：<strong>它不是"忘了某个事实"，而是"哪句话算数"这个判断失效了。</strong>所以用户越强调越没用——你补的是内容，坏掉的是权重。</p>
-
-    <p>七个 issue 里最典型的是 #33262：报告者在长任务中不断增加约束，并声明"后续消息只改指定部分、其余规则继续有效"。压缩之后，模型能大致描述任务，却漏掉"先文档后代码"这类硬规则，还把已经明确排除的方案重新提出来。<strong>另一个容易误导的细节</strong>：#33398 的讨论里有位报告者自报"94 个长任务中 27.8% 的压缩事件出现丢失继续"——这是单用户自报、未经官方裁定，只能当案例背景，不能当数据用。</p>
-    <p>反手一句：<strong>Claude Code 也有同类问题</strong>——压缩崩溃或重复执行、恢复后保护未生效、切模型后压缩窗口算错、hooks 没加载、忽略指令。所以本文的立场从来不是"一个稳一个不稳"，而是：两边都会失败，现有证据更支持 Claude 的<strong>错误分布更温和、纠偏成本更低</strong>；Codex 更容易出现"任务模型悄悄损坏了，但它继续高速执行"。</p>
-
-    <h2 class="sec">证据四：把用户放成变量，把使用面摆上桌<span class="back">深入版 §五</span></h2>
-    <p>前三类证据都在测模型。但真实协作里还有一个变量被长期忽略：<strong>对面坐的是谁</strong>。SWE-Journey 把这件事做成了实验——30 个长任务（594 个子任务，平均要改 10.2 个文件、768 行），用四种人设驱动多轮会话，平均 18.28 轮，远长于旧基准的 5~9 轮。</p>
-    <table class="tbl">
-      <tr><th>用户人设</th><th style="text-align:right">最终通过率（13 家模型均值）</th><th>这类用户通常怎么说话</th></tr>
-      <tr><td>架构师</td><td class="n good">78.50%</td><td>给出边界、约束、验收标准</td></tr>
-      <tr><td>新人开发</td><td class="n">35.57%</td><td>能描述现象，说不清结构</td></tr>
-      <tr><td>产品经理</td><td class="n">30.48%</td><td>说价值和场景，不说实现</td></tr>
-      <tr><td>非开发者</td><td class="n bad">23.00%</td><td>"它就是不工作了，你帮我看看"</td></tr>
-    </table>
-    <p>同一批模型，只把用户从架构师换成非开发者，通过率掉 <strong>55.5 个百分点</strong>；最强的模型配架构师能到 93.59%，而<strong>多数模型的主动提问轮次占比不到 20%</strong>。这不是 Claude 与 Codex 的对比，它对所有编码 Agent 都成立——但它把主要矛盾指出来了：<strong>能不能从弱的表达里恢复意图，比多刷几分更要紧</strong>。谁在这件事上更好，谁就握住了真实协作的入口。</p>
-    <div class="evidence">这份研究也用模拟用户，不是真人；30 个任务、成本受限、任务可能带仓库偏好。它证明的是"用户能力影响巨大"，不是"某个产品对非开发者更友好"。</div>
-
-    <h3>再加一层使用面：138 名开发者的选择理由</h3>
-    <p>ZDNet 在 2026-10 调查了 138 名正在用 AI 编码工具的开发者：约 75% 用 Claude Code，约三分之一用 Codex，22% 两个都用。被问"为什么选它"时，理由按提及频率是：</p>
-    <ul class="plain">
-      <li>大代码库跨文件改动能保持连贯（14%）——正是"任务模型稳定"；</li>
-      <li>先计划再动手，复杂重构少纠正（9%）——正是"纠偏成本"；</li>
-      <li>同任务代码质量和推理更好（9%）；</li>
-      <li>在终端里对真实仓库执行，不是编辑器里的补全（7%）；</li>
-      <li>先发者的 skills 与工作流生态已成规模，切换成本实在（5%）。</li>
-    </ul>
-    <p>这份调查不能当性能证据：自愿应答不是随机抽样，"理由"是感知不是实测。它唯一的用处是<strong>方向印证</strong>——开发者自发给出的前两条理由，恰好落在前面两张表测出的维度上。三条彼此独立的来源（受控评测、过程诊断、使用感知）指向同一处，才够格当一个"当前最优假设"。</p>
-    <p>顺带说一句：同一份调查里也有人夸 Codex——单位任务成本更低、PR review 更强、最难的单题推理更深。这不是反例，正好拼成同一幅画像：<strong>执行器很强，协作偏弱。</strong>两件事可以同时成立。</p>
-
-    <h2 class="sec">这些证据不能证明什么<span class="back">深入版 §六</span></h2>
-    <ul class="plain">
-      <li><b>不能说失败率排行。</b>issue 没有使用量分母；SWE-Together 只有 109 个被 0.97% 筛选过的任务。它们只支撑"失败模式存在"。</li>
-      <li><b>不能把模型优势当产品优势。</b>SWE-Together 的优势是在统一框架下测的，属模型层；Claude Code 自己的压缩策略、上下文管理、权限流是另一组变量，没被单独测过。</li>
-      <li><b>不能把解决率当协作质量。</b>同样的解决率下，失败动作和有害动作可以差 2~2.4 倍。</li>
-      <li><b>不能把明确任务的高分外推。</b>Terminal-Bench 这类任务目标清晰、验收自动，恰好绕开了本文关心的三件事。</li>
-      <li><b>不能把调查分布当因果。</b>方向可用，比例不可引用。</li>
-      <li><b>不能把本文结论当已证事实。</b>"Claude 更适合协商型协作"是四类证据共同指向的假设，没有成对实验钉死它。</li>
-    </ul>
-
-    <figure>
-      <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="四类证据对三个维度的覆盖情况，以及共同缺口">
-        <text x="20" y="24" font-size="12.5" fill="#6b7280">● 直接测到　◐ 间接或只测一部分　○ 没有测　× 这类研究还不存在</text>
-        <text x="400" y="58" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">任务模型稳不稳</text>
-        <text x="570" y="58" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">纠偏成本高不高</text>
-        <text x="740" y="58" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">乱了能不能爬出来</text>
-        <line x1="20" y1="72" x2="830" y2="72" stroke="#e5e7eb"/>
-
-        <text x="300" y="104" font-size="13" fill="#1f2328" text-anchor="end">SWE-Together（109 任务）</text>
-        <circle cx="400" cy="100" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <path d="M400,91 A9,9 0 0,1 400,109 Z" fill="#9ca3af"/>
-        <circle cx="570" cy="100" r="9" fill="#10b981"/>
-        <circle cx="740" cy="100" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-
-        <text x="300" y="154" font-size="13" fill="#1f2328" text-anchor="end">TraceProbe（2,500 轨迹）</text>
-        <circle cx="400" cy="150" r="9" fill="#10b981"/>
-        <circle cx="570" cy="150" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <path d="M570,141 A9,9 0 0,1 570,159 Z" fill="#9ca3af"/>
-        <circle cx="740" cy="150" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <path d="M740,141 A9,9 0 0,1 740,159 Z" fill="#9ca3af"/>
-
-        <text x="300" y="204" font-size="13" fill="#1f2328" text-anchor="end">7 个 Codex issue</text>
-        <circle cx="400" cy="200" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <path d="M400,191 A9,9 0 0,1 400,209 Z" fill="#9ca3af"/>
-        <circle cx="570" cy="200" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <circle cx="740" cy="200" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-
-        <text x="300" y="254" font-size="13" fill="#1f2328" text-anchor="end">SWE-Journey + 138 人调查</text>
-        <circle cx="400" cy="250" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <circle cx="570" cy="250" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-        <path d="M570,241 A9,9 0 0,1 570,259 Z" fill="#9ca3af"/>
-        <circle cx="740" cy="250" r="9" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
-
-        <line x1="20" y1="280" x2="830" y2="280" stroke="#e5e7eb" stroke-dasharray="5 4"/>
-        <text x="300" y="316" font-size="13" fill="#b91c1c" text-anchor="end">成对实验（还不存在）</text>
-        <text x="400" y="316" font-size="17" fill="#b91c1c" text-anchor="middle">×</text>
-        <text x="570" y="316" font-size="17" fill="#b91c1c" text-anchor="middle">×</text>
-        <text x="740" y="316" font-size="17" fill="#b91c1c" text-anchor="middle">×</text>
-
-        <text x="300" y="366" font-size="12.5" fill="#6b7280" text-anchor="end">共同盲区</text>
-        <rect x="320" y="346" width="510" height="34" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="575" y="368" font-size="12.5" fill="#b91c1c" text-anchor="middle">没有一项测过"失败解释有没有让用户真的看懂"——而这才是恢复能力的入口</text>
-      </svg>
-      <figcaption>图 3 · 四类证据的覆盖情况（●◐○ 是本文按各研究设计做的判断，不是论文自评）</figcaption>
-    </figure>
-    <p class="figread">竖着看每一列，会发现一件事：<strong>绿色只出现在中间那一列</strong>。"纠偏成本"被反复测到，所以站得住；"任务模型稳不稳"多是间接推断；"乱了能不能爬出来"基本是空白。这就是为什么结论只能写成"初步支持"——<strong>不是谦虚，是这张图右上和右下两个角还没被填上。</strong></p>
-
-    <h2 class="sec">还缺什么：两个指标，一份你能自己做的实验<span class="back">深入版 §七</span></h2>
-    <p>现有研究测了"纠正了几次"，没测"纠正之后发生了什么"。要补的两个量：</p>
-    <ul class="plain">
-      <li><b>纠正吸收率</b>——一次纠正之后，既修好了指定问题、又没破坏其他仍有效的约束，这种纠正占多少比例。它直接对应"任务模型是增量更新，还是整段覆盖"。</li>
-      <li><b>恢复成本</b>——跑偏之后回到正确方向，要花多少 token、多少分钟、多少轮。它把"最后我干脆重开了"这句话变成可比数字。</li>
-    </ul>
-    <p>这两个量合起来，才分得清两种能力：<strong>"每次都做对"和"错了能便宜地爬出来"</strong>。后者正是本文主张的那一项，而它现在恰好没被任何公开研究测过。</p>
-    <h3>想自己验，最小可做版本</h3>
-    <ol class="steps">
-      <li>同一个真实项目、相同初始状态、成对任务，两边各用推荐的前沿模型；</li>
-      <li>固定 commit、权限、可用工具和时间预算，每个任务独立跑至少 10 次；</li>
-      <li><b>不把一方的澄清答案复制给另一方</b>——这一条最容易破，破了实验就作废；</li>
-      <li>保存完整轨迹，交给不知道哪份是哪个产品的人盲评；</li>
-      <li>任务至少覆盖七种：模糊口语、上下文恢复、局部纠正、冲突约束、跨压缩长会话、连续三轮追加、以及一个故意做不了的任务。</li>
-    </ol>
-    <p>结果别只报平均分。同时报中位数、90 分位的监督成本、最坏 10% 的失败、同任务方差、"一次成功"和"连续两次都成功"、可恢复与必须重开各占多少。只有一件事会让这个实验直接作废：<strong>评审者知道哪份是哪个产品。</strong></p>
-
-    <h2 class="sec">结论：先问"拉回来的成本"，再问"分数多高"<span class="back">深入版 §八</span></h2>
-    <p>如果把编码代理当成"从完整规格到代码的执行工具"，两者差距可能有限——Codex 在明确任务上很强，还更省 token。如果把它当成"和你一起发现目标、吸收纠正、把软件持续演化下去的协作者"，四类证据都更支持 Claude 系。</p>
-    <p>真正决定体验的不是峰值能力，而是这五项相乘：<strong>自然意图理解 × 任务模型稳定 × 低纠偏成本 × 失败透明 × 恢复与持续迭代</strong>。任何一项接近零，其余四项加起来也救不回来——这正是"平均分"这种口径最误导人的地方。</p>
-    <div class="quote">选型时最实用的一句话：先问"它跑偏了我把它拉回来要花多少"，再问"它考了多少分"。前者决定你每天的感受，后者只决定排行榜。</div>
-  </main>
-
-  <section class="interview">
-    <h2>面试官可能会追问</h2>
-    <details>
-      <summary>Q1：解决率只差 1 个百分点，凭什么说一个平稳、一个反复试错？</summary>
-      <div class="ans">因为过程指标不在排行榜里，但在轨迹里：工具调用中位 41 对 25、工具成功率 91.9% 对 96.7%、失败动作占比 8.0% 对 3.3%、有害动作 0.10 对 0.07。同时要诚实两点：这是"模型+框架"混合证据，只能支持组合层面比较；论文自己也指出 Codex 保留动作占比最大，所以只能说"三个维度上失败更多"，不能说"更乱"。
-        <span class="ref">→ 深入版 §三「证据二：TraceProbe」</span></div>
-    </details>
-    <details>
-      <summary>Q2：这些全是预印本和网上案例，凭什么信？</summary>
-      <div class="ans">不靠单条，靠三条互不相同的证据交叉：受控评测给方向（纠正量与能力相关 −0.92），过程诊断给失败形态（大样本轨迹），公开 issue 证明碎裂真实发生且有复现路径。三者测量方式、偏差结构都不一样，却指向同一方向——这比任何单条都强，但也只够写成"初步支持"。而且复核路径全部公开：论文、代码、Zenodo 轨迹数据、issue 编号都能自己点开重算。
-        <span class="ref">→ 深入版 §六「证据不能证明什么」</span></div>
-    </details>
-    <details>
-      <summary>Q3：你自己的使用体验算证据吗？怎么排除确认偏差？</summary>
-      <div class="ans">排除不了，只能管理，所以本文没用它当论据。硬要用的正确姿势是：把它降级成"提出研究问题"，然后看独立证据是否支持。本文提的问题（长会话里约束会碎）后来被 SWE-Together 的纠正指标和七个 issue 各自从不同方向印证了——这时它才算被支撑，而不是因为"我感觉如此"。
-        <span class="ref">→ 深入版 §五、§六</span></div>
-    </details>
-    <details>
-      <summary>Q4：那是不是该把工具全换成 Claude Code？</summary>
-      <div class="ans">不是，这个框架支持的是分工。明确、验收清晰、可以自动判定的任务交给 Codex 很划算，它更省 token（29.9k 对 74.0k 每次任务）。模糊口语、长会话、边聊边改、需要反复纠正的活交给 Claude 系。真正的错误是拿管理执行器的方式去用一个协作者——比如指望它自己发现你要什么。
-        <span class="ref">→ 深入版 §二「少纠正不等于便宜」、§八</span></div>
-    </details>
-    <details>
-      <summary>Q5：如果我要在团队里自己验一遍，怎么做才不算作弊？</summary>
-      <div class="ans">成对任务、相同初始状态、固定 commit 和预算、每任务至少 10 次、不把一方的澄清答案喂给另一方、用不知情的评审者盲评。指标上除了通过率，必须报纠正吸收率、恢复成本、最坏 10% 和同任务方差。最容易作弊的三处：评审者知道分组、跑的次数不同、只报平均分——平均分会把"偶尔崩一次很贵"这件事完全抹掉。
-        <span class="ref">→ 深入版 §七「一份能自己做的实验」</span></div>
-    </details>
-  </section>
-
-  <footer class="exit">
-    <p><strong>想核对每条数字与完整论证？</strong>深入版在这里：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么最好用的是%20Claude%20Code：分数打平之后，赢在协作可靠性.md" target="_blank" rel="noopener">为什么最好用的是 Claude Code</a>（含 7 个 issue 链接、四类来源的"能支持/不能支持"对照表、完整边界声明）。本页每个小节标题右侧的灰色标记，指的是深入版里对应的那一节。</p>
-    <p style="margin-top:8px;">版本标注：对应深入版 v4（status: revised，2026-10-27）。本页为讲解版，结论与深入版一致；图 1 的曲线形状是按机制示意、纵向无刻度，仅三个数字为实测值；图 3 的覆盖判断是本文按各研究设计所做，不是论文自评。</p>
-    <p style="margin-top:14px;display:flex;justify-content:space-between;gap:16px;font-size:14px;"><a href="讲解-04-提示词与代码边界.html">← 上一篇：Agent 系统可靠性</a><a href="讲解-06-越聊越乱.html">下一篇：为什么和 AI 越聊越乱 →</a></p>
-  </footer>
-
-</div>
-</body>
-</html>
+<section class="content-section" id="cc-conclusion"><p class="kicker">结论</p><h2>体验是五项相乘，不是峰值能力</h2>
+<p>如果把编码代理理解成"从完整规格到代码的执行工具"，Codex 与 Claude Code 的差距可能有限——Codex 在明确任务上很强，还更省 token。如果把编码代理理解成"与人共同发现目标、吸收纠正、持续演化软件的协作者"，四类证据（受控评测、过程诊断、失败案例、使用面调查）都更支持 Claude 系。</p>
+<p class="callout">真正决定体验的不是峰值能力，是五项相乘：<strong>自然意图理解 × 任务模型稳定性 × 低人工纠偏成本 × 失败透明度 × 恢复与持续迭代能力</strong>。这也是评测该从"任务通过率"转向"协作可靠性"的原因——SWE-Together 和 SWE-Journey 已经开始这么做了。</p>
+<p class="closing">对你个人的选型，最实用的一句是：<strong>先问"拉回来的成本是多少"，再问"分数多高"。</strong>本文所有数字性断言都可独立复核（论文、公开数据与 issue 原文见 md 对应段落）。</p><a class="deep" href="?view=deep#deep-s8">查看结论全文与复核方式 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%A5%BD%E7%94%A8%E7%9A%84%E6%98%AF%20Claude%20Code%EF%BC%9A%E5%88%86%E6%95%B0%E6%89%93%E5%B9%B3%E4%B9%8B%E5%90%8E%EF%BC%8C%E8%B5%A2%E5%9C%A8%E5%8D%8F%E4%BD%9C%E5%8F%AF%E9%9D%A0%E6%80%A7.md#s8">Markdown 对应段落</a></section>
+</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><h1>为什么最好用的是 Claude Code：分数打平之后，赢在协作可靠性</h1>
+<p><a id="deep-overview"></a></p>
+<blockquote>
+<p><strong>讲解版入口</strong>：配套 10 分钟图文版在 <code>阅读/讲解-05-为什么最好用的是 Claude Code.html</code>；评价框架对应本文 §一，过程诊断对应 §三，交互侧证据对应 §五，边界对应 §六，还缺什么对应 §七。</p>
+</blockquote>
+<blockquote>
+<p><strong>断言标注约定</strong>：本文关键判断按证据形态标注——<code>[模型证据]</code>（统一框架下的受控或半受控评测，直接测得）、<code>[框架与模型混合证据]</code>（模型与代理框架同时变化，只能支持&quot;组合&quot;层面比较）、<code>[产品案例]</code>（具体 issue/日志，只证明失败模式存在，无分母）、<code>[用户侧调查证据]</code>（自愿应答调查，有自选偏差）、<code>[综合推断]</code>（多类证据共同指向，但尚无缝合成对实验）。无标注的为可直接核对的定义或公开事实。</p>
+</blockquote>
+<p><a id="deep-s0"></a></p>
+<h2>引子：分数打平之后，为什么体验是一头一尾</h2>
+<p>如果你只看排行榜选工具，会遇到一个解释不了的矛盾：Codex 和 Claude Code 的解决率几乎一样，用起来却像两种不同的东西。</p>
+<p>一个常见画面：让它改一个按钮的文案，它顺手把后端也重构了；另一个你只说了一半，它把剩下的一半猜对了。两者最终都能&quot;做完&quot;，但你要花的力气差得很远——前者你要拦它、纠正它、检查它改了哪些不该改的地方。</p>
+<p><strong>一句话答案</strong>：单次通过率衡量的是终点对不对；协作可靠性衡量的是到达终点的路上你要付出什么、以及失败后爬出来的成本。分数打平之后，赢的是后者。</p>
+<p>本文不是&quot;我用过觉得好&quot;。它按证据评审的路子走：先立比较框架（§一），再看四类证据各自测到了什么（§二至§五），然后说清这些证据不能证明什么（§六），最后指出还缺哪些指标、以及一个能自己动手的成对实验（§七）。</p>
+<p><a id="deep-s1"></a></p>
+<h2>一、先立框架：比的不是任务难度，是协作不确定性</h2>
+<p>把任务分成&quot;简单&quot;和&quot;复杂&quot;，信息量很低。一个跨几十个文件的机械迁移可能很长，却几乎没有业务判断；一个只改五行的需求可能依赖隐含的产品语义、历史否决过的方案和接口契约，反而更难。</p>
+<p>真正决定协作难度的变量是这些：初始表达有多完整、依赖多少上下文、需求有多歧义、约束怎么累积、反馈可不可观察、路径有多长、人要介入几次、搞乱了能不能恢复、压缩会损失什么、失败透不透明。</p>
+<p>由此，本文用三条主线评价协作可靠性：</p>
+<ol>
+<li><strong>任务模型的建立与持续稳定性</strong>；</li>
+<li><strong>总人类协作成本</strong>——至少含四类：需求显式化成本（你要把意图写得多像规格书）、过程监督成本（要不要盯着）、纠偏成本（指出错误后几轮才被吸收）、恢复成本（乱了之后能修，还是只能重开）；</li>
+<li><strong>失败的可解释性与可恢复性</strong>。</li>
+</ol>
+<p><strong>任务模型</strong>是代理执行时实际依赖的内部工作表示，至少包含：用户真正想要的结果、当前代码和环境事实、已确认与未确认的假设、必须保留的约束、明确排除的范围、后续消息改了旧目标的哪一部分、当前完成状态与验证标准。</p>
+<p>真实协作链条是：</p>
+<pre><code class="language-text">理解模糊、口语化的表达
+→ 结合代码与历史对话恢复真实意图
+→ 把新纠正合并进累计目标
+→ 长会话与压缩后保持完整约束
+→ 依据同一个目标持续执行和验证
+→ 在已有结果上继续迭代
+</code></pre>
+<p>链条上任何一环损坏，后面都可能是&quot;高度自洽但整体错误&quot;——每一步单独看都合理，连起来离目标越来越远。这个判断是本文后面所有证据的挂点：四类证据测的其实都是这条链的不同环节。</p>
+<p><a id="deep-s2"></a></p>
+<h2>二、证据一：SWE-Together 把&quot;用户纠正几次&quot;变成了指标</h2>
+<p>SWE-Together（arXiv 2606.29957，2026-06-29 提交）从 11,260 条真实用户—代理会话中筛出 109 个可复现的仓库级任务（转化率约 0.97%），用 LLM 用户模拟器按原始会话的意图锚点逐步释放澄清、纠正和新增要求；统一使用 OpenCode 框架，每个模型独立跑两次。它同时测最终正确性与<strong>用户纠正度</strong>（明确纠正记全权重，软性提醒记 0.2 权重）。<code>[模型证据]</code>（预印本，方法与代码公开）</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>模型（统一 OpenCode 框架）</th>
+<th align="right">pass@1</th>
+<th align="right">两次均成功 pass²</th>
+<th align="right">稳定解决率 SSR</th>
+<th align="right">平均质量</th>
+<th align="right">用户纠正（越低越好）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Claude Opus 4.8</td>
+<td align="right">63%</td>
+<td align="right">52%</td>
+<td align="right">59%</td>
+<td align="right">0.801</td>
+<td align="right">1.38</td>
+</tr>
+<tr>
+<td>GPT-5.5</td>
+<td align="right">58%</td>
+<td align="right">48%</td>
+<td align="right">55%</td>
+<td align="right">0.763</td>
+<td align="right">1.59</td>
+</tr>
+<tr>
+<td>Claude Opus 4.6</td>
+<td align="right">58%</td>
+<td align="right">46%</td>
+<td align="right">58%</td>
+<td align="right">0.755</td>
+<td align="right">1.59</td>
+</tr>
+<tr>
+<td>GLM-5.2</td>
+<td align="right">55%</td>
+<td align="right">42%</td>
+<td align="right">48%</td>
+<td align="right">0.735</td>
+<td align="right">1.53</td>
+</tr>
+<tr>
+<td>GLM-5.1</td>
+<td align="right">52%</td>
+<td align="right">35%</td>
+<td align="right">49%</td>
+<td align="right">0.729</td>
+<td align="right">1.54</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Pro</td>
+<td align="right">48%</td>
+<td align="right">29%</td>
+<td align="right">38%</td>
+<td align="right">0.679</td>
+<td align="right">1.76</td>
+</tr>
+<tr>
+<td>MiniMax 2.7</td>
+<td align="right">40%</td>
+<td align="right">26%</td>
+<td align="right">34%</td>
+<td align="right">0.630</td>
+<td align="right">2.17</td>
+</tr>
+</tbody></table></div>
+<p>这张表的价值在于它把&quot;体验差&quot;变成可数的量：纠正量与 pass@1 的 Pearson 相关是 −0.92，与稳定解决率是 −0.84。也就是说，&quot;能力越强 → 用户纠正越少&quot;在这批任务上成立得相当强，所以纠正次数可以当作独立指标用。</p>
+<p>读这张表要克制三处：</p>
+<ul>
+<li><strong>差距不是数量级</strong>。Opus 4.8 与 GPT-5.5 的平均纠正差 0.21 次。真正值得注意的是 Claude 在更少纠正的<strong>同时</strong>拿到更高质量和更高稳定成功率——三项同向，而不是单点领先。</li>
+<li><strong>&quot;Claude 系列必然更少纠正&quot;不成立</strong>。Opus 4.6 与 GPT-5.5 的纠正量完全相同（1.59）。版本与能力水平仍然重要，这条证据不支持任何&quot;品牌决定论&quot;。</li>
+<li><strong>少纠正不等于便宜</strong>。论文同时报了效率：GPT-5.5 每任务约 29.9k token、10.7 分钟，全场最省；Opus 4.8 约 74.0k token、23.3 分钟。纠正更少，token 消耗明显更高。&quot;协作成本&quot;必须同时算纠偏劳动和运行成本，这是选型时真实的权衡，不是可以藏起来的一栏。</li>
+</ul>
+<p>还有一处必须说明的样本偏差：0.97% 的筛选转化率意味着任务集偏向&quot;有可恢复仓库状态、目标清晰、结果可观察&quot;的会话。真实协作里大量任务并不满足这三条，所以这张表对协作全谱系是有偏样本。</p>
+<p><a id="deep-s3"></a></p>
+<h2>三、证据二：TraceProbe 显示同一终点可以有两条完全不同的路径</h2>
+<p>TraceProbe（arXiv 2607.06184，2026-07-07 提交）把 2500 条轨迹（SWE-Bench Verified 与五个生产设置，横跨 Claude Code / Codex / OpenCode 三个 scaffold 与 Opus 4.6 / GPT-5.4 / GLM-5 三个模型骨干）规范化为九类动作，用确定性规则检测搜索循环、验证遗漏、重复读取、修改回滚等反模式。数据与代码公开（Zenodo DOI 10.5281/zenodo.20789918）。<code>[框架与模型混合证据]</code>（审稿中预印本）</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">Claude Code + Opus 4.6</th>
+<th align="right">Codex + GPT-5.4</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>解决率</td>
+<td align="right">77.4%</td>
+<td align="right">78.4%</td>
+</tr>
+<tr>
+<td>每任务中位步骤</td>
+<td align="right">27</td>
+<td align="right">24</td>
+</tr>
+<tr>
+<td>工具调用（中位）</td>
+<td align="right">25</td>
+<td align="right">41</td>
+</tr>
+<tr>
+<td>工具成功率</td>
+<td align="right">96.7%</td>
+<td align="right">91.9%</td>
+</tr>
+<tr>
+<td>保留动作占比</td>
+<td align="right">27.6%</td>
+<td align="right">36.2%</td>
+</tr>
+<tr>
+<td>失败动作占比</td>
+<td align="right">3.3%</td>
+<td align="right">8.0%</td>
+</tr>
+<tr>
+<td>有依据动作占比</td>
+<td align="right">36.9%</td>
+<td align="right">32.0%</td>
+</tr>
+<tr>
+<td>范围外探索</td>
+<td align="right">17.6%</td>
+<td align="right">14.3%</td>
+</tr>
+<tr>
+<td>有害动作比例</td>
+<td align="right">0.07</td>
+<td align="right">0.10</td>
+</tr>
+</tbody></table></div>
+<p>这几行合起来是一幅画面：<strong>Codex 用更多试错换到了同等结果</strong>。工具调用中位数 41 对 25，工具成功率却更低（91.9% 对 96.7%），失败动作占比是 2.4 倍。解决率只差 1 个百分点，统计上几乎不可区分，但路径的成本结构完全不同。</p>
+<p>这里必须收窄说法，否则就成了过度归因。论文自己也指出：Codex 的解决率最高，保留动作占比也最大。所以能说的是&quot;失败动作更多、有害动作更多、工具成功率更低&quot;这三个可测维度，不能说成笼统的&quot;Codex 更乱&quot;。另外，这个对比里模型和 scaffold 同时变化，无法分离各自动贡献；研究本身也没做完 Claude Code × GPT 与 Codex × Claude 的完整交叉。</p>
+<p>过程结构也不是全部。它不测用户纠偏的认知成本，也不测失败解释好不好用——这两件事恰好是人最累的地方，而它们只能靠 §五 的交互实验和 §七 提的指标去逼近。</p>
+<p><a id="deep-s4"></a></p>
+<h2>四、证据三：七个 issue 证明&quot;累计约束碎裂&quot;是真实失败模式</h2>
+<p>GitHub issue 能证明的是：某类失败确实发生过、发生在产品哪一层、有没有复现步骤、多个用户是否独立描述了相似症状、官方是否承认并修复。它不能证明发生概率，也不能给产品排名——因为没有&quot;总使用次数&quot;这个分母。</p>
+<p>所以本文把 issue 当<strong>失败模式的存在性证据</strong>，不当失败率排行榜。</p>
+<h3>Codex 侧（7 例，均于 2026-10-16 逐一打开核实）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>代表案例</th>
+<th>能支持的结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>累计约束丢失</td>
+<td>openai/codex #33262</td>
+<td>长会话压缩后可能保留不完整任务契约</td>
+</tr>
+<tr>
+<td>重复读取</td>
+<td>#33498</td>
+<td>上下文利用可能退化为重复搜索</td>
+</tr>
+<tr>
+<td>交接后提前停止</td>
+<td>#33398</td>
+<td>task handoff 未必可靠恢复执行状态</td>
+</tr>
+<tr>
+<td>需要原子化 rollover</td>
+<td>#33310</td>
+<td>社区认为长任务交接缺少稳定契约</td>
+</tr>
+<tr>
+<td>长会话上下文失控</td>
+<td>#33769</td>
+<td>用户需要主动控制进入上下文的内容</td>
+</tr>
+<tr>
+<td>过期消息重新执行</td>
+<td>#33819</td>
+<td>会话队列错误可能导致旧意图重新生效</td>
+</tr>
+<tr>
+<td>Goal 恢复不执行</td>
+<td>#33829</td>
+<td>声称继续与实际继续可能不一致</td>
+</tr>
+</tbody></table></div>
+<p>其中 #33262 报告的场景最典型：报告者在长仓库任务中不断增加明确约束，并声明后续消息只修改指定部分、其余规则继续有效；上下文压缩后，Codex 能近似描述任务，却遗漏&quot;先文档后代码&quot;这类强制规则、重新引入已明确排除的工作，把完整交付缩减为几个通用步骤。用户多次重述完整契约，后续执行仍像只保留了最新一条消息。</p>
+<p>有一个诱人的量化说法要挡住：#33398 的后续讨论里，报告者自报&quot;94 个长任务中 27.8% 的压缩事件出现丢失继续&quot;，但这只是单用户自报、未经官方裁定，只能作案例背景，不能进本文的数字体系。</p>
+<p><strong>Claude Code 也有同类问题</strong>：<code>/compact</code> 崩溃或重复执行、resume-from-summary 保护未触发、context thrashing、中途切换模型后压缩窗口错误、hooks 未加载、模型忽略指令、后台会话恢复异常，都能在它的仓库里找到报告（搜索入口见附录 C）。</p>
+<p>所以本文的立场不是&quot;一个稳、一个不稳&quot;，而是：<strong>两者都会失败，现有证据更支持 Claude 的协作错误分布较温和、纠偏成本较低；Codex 更容易出现隐式任务模型损坏并继续执行</strong>。<code>[综合推断]</code></p>
+<p><a id="deep-s5"></a></p>
+<h2>五、证据四：把用户放成变量，把使用面摆上桌面</h2>
+<p>前三条证据都在测模型或产品。这一节补两块更接近真实使用的东西：用户能力的影响，和活跃开发者的选择分布。</p>
+<h3>1. SWE-Journey：用户是谁，比模型多强更能决定成败</h3>
+<p>SWE-Journey（arXiv 2610.11559，2026-10-08 提交）把&quot;对面坐的是谁&quot;变成实验变量：合成 30 个长任务实例（594 个子任务，对照补丁平均 10.2 个文件、768 行，约为现有专业基准的两倍文件、四倍行数），再用四种用户人设驱动多轮会话——非开发者、产品经理、新人开发、架构师。会话平均 18.28 轮，远长于旧基准的 5~9 轮。<code>[模型证据]</code>（预印本，未见公开代码）</p>
+<p>13 家模型、四种人设的均值：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>用户人设</th>
+<th align="right">终点失败转通过率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>架构师</td>
+<td align="right">78.50%</td>
+</tr>
+<tr>
+<td>新人开发</td>
+<td align="right">35.57%</td>
+</tr>
+<tr>
+<td>产品经理</td>
+<td align="right">30.48%</td>
+</tr>
+<tr>
+<td>非开发者</td>
+<td align="right">23.00%</td>
+</tr>
+</tbody></table></div>
+<p>同一批模型，用户从架构师换成非开发者，通过率掉 55.5 个百分点；最强一档模型配架构师能到 93.59%，而<strong>多数模型的主动提问轮次占比不到 20%</strong>。</p>
+<p>这张表不是 Claude 与 Codex 的对比，它是对所有编码 Agent 都成立的结论。但它正好落在本文第二条主线上：协作可靠性由&quot;代理能不能从能力弱的表达里恢复意图&quot;决定，而现有主流 Agent 在这个维度上集体不及格。谁在澄清与纠偏上更好，谁就握住了真实协作的主要矛盾。</p>
+<p>边界也要给足：用户智能体只是近似真人，任务可能带着仓库与模型偏好，成本把规模卡在 30 个任务。</p>
+<h3>2. 开发者调查：75% 的活跃用户选了 Claude Code，理由分布说明了什么</h3>
+<p>ZDNet 在 2026-10 对 138 名正在使用 AI 编码工具的开发者做了调查：约 75% 使用 Claude Code，约三分之一使用 Codex，22% 两者都用。<code>[用户侧调查证据]</code>（自愿应答样本，有自选偏差；只看分布方向，不看绝对值）</p>
+<p>选择 Claude Code 的理由，按被提及的频率：</p>
+<ol>
+<li>大代码库跨文件改动保持连贯（14%）——对应&quot;任务模型稳定性&quot;；</li>
+<li>先计划再动手，复杂重构中需要更少纠正（9%）——对应&quot;纠偏成本&quot;；</li>
+<li>同任务代码质量与推理更好（9%）；</li>
+<li>在终端里对真实仓库和真实基础设施执行，而不是编辑器里的自动补全（7%）；</li>
+<li>先发者的 skills、集成与工作流生态已成规模，切换成本实打实（5%）。</li>
+</ol>
+<p>这张表本身不能当性能证据：自愿应答不是随机抽样，&quot;理由分布&quot;反映的是感知而非实测，调查时点两侧模型都在快速迭代。它的用处只有一个——<strong>方向印证</strong>。开发者自发给出的前两条理由，恰好落在 SWE-Together 和 TraceProbe 测出的那两个维度上；三条独立来源（受控评测、过程诊断、使用感知）指向同一处，比任何单条都更值得当假设用。</p>
+<p>同一份调查里也有人指出 Codex 的优势：单位任务成本更低、PR review 更强、最难的单题推理更深。这不是反例，而是印证了本文&quot;执行器强、协作弱&quot;的画像——两件事可以同时成立。</p>
+<p><a id="deep-s6"></a></p>
+<h2>六、证据不能证明什么</h2>
+<p>把前面四类证据的外推全部挡掉，只剩这些能站住：</p>
+<ol>
+<li><strong>不能说失败率排行</strong>。GitHub issue 没有使用量分母；SWE-Together 只有 109 个经 0.97% 筛选的高精度任务。两者都只支撑&quot;失败模式存在&quot;，不支撑&quot;多久失败一次&quot;。</li>
+<li><strong>不能把模型优势当成产品优势</strong>。SWE-Together 的 Claude 优势是在统一 OpenCode 框架下测的，属模型层证据；Claude Code 产品自己的框架层（压缩策略、上下文管理、权限流）是另外一组变量，没被单独测过。</li>
+<li><strong>不能把解决率等同协作质量</strong>。TraceProbe 已经展示：同样的解决率下，失败动作与有害动作可以差 2~2.4 倍。</li>
+<li><strong>不能把明确任务的高分外推为&quot;擅长模糊协作&quot;</strong>。Terminal-Bench 这类任务目标明确、验收清晰，恰好绕开了本文的三条主线。</li>
+<li><strong>不能把调查分布当因果</strong>。方向可用，比例不可引用。</li>
+<li><strong>不能把本文的综合推断当已验证结论</strong>。&quot;Claude 更适合协商型协作&quot;是多类证据共同指向的当前最优假设，尚无同时覆盖模糊意图、纠正吸收、失败解释与多轮迭代的成对实验直接验证。</li>
+</ol>
+<p>第 6 条不是免责声明，它是本文的产出之一：知道证据停在哪，才知道下一个实验该测什么。</p>
+<p><a id="deep-s7"></a></p>
+<h2>七、还缺什么：两个指标和一份能自己做的实验</h2>
+<h3>1. 最该补的两个指标</h3>
+<p>现有研究测了&quot;纠正了几次&quot;，没测&quot;纠正之后发生了什么&quot;。要补的两个量：</p>
+<ul>
+<li><strong>纠正吸收率</strong> = 一次纠正之后，既修复了指定问题、又没有破坏其他仍有效约束的比例。它是&quot;任务模型是否增量更新&quot;最直接的可测代理。SWE-Together 只数了次数，这一层是空的。</li>
+<li><strong>恢复成本</strong> = 跑偏之后，需要多少用户 token、多少分钟、多少轮才能回到正确方向。它把&quot;最后我干脆重开了&quot;这种体验变成可比数字。</li>
+</ul>
+<p>这两个指标合起来，才把&quot;纠偏的认知劳动&quot;从抱怨变成可复核的量，也才分得清&quot;每次都做对&quot;和&quot;错了能便宜地爬出来&quot;这两种能力——后者正是本文主张的核心。</p>
+<h3>2. 一份可自己执行的成对实验</h3>
+<p>想验证个人体感有没有统计稳定性，最小可做版本是这样：</p>
+<p>同一真实项目、相同初始状态、成对任务；两边各用推荐的前沿模型；固定 commit、权限、工具和时间预算；每个任务独立跑至少 10 次；<strong>不把一方的澄清答案复制给另一方</strong>；保存完整轨迹，交给不知情的评审者盲评。</p>
+<p>任务类型至少覆盖七种：模糊口语需求、上下文恢复、局部纠正、冲突约束、跨压缩长会话、连续三轮追加需求、故意给一个做不了的任务。</p>
+<p>指标别只报平均分：首轮目标复述准确率、主动澄清有效率、用户纠正次数与字数、约束保持率、纠正吸收率、假完成率、严重跑偏率、可恢复率、持续迭代率、人工审查分钟。结果同时报中位数、90 分位监督成本、最坏 10% 的失败、同任务方差、&quot;一次成功&quot;与&quot;连续两次都成功&quot;、失败类型分布、可恢复与必须重开各占多少。</p>
+<p>只有一件事会让这个实验作废：把两边的对话记录混着看，或者评审者知道哪份是哪个产品。盲评是整个设计里最容易被省掉、也最不能省的一步。</p>
+<p><a id="deep-s8"></a></p>
+<h2>八、结论</h2>
+<p>如果把编码代理理解成&quot;从完整规格到代码的执行工具&quot;，Codex 与 Claude Code 的差距可能有限——Codex 在明确任务上很强，还更省 token。如果把编码代理理解成&quot;与人共同发现目标、吸收纠正、持续演化软件的协作者&quot;，四类证据（受控评测、过程诊断、失败案例、使用面调查）都更支持 Claude 系。</p>
+<p>真正决定体验的不是峰值能力，是这五项相乘：</p>
+<pre><code class="language-text">自然意图理解 × 任务模型稳定性 × 低人工纠偏成本 × 失败透明度 × 恢复与持续迭代能力
+</code></pre>
+<p>这也是为什么编码代理的评测该从&quot;任务通过率&quot;转向&quot;协作可靠性&quot;——SWE-Together 和 SWE-Journey 已经开始这么做了。而对你个人的选型，最实用的一句是：<strong>先问&quot;拉回来的成本是多少&quot;，再问&quot;分数多高&quot;</strong>。</p>
+<h3>复核方式</h3>
+<p>本文的数字性断言都可独立复核：SWE-Together 的论文与公开代码（github.com/Togetherbench/SWE-Together）、TraceProbe 的轨迹数据（Zenodo DOI 10.5281/zenodo.20789918）、SWE-Journey 论文（arXiv 2610.11559）、七个 Codex issue 原文（附录 B）均公开可查。所有数字于 2026-10-16 逐项核对，2026-10-21 增补第六节证据后复核；如论文改版与本文不一致，以原始来源为准。</p>
+<h2>证据边界声明</h2>
+<p><strong>范围</strong>：适用于正文全部带标注的判断，也适用于未标注但涉及模型行为的描述。</p>
+<ul>
+<li><code>[模型证据]</code> 来自公开评测：SWE-Together 与 SWE-Journey 都是预印本，前者有公开代码、后者未见；两者都是<strong>模拟用户</strong>而非真人，能支持机制性判断，不能直接给出某款产品在你自己仓库里的表现。</li>
+<li><code>[框架与模型混合证据]</code>（TraceProbe）里模型与 scaffold 同时变化，只能支持&quot;组合&quot;层面比较，不能把差异归给模型或框架中的任一方。</li>
+<li><code>[产品案例]</code> 来自公开 issue，<strong>无分母</strong>，只证明失败模式存在与形态，不证明发生率。</li>
+<li><code>[用户侧调查证据]</code> 是自愿应答样本，只取方向，不引用比例做性能结论。</li>
+<li><code>[综合推断]</code> 是本文的判断，不是被实验钉死的结论；推翻它的方式是 §七 那份成对实验，或出现同时覆盖模糊意图、纠正吸收、失败解释与多轮迭代的受控研究。</li>
+</ul>
+<h3>各类来源分别支持什么</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>能支持的判断</th>
+<th>不能直接证明的判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SWE-Together（arXiv 2606.29957）</td>
+<td>多轮会话中用户纠正量可作为独立能力指标；统一框架下模型间质量与稳定率差异</td>
+<td>Claude Code 与 Codex 两个产品的优劣</td>
+</tr>
+<tr>
+<td>TraceProbe（arXiv 2607.06184）</td>
+<td>同等解决率下过程结构可显著不同；失败/有害动作可测</td>
+<td>模型与框架各占多少贡献；用户认知成本</td>
+</tr>
+<tr>
+<td>SWE-Journey（arXiv 2610.11559）</td>
+<td>用户表达能力对成功率的影响远大于模型间差距；主动澄清普遍不足</td>
+<td>真实人类用户的体验；两个产品正面对比</td>
+</tr>
+<tr>
+<td>Codex GitHub issue ×7</td>
+<td>累计约束碎裂等失败模式真实存在且有复现路径</td>
+<td>发生概率、产品稳定性排名</td>
+</tr>
+<tr>
+<td>ZDNet 开发者调查（138 人）</td>
+<td>活跃使用者的选择分布与理由方向</td>
+<td>随机抽样结论、实测性能</td>
+</tr>
+<tr>
+<td>Claude Code issue 搜索入口</td>
+<td>Claude Code 同样存在压缩、恢复、指令失效问题</td>
+<td>&quot;Claude Code 天然稳定&quot;</td>
+</tr>
+</tbody></table></div>
+<h2>参考资料</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2606.29957">SWE-Together: Evaluating Coding Agents in Interactive User Sessions</a>（2026-06-29 提交；预印本，方法与代码公开）</li>
+<li><a href="https://github.com/Togetherbench/SWE-Together">SWE-Together GitHub</a>（可复现任务构造、模拟用户与评价方法）</li>
+<li><a href="https://arxiv.org/abs/2607.06184">What Resolve Rate Hides: Trajectory Structure Diagnostics for Coding Agents</a>（2026-07-07 提交；审稿中预印本，数据公开）</li>
+<li><a href="https://doi.org/10.5281/zenodo.20789918">TraceProbe 开放数据</a></li>
+<li><a href="https://arxiv.org/abs/2610.11559">SWE-Journey（arXiv 2610.11559）</a>（2026-10-08 提交；预印本，作者称流水线后续开源）</li>
+<li><a href="https://metr.org/time-horizons/">METR Task-Completion Time Horizons</a>（页面最近更新 2026-09-08，已声明不再活跃更新）</li>
+<li><a href="https://www.zdnet.com/article/why-most-developers-prefer-claude-code-over-codex/">ZDNet：75% of developers I surveyed prefer Claude Code</a>（2026-10；138 名自愿应答开发者）</li>
+</ul>
+<h2>附录 A：Codex 产品案例（均于 2026-10-16 逐一打开核实）</h2>
+<ol>
+<li><a href="https://github.com/openai/codex/issues/33262">#33262：长会话丢失累计操作约束</a></li>
+<li><a href="https://github.com/openai/codex/issues/33498">#33498：代理重复读取上下文中未变化的文件</a></li>
+<li><a href="https://github.com/openai/codex/issues/33398">#33398：task handoff 后提前停止</a></li>
+<li><a href="https://github.com/openai/codex/issues/33310">#33310：请求原子化上下文 rollover</a></li>
+<li><a href="https://github.com/openai/codex/issues/33769">#33769：长会话主动排除上下文</a></li>
+<li><a href="https://github.com/openai/codex/issues/33819">#33819：旧用户消息被再次投递并执行</a></li>
+<li><a href="https://github.com/openai/codex/issues/33829">#33829：声称恢复计划但未真正继续</a></li>
+</ol>
+<p>以上用于证明失败模式存在，不用于估计实际发生率。</p>
+<h2>附录 B：Claude Code 产品案例入口</h2>
+<ol>
+<li><a href="https://github.com/anthropics/claude-code/issues?q=is%3Aissue%20%28%22loses%20context%22%20OR%20%22context%20drift%22%20OR%20%22forgets%20instructions%22%20OR%20%22compaction%22%29">Claude Code context / compaction issues</a>（搜索入口，未逐条编号核实）</li>
+<li><a href="https://github.com/anthropics/claude-code/issues?q=is%3Aissue%20%22plan%20mode%22">Claude Code Plan Mode issues</a></li>
+<li><a href="https://code.claude.com/docs/en/overview">Claude Code 官方概览</a></li>
+</ol>
+<p>以上说明 Claude Code 也存在压缩、恢复、权限与指令失效问题，不支持&quot;Claude Code 天然稳定&quot;的绝对判断。</p>
+<h2>Changelog</h2>
+<ul>
+<li><strong>v4（2026-10-27，按 SHOW v3.1 重写）</strong><ul>
+<li>结构：按&quot;证据评审&quot;篇型重排为 结论→框架→四类证据→不能证明什么→还缺什么→结论（原 v3 的六个&quot;证据不能证明什么&quot;边界段散在各节末尾，现归并到 §六一处；原 §七&quot;证据不能证明什么&quot;与 §八 综合结论合并压缩）；</li>
+<li>补回：§七「还缺什么」为 v2 有、v3 删掉的内容（纠正吸收率、恢复成本、可执行成对实验）；这两个指标是全文唯一把&quot;结论&quot;接回&quot;怎么自己验证&quot;的部分，删掉后文章只剩判断题、没有操作题；</li>
+<li>删除：三处&quot;这张表不能告诉你什么&quot;套话改为表后正文一句真边界（SHOW-M02 v3.1 明确不强制补套话）；正文里&quot;这一节是某版本新增的&quot;&quot;更新版新增&quot;等版本自述，改由本 Changelog 承担；</li>
+<li>降级：任务模型碎裂图中&quot;每次纠正有 50% 概率掷骰子&quot;的说法删除——修辞化的伪百分比最容易被当成测量值引用，改为&quot;每一次纠正都要重新猜一次是修复还是覆盖&quot;；</li>
+<li>补边界：#33398 的单用户自报数字（94 任务 / 27.8%）显式标为案例背景、不进数字体系；SWE-Together 的 0.97% 筛选偏差写进 §二正文（原仅在边界节出现）；</li>
+<li>未改：全部承重数字、引用编号、标注等级与结论口径（含&quot;尚未有成对实验&quot;这一自我设限）保持原样；无新增未经核实的数字。</li>
+</ul>
+</li>
+<li><strong>v3（2026-10-21）</strong>：更名、压缩叙述、新增交互侧证据（SWE-Journey、ZDNet 调查）。v2（2026-10-16）完成全量数据核实，含示意对照会话与用户观察方法说明。v1（2026-07-17）初版。</li>
+</ul>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 4.1-review · 2026-11-27</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>

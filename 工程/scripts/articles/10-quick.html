@@ -1,0 +1,47 @@
+<section class="content-section" id="dm-intro"><p class="kicker">先给一句话答案</p><h2>AI 扩大一个人能完成的任务范围，三件事要分开验证</h2>
+<p>一个人可以借助 AI 完成原本不会的数据分析；软件团队可以让 AI 写代码，再安排 AI 检查；科学家也开始用它连接设计与实验。接下来要问的是：结果由谁判断，工具能否承受使用量，新人怎样积累本领，团队如何持续运转？</p>
+<p class="callout">本文的一句话答案：<strong>能交出成果、本人学会了、团队能稳定交付，是三件需要分别验证的事。</strong></p>
+<p>本文沿七份公开材料回答这些问题，前三份都来自 Anthropic。证据标签约定：[团队自述]、[公司观察研究]、[随机实验]、[合作早期研究]、[综合判断]、[待验证解释]——来源均公开可查，本轮未访问企业内部数据、未重跑实验。</p><a class="deep" href="?view=deep#overview">查看引言与证据标签约定 ↗</a> <a class="md-source" href="{{MD_URL}}#overview">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-three"><p class="kicker">分析框架</p><h2>先分清三个问题：能做、会做、能持续交付</h2>
+<p>构造示例：一名不熟悉编程的运营人员，用 AI 做出一张销售预测表。预测表满足这次需要，检查的是借助工具完成任务的能力；能否解释为什么这样算，检查的是本人掌握的知识与判断；每周都要更新时谁维护数据、承担费用，检查的是团队持续交付的能力。</p>
+<figure><div class="figure-top"><span>框架</span><b>图 01｜三个问题互相影响，却不能互相替代</b></div><div class="diagram-scroll"><img src="配图/10/fig01.svg" alt="能做、会做、能持续交付三张卡片及其关系：本人判断帮助检查成果，团队流程支持生产与验证，一次成果不能证明本人掌握" loading="lazy" decoding="async"></div><figcaption>图中是本文的分析分工，不是经过估计的因果模型；七份材料分别照亮这三件事的不同部分。</figcaption></figure><a class="deep" href="?view=deep#s0">查看三个问题的定义与分工图 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-software"><p class="kicker">软件生产</p><h2>AI 写得越多，检查越需要重新安排</h2>
+<p>当 AI 大量生成修改，逐条等待同事阅读就会排队——紧缺的是人的检查时间，不只是生成代码的速度。Claude Code 团队的安排是：多数代码阅读移交机器，AI 审查与自动测试贯穿开发流程；对可信作者的低风险修改，自动检查通过后可不再要求人工审批，风险较高的修改按风险加入人工，敏感路径另有规则；发起修改的人继续对结果负责。<code>[团队自述]</code> [S1]</p>
+<p class="callout">如果每次加快写代码，都让更多修改堆在同一个人工关口，整体交付未必同步加快。它不证明所有代码都可以自动合并，更不证明人已不需要理解系统。</p><a class="deep" href="?view=deep#s1">查看审查流程与值得关注的工作 ↗</a> <a class="md-source" href="{{MD_URL}}#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-infra"><p class="kicker">基础设施</p><h2>工具的主要使用者变了，设计假设也会变</h2>
+<p>Anthropic 的情况是 AI 与自动任务成了代码库的主要客户端：统一代码库每日合并的改动，从 5 月约 2,500 次增至 9 月超过 30,000 次。公司为此建设 Scion 版本控制系统，让历史查询、合并等工作由服务器承担，客户端按需取得数据。<code>[团队自述]</code> [S2]</p>
+<figure><div class="figure-top"><span>两条链</span><b>图 02｜生产流程与基础设施：事件 → 机制 → 推演</b></div><div class="diagram-scroll"><img src="配图/10/fig02.svg" alt="链A：AI 生成修改导致检查重排、人按风险加入；链B：合并次数大增推动 Scion 重建，负载沿工作链向外传导" loading="lazy" decoding="async"></div><figcaption>合并数字属于统一代码库，不是 Claude Code 独立仓库的产出；改动数量不能换算成功能价值，Git 仍适合绝大多数代码库。</figcaption></figure><a class="deep" href="?view=deep#s2">查看仓库类比与传导推演 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-org"><p class="kicker">组织</p><h2>少做一些具体操作，也可能多做一些协调</h2>
+<p>内部就业研究报告：初级技术人员在新聘技术人员中的占比从 27% 降至 9%；员工更多建设 AI 工作规则、监控工具和任务流程；即使不担任管理职务，技术员工的会议时间也比一年前增加 16%；公司整体和技术招聘的绝对规模仍在增长。<code>[公司观察研究]</code> [S3]</p>
+<p class="callout">个人少打一些字，并不自动意味着组织少开一些会：安排多个 AI 工作会遇到新的选择——哪个先做、什么异常值得中断、冲突时接受哪一个。基础任务被分担后，新人怎样获得形成判断力的练习，是这项观察提出但没测完答案的问题。</p>
+<p>招聘占比下降不能直接解释成裁员，也不能单凭这一家公司推出全市场趋势。</p><a class="deep" href="?view=deep#s3">查看组织观察的数字与待验证解释 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-consultants"><p class="kicker">跨专业</p><h2>工具帮助完成任务，知识还要另考</h2>
+<p>487 名管理咨询师的随机实验：处理组配 ChatGPT 与使用培训，三项数据科学任务表现更好，但整体未达到专家基准；事后不用 ChatGPT 回答技术知识题，没有发现处理组更有优势。<code>[随机实验]</code> [S4] 注意：实验实际发生于 2024 年，检验的是当时工具、培训与任务的组合。</p>
+<p>类比：借助导航到了目的地，不意味着已经记住每个路口。企业可以扩大员工承担任务的范围，同时另行验证解释、检查和迁移方法的能力；缺少短期知识增长，也不能自动否定工具的帮助。</p><a class="deep" href="?view=deep#s4">查看实验口径与两个结果为何同时成立 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-lilli"><p class="kicker">生产系统</p><h2>用上 AI 以后，还要长期维护和算账</h2>
+<p>麦肯锡内部知识工具 Lilli 的复盘：随着更多场景加入，平台成本快速上涨；原来依赖一家供应商提供的多个模型，难以针对各项任务优化。团队因此重建为不绑定某一家供应商、组件更易组合的平台。<code>[团队自述]</code> [S5]</p>
+<p>按任务要求选择合适模型，常被称作模型路由。公司需要经营的不只是一个聊天窗口，还包括知识更新、模型选择、质量检查和费用控制。但"内部平台改造"与"咨询公司主要靠卖行业系统赚钱"之间，还缺客户合同、收入结构和长期维护责任等证据——后者只能保留为待观察的商业方向。</p><a class="deep" href="?view=deep#s5">查看单一供应商口径与模型路由示例 ↗</a> <a class="md-source" href="{{MD_URL}}#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-law"><p class="kicker">法律与学习</p><h2>已有基础，可能影响怎样从 AI 协作中学习</h2>
+<p>11 家美国知识产权律所、133 名专利律师的三个月随机实验：使用 AI 起草助手时稿件质量提高，初级律师收益更大；之后不用 AI 修改一份现有申请时，额外收益集中在资深律师，初级律师平均未见收益。<code>[随机实验／工作论文]</code> [S6]</p>
+<figure><div class="figure-top"><span>对照</span><b>图 03｜两个实验对照：成品收益与独立能力收益分布在不同人群</b></div><div class="diagram-scroll"><img src="配图/10/fig03.svg" alt="左栏咨询师实验：借助工具更好但撤去工具无知识优势；右栏律师实验：即时收益与独立收益分布在不同人群；底部是有基础者更容易积累知识的解释" loading="lazy" decoding="async"></div><figcaption>两项研究的样本、工具、任务和观察期不同，不能拼成同一个实验；共同支持的是分别观察成果和人的能力。</figcaption></figure>
+<p class="callout">一种解释 [待验证解释]：有基础的人更容易识别 AI 方法里哪些有用、哪些值得怀疑，通过比较与追问积累知识。新人培养需要在高质量交付之外安排判断练习——例如解释一处修改的理由，或在没有工具时识别明显问题。</p><a class="deep" href="?view=deep#s6">查看实验条件与机制解释 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-bio"><p class="kicker">生物研发</p><h2>AI 开始连接设计、数据和真实实验</h2>
+<p>六名 Generate 科学家使用 Claude Code 参与设计：代理提出候选、科学家筛选、细胞实验检验、结果约束下一轮设计。其中一种信号结构比参照设计短约 70%，并在部分实验室指标上表现更好；团队还用 Claude Code 建设实验记录和数据工具。<code>[合作早期研究]</code> [S7a][S7b]</p>
+<p class="callout">70% 指信号结构的长度变化，不是整个药物缩小 70%，也不是研发周期缩短 70%。AI 参与的是研究过程：提出一个看似合理的方案，仍需经过现实检验；这个案例没有证明患者获益。</p><a class="deep" href="?view=deep#s7">查看实验循环与证据阶段说明 ↗</a> <a class="md-source" href="{{MD_URL}}#s7">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-together"><p class="kicker">综合</p><h2>工作的边界、学习和组织要一起看</h2>
+<p>执行某些任务的门槛下降后，发现错误、理解后果和决定例外仍然需要专业知识；经验可以写进流程，但写进规则还不等于有效——价值要看规则能不能被执行、能不能发现真实问题、过期后谁来修改；具体任务做快以后，要重新寻找整个流程的限制。</p>
+<figure><div class="figure-top"><span>瓶颈与观察</span><b>图 04｜瓶颈会移动，组织在变化，值得观察的方向</b></div><div class="diagram-scroll"><img src="配图/10/fig04.svg" alt="交付流程中瓶颈会移动；组织观察显示初级占比下降、会议时间上升、招聘仍在增长；底部是端到端交付、返工事故、含维护成本等观察方向" loading="lazy" decoding="async"></div><figcaption>瓶颈是当前最限制整体进度的环节，会随工作量和其他环节的能力变化；组织数字属单一公司观察，不能直接推出全市场趋势。</figcaption></figure>
+<p class="callout">可尝试的起点：<strong>把成果验收与能力培养分开安排</strong>——交付时允许充分使用工具，培养时另外检验解释、纠错和换情境处理问题的能力。这是由证据启发的建议，尚不能称为经七份材料验证的最佳方案。</p><a class="deep" href="?view=deep#s8">查看四条综合判断与替代解释 ↗</a> <a class="md-source" href="{{MD_URL}}#s8">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-sources"><p class="kicker">来源</p><h2>七份材料全部公开可查</h2>
+<p>S1—S7b 覆盖 Claude Code 团队复盘、Scion 工程复盘、Anthropic 内部就业研究、咨询师随机实验、Lilli 平台复盘、专利律师工作论文与生物研发合作说明；发布日期、实验发生时间与观察期分别理解，本轮核对日为 2026-11-05。企业自述、公司观察、期刊实验、工作论文和合作早期研究分别保留其证据身份；类比、构造示例与综合判断不充当新实测。</p>
+<p class="closing">本文是公开材料的解释与评审，不是劳动力市场预测模型、法律意见或临床研究报告。</p><a class="deep" href="?view=deep#s9">查看来源表与证据边界声明 ↗</a> <a class="md-source" href="{{MD_URL}}#s9">Markdown 对应段落</a></section>

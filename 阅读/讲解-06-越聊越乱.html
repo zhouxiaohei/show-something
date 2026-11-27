@@ -1,526 +1,633 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 文档类型：讲解版（机制拆解）· 结构模板 A（结论先行） -->
-<title>讲解 · 为什么和 AI 越聊越乱</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
-  }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
-  a { color: #3b82f6; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  /* Hero */
-  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
-  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
-  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
-  .hero .why { color: #6b7280; font-size: 15px; }
-  .hero .why strong { color: #1f2328; }
-  .hero .meta { margin-top: 8px; font-size: 12px; color: #94a3b8; }
-  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
-  /* 30秒版 */
-  .quick {
-    background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px;
-    padding: 20px 24px; margin-bottom: 40px;
-  }
-  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
-  .quick ol { padding-left: 22px; }
-  .quick li { margin-bottom: 8px; }
-  .quick li:last-child { margin-bottom: 0; }
-  /* 正文 */
-  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
-  h3 { font-size: 17px; margin: 26px 0 10px; }
-  p { margin-bottom: 12px; }
-  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
-  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
-  /* 类比卡片 */
-  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
-  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
-  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
-  .analogy.green { background: #ecfdf5; border-color: #86efac; }
-  .analogy h3 { margin-top: 0; }
-  .analogy .row { margin-bottom: 8px; }
-  .analogy .row:last-child { margin-bottom: 0; }
-  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
-  .blue .label  { color: #3b82f6; }
-  .yellow .label{ color: #f59e0b; }
-  .green .label { color: #10b981; }
-  .edge { font-size: 14px; color: #6b7280; }
-  .edge strong { color: #1f2328; }
-  /* 引用与金句 */
-  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
-  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
-  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
-  ul.plain { padding-left: 22px; margin-bottom: 12px; }
-  ul.plain li { margin-bottom: 6px; }
-  /* 表格 */
-  table { width: 100%; border-collapse: collapse; margin: 16px 0 20px; font-size: 14px; }
-  th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
-  th { background: #f9fafb; font-weight: 600; }
-  /* 图 */
-  figure { margin: 24px 0; }
-  figure svg { width: 100%; height: auto; display: block; }
-  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
-  /* 面试官加分区 */
-  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
-  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
-  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
-  .interview details:last-of-type { margin-bottom: 0; }
-  .interview summary { cursor: pointer; font-weight: 600; }
-  .interview details[open] summary { margin-bottom: 8px; }
-  .interview .ans { font-size: 15px; color: #374151; }
-  /* 出口 */
-  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
-  .exit strong { color: #1f2328; }
-</style>
-</head>
-<body>
-<div class="wrap">
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-06"><meta name="document-version" content="1.4-review">
+<meta name="description" content="冲突轴机制：四种答不对分诊、重开不是清空、信息结构不对称与三份外部证据。"><meta name="color-scheme" content="dark">
+<title>为什么和 AI 越聊越乱 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-06">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">Agent 引擎与记忆</p><h1>为什么和 AI 越聊越乱</h1><p class="article-summary">冲突轴机制：四种答不对分诊、重开不是清空、信息结构不对称与三份外部证据。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#cx-tldr">乱的来源是&quot;同时有效的版本数&quot;在涨，不是信息总量在涨</a><a href="#cx-intro">三种乱法，同一个共同点：它改的不是你要改的那一处</a><a href="#cx-triage">先把&quot;答不对&quot;分成四种：只有&quot;冲突&quot;该重开</a><a href="#cx-steps">四步流程，与 Claude Code 官方工作流对齐</a><a href="#cx-restart">重开不是清空：交付物是一份更好的任务书</a><a href="#cx-mech1">新增与更新的信息结构不对称：一个目标，还是三个值</a><a href="#cx-mech2">冲突不会暴露，它会被解释成自洽</a><a href="#cx-boundary">改本身没那么难，难的是版本数</a><a href="#cx-scenes">三个场景，把四步走一遍：权威各不相同</a><a href="#cx-views">从八个场景里抽掉领域细节，剩下六条</a><a href="#cx-appendixa">八个场景，按优先级排</a><a href="#cx-appendixb">证据边界：每个来源能支持什么、不能证明什么</a><a href="#cx-next">两个成本最低的动作</a><a href="#cx-changelog">Changelog</a></nav></details><p>2026-11-27 讲解版升级：md 正文未改（仅加导航锚点），新增新标准配图与图解片段，讲解版由构建器重建；证据姿态沿用各文自述声明。核对日期：2026-11-27。</p></aside>
+<main id="article-content"><div class="quick-content"><section class="content-section" id="cx-tldr"><p class="kicker">太长不看</p><h2>乱的来源是"同时有效的版本数"在涨，不是信息总量在涨</h2>
+<p><strong>现象</strong>：从零写一个东西往往顺利，改一个已有的东西却越改越歪。差异不在"改"这个动作，在请求里的信息结构。</p>
+<p><strong>机制一句话</strong>：更新请求天然携带三股力——现状、旧决定的理由、新目标，外加一条从没写进请求的约束；矛盾进入上下文后，模型不会举手报告，它挑一个版本，然后为这个选择编一套解释。</p>
+<p><strong>怎么判断（三问分诊，一分钟）</strong>：① 它能不能准确复述当前目标、已否决的方案、完成判据？② 纠正第二次之后，是改对了，还是换了个错法？③ 删掉它的上一轮回答、只留原始材料，它还这么答吗？任一踩中＝冲突型，该重开；三问全过还是乱＝需求自相矛盾，人来裁决。</p>
+<p><strong>怎么解（四步）</strong>：① 裁决输入 → ② 定目标（带验收）→ ③ 沟通对齐（先复述再动手）→ ④ 混乱了就重构，/clear 并重写任务书，不做第四次纠正。</p>
+<p><strong>重开时交接四件事</strong>：不能变的结果 / 已经证明走不通的路 / 现在客观是什么 / 怎么算完成。重开两次还错，问题在需求侧，出口不在上下文里。</p>
+<p class="callout">要动手，读第一部分加附录 A 就够；要理解为什么，读第二、三部分。本文走<strong>冲突轴</strong>（同一件事有两个以上互相矛盾的版本），噪声轴（信息变多变旧）在第 01 篇。</p><a class="deep" href="?view=deep#deep-s0">查看太长不看全文 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s0">Markdown 对应段落</a></section>
 
-  <div class="toplink"><a href="../index.html">← 阅读目录</a>　｜　<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么和%20AI%20越聊越乱.md">📄 深入版（含完整证据链）→</a></div>
+<section class="content-section" id="cx-intro"><p class="kicker">引子</p><h2>三种乱法，同一个共同点：它改的不是你要改的那一处</h2>
+<p>三种开场：改一个报错，它改了一处、报错换个地方、第三轮开始改测试；让它"改得口语一点"，语气对了，论证顺序变了、两个数字没了；给四百行的函数加开关，它把整个函数重写，连错误处理都换了风格。三次都不是"它不会"，三次都是"它把整个对象当成了一份可重写的材料"。</p>
+<p class="callout"><strong>一句话答案</strong>：新建时，上下文里只有一个方向的力，就是目标；更新时，至少有三股力——现状、旧决定的理由、新目标，它们经常互相打架。模型不会举手说"这里有两个版本"，它挑一个，然后为这个选择编一套解释。你看到的是它很自信地答错。</p>
+<p>你正在经历它的时候会看到：它引用已经不存在的函数名、行号；纠正第二次后换了一种错法；问"这样对吗"它答"对，因为……"但不跑测试；它推荐你上周否掉的方案。最费人的一个信号：你开始替它记事情——当人开始充当版本管理器，说明窗口里的版本已经管不住了。</p><a class="deep" href="?view=deep#deep-s1">查看引子全文 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s1">Markdown 对应段落</a></section>
 
-  <!-- ① Hero -->
-  <header class="hero">
-    <h1>为什么和 AI 越聊越乱？</h1>
-    <p class="core">一句话核心观点：新建时上下文里只有"目标"一股力，更新时同时有现状、旧决定的理由、新目标三股力，还有一堆没人说出口的约束。矛盾进了上下文，模型不会报告它，会挑一个版本然后为这个选择编一套解释。</p>
-    <p class="why"><strong>为什么值得读：</strong>"改了三次都不对"几乎人人都遇到过，多数人的反应是纠正第四次。这篇讲清楚为什么纠正没用、什么时候该换窗口。解法给成一条可照着走的四步流程（与 Claude Code 官方工作流对齐），并在三个最容易踩的场景里分别展开：修复杂 bug、做调研、架构设计。上一讲《越聊越浅》说的是信息变多变旧，这一篇说的是同一件事有两个矛盾版本，症状像，机制不同。</p>
-    <p class="meta">文档类型：讲解版（机制拆解）· 对应深入版 v1.2（2026-10-23）· 结论与深入版一致，类比均已标注边界</p>
-  </header>
+<section class="content-section" id="cx-triage"><p class="kicker">分诊</p><h2>先把"答不对"分成四种：只有"冲突"该重开</h2>
+<p>不是所有"答不对"都值得重开。混着治，会把"你没说清"误诊成"上下文有病"，然后每开一个新窗口都重复同一个错误。四种：缺料（补材料）、歧义（改写成可判定条件）、冲突（重开并重写任务书）、能力（换模型或拆任务）。</p>
+<figure><div class="figure-top"><span>分诊</span><b>图 02｜四种"答不对"与三问检测</b></div><div class="diagram-scroll"><img src="配图/06/fig02.svg" alt="缺料、歧义、冲突、能力四种类型各带症状与处置，冲突用三个问题一分钟分诊，任一踩中就是冲突型" loading="lazy" decoding="async"></div><figcaption>复述的合格线要写死：当前要达成的结果、已经死掉的方案、完成判据，三条同时答对才算复述通过；官方阈值可抄——同一问题纠正超过两次就 /clear。</figcaption></figure>
+<p>冲突型内部还有四种形态，动作不通用：<strong>版本叠加</strong>（新窗口只放一个版本，其余让它自己去文件系统读）、<strong>决定复活</strong>（把否决理由写成显式约束，"方案 A 因事务边界不成立被否"才有用）、<strong>解释固化</strong>（把"你的结论"降格成"一份待审材料"，让它对着 diff 找反例）、<strong>约束缺席</strong>（先出改动点清单，人确认后再执行）。四种里最常见的是约束缺席，最容易被误诊的也是它。</p><a class="deep" href="?view=deep#deep-s2">查看四种类型、三问分诊与冲突四形态 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s2">Markdown 对应段落</a></section>
 
-  <!-- ② 30 秒版 -->
-  <section class="quick">
-    <h2>⏱ 30 秒版</h2>
-    <ol>
-      <li><strong>乱的主要来源是版本数，不是信息量。</strong>一个窗口里同一件事有三个版本，比三万字无关材料更致命：无关材料让它分心，矛盾版本逼它裁决，而裁决它不擅长。</li>
-      <li><strong>更新请求天生更难说清。</strong>新建只需要"要什么"，更新要同时回答"现在是什么、原来为什么那样、要改成什么"，外加"什么不许动"，最后这条最常被省略，也最常出事。</li>
-      <li><strong>矛盾不会自己暴露。</strong>模型会挑一个版本继续，然后配一套自洽的解释。你看到的是它很自信地答错。</li>
-      <li><strong>先查表达，再查冲突。</strong>同一个模型换个编辑格式，通过率能从 20% 到 61%，说明"改不对"有一大块只是没说清。表达没问题还乱，才该重开。</li>
-      <li><strong>通用解法是四步流程。</strong>裁决输入（先定什么算数）→ 定目标（解决什么、现状、做成什么样、为什么）→ 沟通对齐（先复述、小步走）→ 混乱了就回到前三步重新来。与 Claude Code 官方工作流 Explore → Plan → Implement → Commit 逐级对应。</li>
-      <li><strong>重开的交付物是一份更好的任务书。</strong>官方规则：同一问题纠正两次就该重开，且要带着"学到的东西"重写 prompt。空窗口配旧问题，只是把失败重放一遍。</li>
-    </ol>
-  </section>
+<section class="content-section" id="cx-steps"><p class="kicker">通用解法</p><h2>四步流程，与 Claude Code 官方工作流对齐</h2>
+<p>不同任务各有各的乱法，解法是同一条流程：<strong>裁决输入 → 定目标 → 沟通对齐 → 混乱就重构</strong>。它逐级对应官方的 Explore → Plan → Implement → Commit，官方理由是"把调研规划与实现分开，避免解决错的问题"。</p>
+<figure><div class="figure-top"><span>流程</span><b>图 04｜四步流程与官方对应</b></div><div class="diagram-scroll"><img src="配图/06/fig04.svg" alt="裁决输入、定目标、沟通对齐、混乱就重构四步卡片，分别对应官方 Explore、Plan、Implement 与 /clear" loading="lazy" decoding="async"></div><figcaption>如实交代：官方没给"这套流程提升成功率"的量化数字，四步与官方工作流的对应关系是本文标注的，不作为实验结论引用。</figcaption></figure>
+<p class="callout">每一步最容易做错的地方：不裁决就开工（模型按最先读到的算）；只写"要什么"不写"怎么算对"；一次说完全部要求就放手不管；把"再想想"当第四步——那是在原地加轮次。</p><a class="deep" href="?view=deep#deep-s3">查看四步表、官方引文与易错点 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s3">Markdown 对应段落</a></section>
 
-  <!-- ③ 正文 -->
-  <main>
-    <div class="sqa">
-      <p><span class="tag">情境 S</span>让它从零写个函数，它问清行为就动手，质量稳定。让它改一个已有函数，前面几轮也正常。</p>
-      <p><span class="tag">冲突 C</span>某一轮之后开始歪：加个开关它重写了整个函数；让它改语气它把论证结构也改了；让它修报错它第三轮开始改测试。你纠正，它换一种错法继续。你开始替它记事情：哪条约束还有效、哪个方案已经死了。</p>
-      <p><span class="tag">问题 Q</span>为什么"改"比"新建"容易乱？是它不会改，还是别的问题？什么时候该放弃纠正、换一个窗口？</p>
-      <p><span class="tag">答案 A</span>通用解法是四步流程：裁决输入（先定什么算数）→ 定目标（解决什么、现状、做成什么样、为什么）→ 沟通对齐（先复述、小步走）→ 混乱了就回到前三步重新来，与 Claude Code 的 Explore → Plan → Implement → Commit 逐级对应。真要重开，交付物是一份重写过的任务书，交接四件事。</p>
-    </div>
+<section class="content-section" id="cx-restart"><p class="kicker">重开</p><h2>重开不是清空：交付物是一份更好的任务书</h2>
+<p>官方给了两个动作，大部分人只做了前半个：/clear 重开，以及带着你学到的东西重写一个更具体的 prompt。只做动作一，就是把同一个问题重新问一遍，第五次还是错。</p>
+<figure><div class="figure-top"><span>交接</span><b>图 05｜交接四件事与需求侧出口</b></div><div class="diagram-scroll"><img src="配图/06/fig05.svg" alt="交接四件事：不能变的结果、走不通的路、现在客观是什么、怎么算完成；重开两次还错说明问题在需求侧" loading="lazy" decoding="async"></div><figcaption>顺序有讲究：先"不能变"，再"走不通"，最后才是"要做什么"；反过来写，约束会变成事后装饰。重开不免费：新窗口前缀缓存失效，缓存与未缓存差 10 倍（Manus）。</figcaption></figure>
+<p class="callout">三条容易搞反的做法：要删的是过程不是证据（erasing failure removes evidence）；重开后第一条消息是"先复述"不是"帮我改 X"；重开两次还错就别再重开——那不是上下文问题，是需求内部自相矛盾。判据不该是"感觉有点乱"，是<strong>它还能不能准确复述任务模型</strong>。</p><a class="deep" href="?view=deep#deep-s4">查看交接清单、三条搞反的做法与重开成本 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s4">Markdown 对应段落</a></section>
 
-    <h2 class="sec">机制一：更新请求里装了三倍的东西，还有一条没写</h2>
-    <div class="analogy blue">
-      <div class="row"><span class="label">生活类比：</span>给画师一张白纸，"画一只鸟"，他画就是了。换成指着一幅完成的山水画说"加一只鸟"，事情立刻变多：配色调、不挡山、停在留白处。这些要求你没说，因为它们"本来就那样"。</div>
-      <div class="row edge"><span class="label">类比的边界：</span>模型看得见现状，缺的是"没提的就是不变"这个默认。所以更新请求里，写清"不许动什么"的价值通常高于把"要改什么"写得更细。</div>
-    </div>
+<section class="content-section" id="cx-mech1"><p class="kicker">机制一</p><h2>新增与更新的信息结构不对称：一个目标，还是三个值</h2>
+<p>同一句"帮我做一个 X"和"帮我改一下这个 X"，请求里装的东西差了三倍。新建写成：目标 G → 产物 X；更新要写成：现状 S ＋ 旧决定的理由 R ＋ 新目标 G' → 产物 X'，并且 X' 必须与现状里"没被提到的那部分"保持兼容。本文主张的是这个<strong>结构版本</strong>，不是"更新必然比新建差"的能力版本——后者没有直接对照实验。</p>
+<figure><div class="figure-top"><span>结构</span><b>图 01｜新建一条力线，更新三股力加一条缺席约束</b></div><div class="diagram-scroll"><img src="配图/06/fig01.svg" alt="新建请求只有目标一条力线；更新请求携带现状、旧决定的理由与新目标三股力，外加一条从没写进请求的兼容性约束" loading="lazy" decoding="async"></div><figcaption>图里那条虚线是全图的关键：它不在请求里，只在现状里——命名习惯、错误处理风格、兼容版本，从没被写进任何一次请求。推断错了就是改动溢出。</figcaption></figure>
+<p>更新的验收是阴性命题：改对了，<strong>而且没改坏别的地方</strong>。验收清单至少三条：目标行为变了、相邻行为没变、构建与测试全绿——中间那条最容易被省掉，也最容易出事。阴性证明没有便宜做法，只有笨做法：列相邻行为清单（从代码里搜，不凭记忆）、逐条跑、把清单写进交接材料。</p><a class="deep" href="?view=deep#deep-s5">查看值个数、缺席约束与阴性验收 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s5">Markdown 对应段落</a></section>
 
-    <figure>
-      <svg viewBox="0 0 900 360" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="新建与更新的信息结构对比图">
-        <defs>
-          <marker id="arw6-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-          <marker id="arw6-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#ef4444"/>
-          </marker>
-        </defs>
-        <!-- 左：新建 -->
-        <text x="225" y="40" font-size="16" font-weight="700" fill="#10b981" text-anchor="middle">新建：一条力线</text>
-        <rect x="105" y="90" width="240" height="52" rx="10" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="225" y="122" font-size="14" fill="#1f2328" text-anchor="middle">目标 G</text>
-        <line x1="225" y1="142" x2="225" y2="192" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray)"/>
-        <rect x="105" y="196" width="240" height="52" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
-        <text x="225" y="228" font-size="14" fill="#1f2328" text-anchor="middle">产物 X</text>
-        <text x="225" y="300" font-size="13" fill="#10b981" text-anchor="middle">只需满足一个显式目标</text>
-        <!-- 右：更新 -->
-        <text x="640" y="40" font-size="16" font-weight="700" fill="#3b82f6" text-anchor="middle">更新：三股力，一股缺席</text>
-        <rect x="430" y="70" width="200" height="46" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="530" y="99" font-size="13" fill="#1f2328" text-anchor="middle">现状 S（含隐性约束）</text>
-        <rect x="660" y="70" width="180" height="46" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="750" y="99" font-size="13" fill="#1f2328" text-anchor="middle">旧决定的理由 R</text>
-        <rect x="545" y="70" width="0" height="0"/>
-        <rect x="430" y="150" width="0" height="0"/>
-        <rect x="545" y="150" width="200" height="46" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="645" y="179" font-size="13" fill="#1f2328" text-anchor="middle">新目标 G'</text>
-        <line x1="510" y1="116" x2="560" y2="150" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray)"/>
-        <line x1="740" y1="116" x2="700" y2="150" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray)"/>
-        <line x1="645" y1="196" x2="645" y2="238" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray)"/>
-        <!-- 缺席约束（虚线） -->
-        <rect x="40" y="150" width="230" height="46" rx="10" fill="#fef2f2" stroke="#fca5a5" stroke-dasharray="6 4"/>
-        <text x="155" y="171" font-size="13" font-weight="600" fill="#ef4444" text-anchor="middle">未说出口的兼容性约束</text>
-        <text x="155" y="189" font-size="11" fill="#6b7280" text-anchor="middle">命名 · 错误处理 · 兼容版本</text>
-        <path d="M 270 173 H 420 V 225 H 537" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arw6-red)"/>
-        <text x="345" y="164" font-size="12" fill="#ef4444" text-anchor="middle">从没写进请求，只在现状里</text>
-        <rect x="545" y="242" width="200" height="52" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
-        <text x="645" y="274" font-size="14" fill="#1f2328" text-anchor="middle">产物 X'</text>
-        <!-- 右侧底注 -->
-        <text x="640" y="330" font-size="13" fill="#3b82f6" text-anchor="middle">三股力经常打架，模型必须先裁决"哪个算数"</text>
-        <text x="225" y="330" font-size="13" fill="#6b7280" text-anchor="middle">没有裁决这一步</text>
-      </svg>
-      <figcaption>图 1 · 新建只有一条力线，更新有三股力加一条从未写进请求的虚线约束，虚线那条最容易被忽略，改动溢出多半从它来</figcaption>
-    </figure>
+<section class="content-section" id="cx-mech2"><p class="kicker">机制二</p><h2>冲突不会暴露，它会被解释成自洽</h2>
+<p>矛盾进入上下文之后，模型很少主动报告矛盾。它通常会选一个版本继续，然后给这个选择配一套理由。三份证据：</p>
+<figure><div class="figure-top"><span>证据链</span><b>图 03｜三份证据：早期答案变前提、失效有名字、顺着错走回不来</b></div><div class="diagram-scroll"><img src="配图/06/fig03.svg" alt="Laban 多轮实验平均低 39%，Breunig 命名上下文冲突，TRUTH DECAY 第 7 次追问降到 30.23%" loading="lazy" decoding="async"></div><figcaption>三份证据说的是同一件事的三个面：冲突怎么产生、冲突叫什么、冲突为什么改不回来。TRUTH DECAY 的 30.23% 低于随机猜——它已经稳定站到了错的一边。</figcaption></figure>
+<p class="callout">合起来就是"越聊越乱"的机制：每一轮都在给下一轮加一条"必须与之相容"的前例，轮次越多，可回退的空间越小。冲突的危险不在它存在，在它安静——模型会把矛盾消化成一套自洽的解释，然后自信地给你。</p><a class="deep" href="?view=deep#deep-s6">查看三份证据与机制假设的证伪方式 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s6">Markdown 对应段落</a></section>
 
-    <h2 class="sec">机制二：矛盾不会暴露，会被解释成自洽</h2>
-    <div class="analogy yellow">
-      <div class="row"><span class="label">生活类比：</span><strong>法官拿到两份互相矛盾的证词</strong>。真实的模型像一个赶时间的法官：挑一份可信的，写一份逻辑完整的判决书。判决书越通顺，你越看不出他曾面临过矛盾。</div>
-      <div class="row edge"><span class="label">类比的边界：</span>法官知道证词有矛盾，模型连"存在矛盾"都不报告。有外部反馈（测试、编译器）时纠错明显变好，类比针对的是无外部信号时。</div>
-    </div>
-    <div class="evidence">证据一笔带过（完整版见深入版）：多轮对话实验（arXiv 2505.06120，2025-05-09）平均掉 39%，o3 从 98.1 掉到 64.1；持续施压实验（arXiv 2503.11656，2025-02-04）里 Claude 从 76.74% 掉到 30.23%，低于随机猜；"context clash" 命名自 Breunig（2025-06-22）。推论：让模型"再想想"没用，那是在同一套解释里写得更自信；有效动作只有换外部证据进来，或换一个没有历史的上下文。</div>
+<section class="content-section" id="cx-boundary"><p class="kicker">边界</p><h2>改本身没那么难，难的是版本数</h2>
+<p>Aider 的实验划出了这条边界：89 个 Python 重构任务上，同一批任务只换"怎么表达这次修改"，GPT-4 Turbo 用 SEARCH/REPLACE 块格式通过率 20%，换成 unified diff 后 61%——只换了表达方式，通过率翻三倍。"改"里有一大块是接口问题。</p>
+<p>所以排查顺序必须摆正：<strong>先怀疑表达</strong>（改哪一处、改成什么、什么不许动，说清了没有）→ <strong>表达没问题仍然乱，怀疑冲突</strong>（窗口里有几个版本）→ <strong>冲突也排除，才是能力问题</strong>。顺序反了会付代价：跳过第一步直接重开，等于每开一个新窗口都把同一个没说清的要求再问一遍。</p>
+<p class="callout">反方向的坑也要防：窗口里已经堆了两个互相矛盾的版本时，写多清楚都没用。一条可操作的区分——<strong>不看对话历史，你能不能把要求写清</strong>？能，就别重开，去改任务书；不能，说明历史里存着决定，那就重开，并把那条决定搬进新任务书。</p><a class="deep" href="?view=deep#deep-s7">查看 Aider 实验与排查顺序 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s7">Markdown 对应段落</a></section>
 
-    <figure>
-      <svg viewBox="0 0 900 330" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="冲突随轮次积累示意图">
-        <defs>
-          <marker id="arw6-gray2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-        </defs>
-        <!-- 三个阶段 -->
-        <text x="150" y="40" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">第 2 轮</text>
-        <text x="430" y="40" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">第 4 轮</text>
-        <text x="710" y="40" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">第 6 轮</text>
-        <!-- 前例堆叠 -->
-        <rect x="70" y="230" width="160" height="34" rx="6" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="150" y="252" font-size="12" fill="#1f2328" text-anchor="middle">前例：早期答案 A</text>
-        <rect x="350" y="196" width="160" height="30" rx="6" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="430" y="216" font-size="12" fill="#1f2328" text-anchor="middle">前例：对 A 的解释</text>
-        <rect x="350" y="230" width="160" height="34" rx="6" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="430" y="252" font-size="12" fill="#1f2328" text-anchor="middle">前例：早期答案 A</text>
-        <rect x="630" y="162" width="160" height="28" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
-        <text x="710" y="181" font-size="12" fill="#1f2328" text-anchor="middle">前例：新的错法 B</text>
-        <rect x="630" y="194" width="160" height="30" rx="6" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="710" y="214" font-size="12" fill="#1f2328" text-anchor="middle">前例：对 A 的解释</text>
-        <rect x="630" y="228" width="160" height="34" rx="6" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="710" y="250" font-size="12" fill="#1f2328" text-anchor="middle">前例：早期答案 A</text>
-        <!-- 可回退空间（绿条收缩） -->
-        <rect x="70" y="60" width="160" height="26" rx="6" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="150" y="78" font-size="12" fill="#10b981" text-anchor="middle">可回退空间：大</text>
-        <rect x="350" y="60" width="110" height="26" rx="6" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="405" y="78" font-size="12" fill="#10b981" text-anchor="middle">缩小</text>
-        <rect x="630" y="60" width="50" height="26" rx="6" fill="#ecfdf5" stroke="#86efac"/>
-        <!-- 箭头 -->
-        <line x1="235" y1="130" x2="342" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray2)"/>
-        <text x="289" y="120" font-size="12" fill="#6b7280" text-anchor="middle">每纠一次</text>
-        <line x1="515" y1="130" x2="622" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray2)"/>
-        <text x="569" y="120" font-size="12" fill="#6b7280" text-anchor="middle">再纠一次</text>
-        <!-- 底注 -->
-        <text x="450" y="310" font-size="13" fill="#6b7280" text-anchor="middle">每一轮都在给下一轮加一条"必须与之相容"的前例——机制假设：当推翻一条结论的成本高于绕开它，模型就可能选择绕开（非实测）</text>
-      </svg>
-      <figcaption>图 2 · 冲突的滚雪球：黄色前例越堆越高，绿色可回退空间越缩越小——纠正没有移走前例，只是往上又加了一层。图为作者提出的机制假设示意，非实测曲线；论证与证伪方案见深入版 §5.4</figcaption>
-    </figure>
+<section class="content-section" id="cx-scenes"><p class="kicker">展开</p><h2>三个场景，把四步走一遍：权威各不相同</h2>
+<p>三个场景难的方式不同，第一步裁决的"权威"也不同：</p>
+<p><strong>修复杂 bug</strong>——权威是数据源＋主流程：真实执行的代码路径和数据流向算数，报错字面位置、上一轮的猜测、"我觉得这里没依赖"全降为待验证材料。让它先画执行路径、列"已排除原因"清单，验收写"复现用例必须过，且相邻行为不变"。</p>
+<p><strong>调研</strong>——权威是来源分级：官方文档与发布说明 &gt; 源码 &gt; 官方 issue 与变更记录 &gt; 一手实践博客 &gt; 论坛与 AI 生成内容。AI 时代多一步去伪存真：每条关键结论标"截至何时、依据哪个版本"，没标的当待验证材料；先做冲突清单，人裁决后再给模型。</p>
+<p><strong>架构设计</strong>——权威是核心原则＋不可能三角：先定哪条优先、什么不可妥协，取舍才有依据；让它出 A/B 方案、各自列成本性能复杂度上的取舍，人对照原则裁决。讨论五六轮开始自相矛盾就重开，新窗口只带原则＋约束＋已否决方案及否决理由。</p><a class="deep" href="?view=deep#deep-s8">查看三个场景的四步要点 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s8">Markdown 对应段落</a></section>
 
-    <h2 class="sec">边界：先查表达，再查冲突，最后才是能力</h2>
-    <p>反例先压住"凡事皆冲突"：Aider 给同一批 89 个重构任务换了表达格式，通过率 20% → 61%，模型和任务都没换。所以排查顺序固定：先查表达，表达没问题查冲突，冲突也排除才换模型或拆任务。一条可操作的判据：不看对话历史能把要求写清，就去改任务书；必须翻回去看"上次为什么否掉 A"才写得出来，才重开。</p>
+<section class="content-section" id="cx-views"><p class="kicker">通用观点</p><h2>从八个场景里抽掉领域细节，剩下六条</h2>
+<p>① 乱的来源是同时有效的版本数，不是信息总量；② 更新请求的隐性成本在没说出口的约束上——"要改什么"只解决了三分之一；③ 冲突不会自己暴露，它会被解释成自洽，检测靠复述和对照证据；④ 重开的交付物是一份更好的任务书，不是一个更空的窗口；⑤ 判据不是 token 数，是任务模型还稳不稳；⑥ 有些乱不在上下文里，在需求里。</p>
+<p class="callout">一句收尾：新建是"照着目标造一个东西"，更新是"在三份互相打架的材料之间裁决，再造一个东西"。前者模型擅长，后者它只能装作擅长。</p><a class="deep" href="?view=deep#deep-s9">查看六条观点全文 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s9">Markdown 对应段落</a></section>
 
-    <h2 class="sec">通用解法：四步流程，与 Claude Code 官方工作流对齐</h2>
-    <p>不同任务各有各的乱法，解法是同一条流程。Claude Code 官方最佳实践的工作流 <strong>Explore → Plan → Implement → Commit</strong> 与它逐级对应，官方理由："Separate research and planning from implementation to avoid solving the wrong problem."（调研规划与实现分开，避免解决错的问题。）</p>
-    <figure>
-      <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="四步流程与 Claude Code 工作流对应图">
-        <defs>
-          <marker id="arw6g4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-          <marker id="arw6o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/>
-          </marker>
-        </defs>
-        <!-- 四个步骤节点 -->
-        <rect x="30" y="60" width="195" height="72" rx="12" fill="#3b82f6"/>
-        <text x="127" y="90" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">① 裁决输入</text>
-        <text x="127" y="114" font-size="11" fill="#dbeafe" text-anchor="middle">先定"什么算数"</text>
-        <rect x="255" y="60" width="195" height="72" rx="12" fill="#10b981"/>
-        <text x="352" y="90" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">② 定目标</text>
-        <text x="352" y="114" font-size="11" fill="#d1fae5" text-anchor="middle">做什么 · 做成什么样 · 为什么</text>
-        <rect x="480" y="60" width="195" height="72" rx="12" fill="#f59e0b"/>
-        <text x="577" y="90" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">③ 沟通对齐</text>
-        <text x="577" y="114" font-size="11" fill="#fef3c7" text-anchor="middle">先复述 · 小步走 · 跑偏就纠</text>
-        <rect x="705" y="60" width="195" height="72" rx="12" fill="#8b5cf6"/>
-        <text x="802" y="90" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">④ 混乱就重构</text>
-        <text x="802" y="114" font-size="11" fill="#ede9fe" text-anchor="middle">不做第四次纠正</text>
-        <!-- 顺序箭头 -->
-        <line x1="225" y1="96" x2="251" y2="96" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g4)"/>
-        <line x1="450" y1="96" x2="476" y2="96" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g4)"/>
-        <line x1="675" y1="96" x2="701" y2="96" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g4)"/>
-        <!-- Claude Code 对应 -->
-        <rect x="30" y="156" width="195" height="58" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="127" y="180" font-size="12" font-weight="600" fill="#3b82f6" text-anchor="middle">Claude Code：Explore</text>
-        <text x="127" y="200" font-size="11" fill="#1f2328" text-anchor="middle">plan mode 只读探索</text>
-        <rect x="255" y="156" width="195" height="58" rx="10" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="352" y="180" font-size="12" font-weight="600" fill="#10b981" text-anchor="middle">Claude Code：Plan</text>
-        <text x="352" y="200" font-size="11" fill="#1f2328" text-anchor="middle">目标带验收（a check it can run）</text>
-        <rect x="480" y="156" width="195" height="58" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="577" y="180" font-size="12" font-weight="600" fill="#b45309" text-anchor="middle">Claude Code：Implement</text>
-        <text x="577" y="200" font-size="11" fill="#1f2328" text-anchor="middle">course-correct early and often</text>
-        <rect x="705" y="156" width="195" height="58" rx="10" fill="#f5f3ff" stroke="#c4b5fd"/>
-        <text x="802" y="180" font-size="12" font-weight="600" fill="#7c3aed" text-anchor="middle">Claude Code：/clear · /rewind</text>
-        <text x="802" y="200" font-size="11" fill="#1f2328" text-anchor="middle">+ 重写更具体的 prompt</text>
-        <!-- 回环箭头：④ 回 ① -->
-        <path d="M 802 214 V 262 H 127 V 136" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arw6o)"/>
-        <rect x="300" y="240" width="300" height="42" rx="10" fill="#fffbeb" stroke="#f59e0b"/>
-        <text x="450" y="258" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">混乱了：回到①重新裁决</text>
-        <text x="450" y="276" font-size="11" fill="#6b7280" text-anchor="middle">同窗口能做叫重写任务书；堆死了就开新窗口，只带结论</text>
-        <!-- 底注 -->
-        <text x="450" y="330" font-size="13" fill="#6b7280" text-anchor="middle">官方阈值：同一问题纠正超过两次，就该 /clear 并带着学到的东西重写 prompt</text>
-        <text x="450" y="352" font-size="12" fill="#94a3b8" text-anchor="middle">"A clean session with a better prompt almost always outperforms a long session with accumulated corrections."</text>
-      </svg>
-      <figcaption>图 3 · 四步流程：④不是第五次尝试，是回到①重新裁决的信号，Claude Code 的四个动作与四步逐级对应</figcaption>
-    </figure>
-    <div class="evidence">如实交代：官方没给"这套流程提升成功率"的量化数字，对应关系是本文标注的，别当实验结论引用。</div>
+<section class="content-section" id="cx-appendixa"><p class="kicker">附录 A</p><h2>八个场景，按优先级排</h2>
+<p>排序依据三条：发生频率、单次代价、后果可逆性；三条打架时频率优先，其次不可逆。P1 同一问题纠正两次以上（有官方阈值可抄）；P2 已有代码上做最小修改（改动溢出最容易发生）；P3 已定稿产物上追加需求（旧决定与新增要求正面冲突）；P4 长文改稿（边界最模糊）；P5 方案被否后重做（对抗性最强）；P6 多来源材料合并（模型会替你裁决且不告知）；P7 一个窗口干多件事（kitchen sink session，/clear between unrelated tasks）；P8 你自己给了错前提（谄媚最易触发，要显式作废受影响的判断）。</p><a class="deep" href="?view=deep#deep-s10">查看 P1–P8 的冲突点与重开重排 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s10">Markdown 对应段落</a></section>
 
-    <p>下面三个场景走这条流程。重点都在第一步：<strong>裁决什么、用什么当权威</strong>。</p>
+<section class="content-section" id="cx-appendixb"><p class="kicker">附录 B</p><h2>证据边界：每个来源能支持什么、不能证明什么</h2>
+<p>主命题是结构判断（更新请求天然携带更多冲突源），不是能力判断——后者没有直接对照实验，本文不主张。三项论文实验能支持"多轮显著差于单轮""错误会被锚定"，不能直接给出真实仓库里的失败率；官方文档证明"官方建议两次就重开"，不证明"两次是最优阈值"；工程博客与作者经验未受控。本文没做的事：没做"新建 vs 更新"对照实验，没覆盖多 Agent 协作下的冲突传播。</p><a class="deep" href="?view=deep#deep-s11">查看来源表与参考资料清单 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s11">Markdown 对应段落</a></section>
 
-    <h2 class="sec">场景一：修一个复杂的 bug（耦合多、数据源冲突、依赖多）</h2>
-    <p><strong>是什么：</strong>症状不在你改的地方。报错在 A 模块，根因常在 B 模块；你以为是数据问题，其实是调用顺序问题。复杂 bug 的难从来不在"改动本身"（那一行谁都会改），难在定位：症状、日志、你脑中的架构图三者经常互相矛盾，而耦合和依赖链让"改这里会影响哪里"无法直读。这正是冲突高发区：上一轮的猜测还留在窗口里，新的日志又指向别处。</p>
-    <p><strong>第一步裁决什么：</strong>权威是<strong>数据源 + 主流程</strong>：真实执行的代码路径和数据流向（图 4 的汇入箭头）。所以正确开局是让它先画出这条请求实际怎么走，而不是先改。</p>
-    <p><strong>四步怎么走：</strong>① 让它先读代码画执行路径，同时把<strong>已排除的原因</strong>列成清单；② 写清验收："修好后这个复现用例必须过，且相邻行为不变"；③ 小步改，每步跑复现用例；④ 同一根因纠正两次还错就重开，新任务书写三样：现象 + 已排除原因 + 验收方式，别重述问题。</p>
-    <figure>
-      <svg viewBox="0 0 900 320" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="修复杂 bug：先裁决数据源与主流程">
-        <defs>
-          <marker id="arw6g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-          <marker id="arw6r2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#ef4444"/>
-          </marker>
-        </defs>
-        <!-- 左：冲突输入 -->
-        <text x="150" y="40" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">输入：三个互相打架的说法</text>
-        <rect x="40" y="60" width="220" height="48" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="150" y="80" font-size="13" fill="#1f2328" text-anchor="middle">报错日志：症状在 A 模块</text>
-        <text x="150" y="98" font-size="11" fill="#6b7280" text-anchor="middle">症状位置 ≠ 根因位置</text>
-        <rect x="40" y="126" width="220" height="48" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="150" y="146" font-size="13" fill="#1f2328" text-anchor="middle">上一轮的猜测：根因在配置</text>
-        <text x="150" y="164" font-size="11" fill="#6b7280" text-anchor="middle">还留在窗口里，但没被验证</text>
-        <rect x="40" y="192" width="220" height="48" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="150" y="212" font-size="13" fill="#1f2328" text-anchor="middle">你的假设："这里没依赖"</text>
-        <text x="150" y="230" font-size="11" fill="#6b7280" text-anchor="middle">耦合和依赖链让它不可直读</text>
-        <!-- 汇入裁决 -->
-        <line x1="260" y1="84" x2="356" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g)"/>
-        <line x1="260" y1="150" x2="356" y2="150" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g)"/>
-        <line x1="260" y1="216" x2="356" y2="170" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g)"/>
-        <rect x="360" y="118" width="200" height="64" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-        <text x="460" y="144" font-size="14" font-weight="700" fill="#3b82f6" text-anchor="middle">第一步：裁决</text>
-        <text x="460" y="166" font-size="12" fill="#1f2328" text-anchor="middle">权威 = 数据源 + 主流程</text>
-        <line x1="560" y1="150" x2="626" y2="150" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g)"/>
-        <!-- 右：主流程 -->
-        <text x="745" y="40" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">裁决后：沿真实执行路径定位</text>
-        <rect x="630" y="120" width="90" height="44" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="675" y="146" font-size="13" fill="#1f2328" text-anchor="middle">入口</text>
-        <line x1="720" y1="142" x2="754" y2="142" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g)"/>
-        <rect x="758" y="120" width="100" height="44" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
-        <text x="808" y="140" font-size="13" font-weight="600" fill="#ef4444" text-anchor="middle">真实根因</text>
-        <text x="808" y="156" font-size="11" fill="#6b7280" text-anchor="middle">（常不在 A）</text>
-        <line x1="858" y1="142" x2="886" y2="142" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g)"/>
-        <rect x="860" y="120" width="36" height="44" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="878" y="146" font-size="13" fill="#1f2328" text-anchor="middle">…</text>
-        <path d="M 460 182 V 236 H 808 V 168" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arw6g)"/>
-        <text x="630" y="228" font-size="12" fill="#10b981" text-anchor="middle">验证方式：跑复现用例，不看"看起来对"</text>
-        <!-- 反面路径 -->
-        <path d="M 150 240 V 272" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arw6r2)"/>
-        <rect x="40" y="276" width="430" height="36" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-dasharray="6 4"/>
-        <text x="255" y="299" font-size="12" font-weight="600" fill="#ef4444" text-anchor="middle">不裁决就改：沿症状乱改，第三轮开始改测试，越改越乱</text>
-      </svg>
-      <figcaption>图 4 · 修复杂 bug 的第一步：报错、旧猜测、直觉假设都只是材料，裁决依据是真实的数据源与主流程，沿执行路径找根因，不沿症状改</figcaption>
-    </figure>
+<section class="content-section" id="cx-next"><p class="kicker">下一步</p><h2>两个成本最低的动作</h2>
+<p>每次更新请求写清"什么不许动"；同一问题纠正第二次时停下来做三问分诊，而不是纠正第三次。想核对数字口径，全在附录 B 的表里。</p><a class="deep" href="?view=deep#deep-s12">查看下一步全文 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s12">Markdown 对应段落</a></section>
 
-    <h2 class="sec">场景二：调研（项目调研、组件调研）</h2>
-    <p><strong>是什么：</strong>调研的结论会被拿去做决策：选型、立项、架构，错了代价大。难点是信息多且互相冲突：README 说支持，issue 里躺着未修的缺陷，博客说性能好，AI 的回答引的是旧版本文档。调研乱起来和修 bug 同构：窗口里堆着几个互相矛盾的"结论版本"，模型按最先读到的那份下结论。</p>
-    <p><strong>第一步裁决什么：</strong>按图 5 的金字塔分级裁决来源。AI 时代每条关键结论还要标"截至何时、依据哪个版本"，因为旧设计有的还有效、有的正被推翻，概念在重新定义。</p>
-    <p><strong>四步怎么走：</strong>① 先做一轮冲突清单：哪些来源在打架、各依据什么版本，人裁决后再给模型，别把原始材料一股脑丢进去；② 写清调研要回答的问题清单（现状、边界条件、性能口径、维护活跃度），以及结论长什么样；③ 让模型给结论时附来源和日期，无来源的标记出来；④ 发现它混了版本、拿过时说法当现状，重开。新窗口只放已裁决的权威材料，不放原始搜索结果。</p>
-    <figure>
-      <svg viewBox="0 0 900 330" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="调研的权威来源金字塔">
-        <defs>
-          <marker id="arw6g2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-        </defs>
-        <!-- 可信度轴 -->
-        <line x1="70" y1="270" x2="70" y2="60" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6g2)"/>
-        <text x="52" y="70" font-size="12" fill="#6b7280" text-anchor="end">可信度</text>
-        <text x="52" y="88" font-size="12" fill="#6b7280" text-anchor="end">高</text>
-        <text x="52" y="264" font-size="12" fill="#6b7280" text-anchor="end">低</text>
-        <!-- 金字塔四层 -->
-        <polygon points="450,50 520,100 380,100" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
-        <text x="450" y="88" font-size="12" font-weight="600" fill="#1f2328" text-anchor="middle">官方文档</text>
-        <text x="450" y="120" font-size="12" fill="#3b82f6" text-anchor="middle">+ 发布说明（标版本与日期）</text>
-        <polygon points="373,112 527,112 570,168 330,168" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="450" y="136" font-size="12" font-weight="600" fill="#1f2328" text-anchor="middle">源码本身</text>
-        <text x="450" y="154" font-size="11" fill="#6b7280" text-anchor="middle">行为的最终解释权</text>
-        <polygon points="330,180 570,180 610,236 290,236" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="450" y="204" font-size="12" font-weight="600" fill="#1f2328" text-anchor="middle">官方 issue / 变更记录</text>
-        <text x="450" y="222" font-size="11" fill="#6b7280" text-anchor="middle">已知缺陷、废弃与迁移路径</text>
-        <polygon points="290,248 610,248 650,300 250,300" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="450" y="272" font-size="12" font-weight="600" fill="#1f2328" text-anchor="middle">实践博客 / 论坛 / AI 生成内容</text>
-        <text x="450" y="290" font-size="11" fill="#6b7280" text-anchor="middle">当作线索，不作结论；用前先交叉验证</text>
-        <!-- 右侧注释 -->
-        <rect x="680" y="60" width="200" height="120" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="780" y="86" font-size="13" font-weight="700" fill="#3b82f6" text-anchor="middle">AI 时代多一步：去伪存真</text>
-        <text x="780" y="110" font-size="12" fill="#1f2328" text-anchor="middle">旧设计有的还有效，</text>
-        <text x="780" y="128" font-size="12" fill="#1f2328" text-anchor="middle">有的正在被推翻，</text>
-        <text x="780" y="146" font-size="12" fill="#1f2328" text-anchor="middle">概念也在被重新定义。</text>
-        <text x="780" y="168" font-size="11" fill="#6b7280" text-anchor="middle">同词不同义是常态</text>
-        <rect x="680" y="200" width="200" height="100" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="780" y="228" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">每条结论带两个标签</text>
-        <text x="780" y="252" font-size="12" fill="#1f2328" text-anchor="middle">截至什么时间</text>
-        <text x="780" y="270" font-size="12" fill="#1f2328" text-anchor="middle">依据哪个版本</text>
-        <text x="780" y="290" font-size="11" fill="#6b7280" text-anchor="middle">没标 = 待验证材料</text>
-        <text x="450" y="322" font-size="12" fill="#6b7280" text-anchor="middle">冲突清单先人裁决，再给模型，别让模型按"最先读到的那份"下结论</text>
-      </svg>
-      <figcaption>图 5 · 调研的第一步：按可信度分级裁决来源，每条关键结论标注时间与版本，AI 时代权威会过期，去伪存真是必备动作</figcaption>
-    </figure>
+<section class="content-section" id="cx-changelog"><p class="kicker">版本</p><h2>Changelog</h2>
+<p>当前 v1.3（2026-11-27，与 01 篇去重修剪）：§3.1 末补噪声轴/冲突轴指路，正文其余部分与全部数字口径未改。v1.2 结构重排：结论层前置，八个场景速查与证据边界降为附录 A/B。完整变更记录见深入版。</p><a class="deep" href="?view=deep#deep-s13">查看完整 Changelog ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%92%8C%20AI%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E4%B9%B1.md#s13">Markdown 对应段落</a></section>
+</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><p><a id="deep-overview"></a></p>
+<h1>为什么和 AI 越聊越乱</h1>
+<blockquote>
+<p><strong>文档类型</strong>：机制拆解型文章。不是产品说明书，也不是操作手册。全文回答一个问题：为什么&quot;改&quot;比&quot;新建&quot;容易乱，什么时候该换一个窗口。</p>
+<p><strong>体例说明</strong>：不套《文档规范》的八节主干，那套骨架是给&quot;梳理一个对象&quot;用的。全文四层：结论层（分诊、四步、重开）→ 机制层 → 展开层（三场景）→ 附录层（场景速查、证据边界）。规范的硬条款照做：每个数字带口径与日期，因果链写成&quot;约束 → 取舍 → 代价&quot;。</p>
+<p><strong>断言标注</strong>：<code>[论文]</code> 公开受控实验；<code>[官方文档]</code> 厂商一手操作指引；<code>[工程博客]</code> 一手实践经验，未受控；<code>[经验]</code> 作者实践观察；<code>[综合推断]</code> 多类间接证据共同支持但无直接实验；<code>[推测]</code> 本文提出的机制假设，附证伪方式。无标注的为可直接核对的定义或事实。</p>
+<p><strong>与第 01 篇的分工</strong>：<a href="../%E5%8E%9F%E6%96%87/%E4%B8%BA%E4%BB%80%E4%B9%88%E7%BC%96%E7%A0%81%20Agent%20%E8%B6%8A%E8%81%8A%E8%B6%8A%E6%B5%85%EF%BC%9A%E4%B8%8A%E4%B8%8B%E6%96%87%E8%85%90%E7%83%82%E3%80%81%E8%87%AA%E6%88%91%E7%BA%A0%E9%94%99%E7%9B%B2%E5%8C%BA%E4%B8%8E%E4%BA%A4%E6%8E%A5%E6%88%90%E6%9C%AC.md">第 01 篇</a> 讲&quot;信息变多、变旧之后，哪一份算权威版本变得不确定&quot;，那是<strong>噪声</strong>轴。本文讲&quot;同一件事在窗口里有两个以上互相矛盾的版本&quot;，那是<strong>冲突</strong>轴。两篇症状像，机制不同，本文不重述腐烂、自我纠错盲区、交接成本那三套。</p>
+</blockquote>
+<p><a id="deep-s0"></a></p>
+<h2>太长不看</h2>
+<p><strong>现象</strong>：让它从零写一个东西往往顺利，让它改一个已有的东西却容易越改越歪。乱的来源是上下文里&quot;同时有效的版本数&quot;在涨，不是信息总量在涨。</p>
+<p><strong>机制一句话</strong>：更新请求天然携带三股力（现状、旧决定的理由、新目标），外加一条从没写进请求的约束；矛盾进入上下文后，模型不会举手报告，它挑一个版本，然后为这个选择编一套解释。</p>
+<p><strong>怎么判断（三问分诊，一分钟）</strong>：</p>
+<ol>
+<li>它能不能准确复述当前目标、已否决的方案、完成判据？</li>
+<li>纠正第二次之后，是改对了，还是换了个错法？</li>
+<li>把它的上一轮回答删掉、只留原始材料，它还这么答吗？</li>
+</ol>
+<p>任一踩中 = 冲突型，该重开；三问全过还是乱 = 需求自相矛盾，人来裁决。</p>
+<p><strong>怎么解（四步，与 Claude Code 官方 Explore → Plan → Implement → Commit 对齐）</strong>：① 裁决输入，先定&quot;什么算数&quot; → ② 定目标，目标必须带验收 → ③ 沟通对齐，先复述再动手 → ④ 混乱了就重构，/clear 并重写任务书，不做第四次纠正。</p>
+<p><strong>重开时交接四件事</strong>：不能变的结果 / 已经证明走不通的路 / 现在客观是什么 / 怎么算完成。重开两次还错，问题在需求侧，出口不在上下文里。</p>
+<p>全文分四层：<strong>第一部分</strong>给结论（分诊、四步、重开），<strong>第二部分</strong>讲机制，<strong>第三部分</strong>拿三个场景把四步走一遍，<strong>附录</strong>收场景速查表与证据边界。要动手，读第一部分加附录 A 就够；要理解为什么，读第二、三部分。</p>
+<p><a id="deep-s1"></a></p>
+<h2>引子：三种乱法，同一个共同点</h2>
+<p><strong>第一种。</strong> 让模型改一个报错。它改了一处，报错换了个地方；再让它改，又换回原处；第三轮，它开始改测试，让测试通过。</p>
+<p><strong>第二种。</strong> 让它把一段文字&quot;改得口语一点&quot;。稿子回来了，语气确实口语了，但论证顺序变了，中间两个数字没了。</p>
+<p><strong>第三种。</strong> 给一个四百行的函数加个开关。它把整个函数重写了，顺手把错误处理也换成了它更喜欢的那种。</p>
+<p>三次都不是&quot;它不会&quot;。三次都是&quot;它改的不是你要改的那一处&quot;。</p>
+<p>新建的时候，它很少犯这个错。让它从零写这个函数，它会老老实实问你要什么行为；让它改这个函数，它会把整个函数当成一份可重写的材料。</p>
+<p><strong>一句话答案</strong>：新建时，上下文里只有一个方向的力，就是目标。更新时，上下文里至少有三股力：现状、旧决定的理由、新目标。这三股力经常互相打架，而模型不会举手说&quot;这里有两个版本&quot;，它会挑一个，然后为这个选择编一套解释。你看到的是它很自信地答错。</p>
+<p>所以&quot;越聊越乱&quot;的乱，更多来自<strong>同时有效的版本数</strong>在涨。信息总量是次要变量。</p>
+<h3>你在经历这个的时候，会看到这些</h3>
+<ul>
+<li>它引用一个已经不存在的函数名、行号或段落 <code>[经验]</code>；</li>
+<li>你纠正第二次之后，它没有改对，换了一种错法 <code>[经验]</code>；</li>
+<li>你问&quot;这样对吗&quot;，它回答&quot;对，因为……&quot;，但不去跑一次测试 <code>[经验]</code>；</li>
+<li>它开始推荐你上周已经否掉的方案，理由和当时一模一样 <code>[经验]</code>；</li>
+<li>最费人的一个：你开始替它记事情——记住哪条约束还没被推翻，哪个方案已经死了，哪一版才是最新的。</li>
+</ul>
+<p>最后一条是真信号。当人开始充当版本管理器，说明上下文里的版本已经管不住了。</p>
+<hr>
+<h1>第一部分 · 结论：怎么判断，怎么解</h1>
+<p><a id="deep-s2"></a></p>
+<h2>一、先把“答不对”分成四种</h2>
+<p>不是所有&quot;答不对&quot;都值得重开。混着治，会把&quot;你没说清&quot;误诊成&quot;上下文有病&quot;，然后每开一个新窗口都重复同一个错误。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>症状</th>
+<th>该怎么办</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>缺料</strong></td>
+<td>第一轮就答偏，多问两句才发现关键信息你没给</td>
+<td>补材料，不用重开</td>
+</tr>
+<tr>
+<td><strong>歧义</strong></td>
+<td>答得对，但不是你要的那个对</td>
+<td>把要求改写成可判定的条件</td>
+</tr>
+<tr>
+<td><strong>冲突</strong></td>
+<td>前几轮对，某一轮之后开始反复错，越纠越偏</td>
+<td>重开，并且重写任务书</td>
+</tr>
+<tr>
+<td><strong>能力</strong></td>
+<td>任务超出模型当前能力（长链路推理、超大范围重构）</td>
+<td>换模型或拆任务</td>
+</tr>
+</tbody></table></div>
+<p>只有第三种该重开。分诊靠三个问题，一分钟能做完：</p>
+<pre><code class="language-text">1. 它能不能准确复述当前目标、已否决的方案、完成判据？——不能，就是冲突
+2. 纠正第二次之后，它是改对了，还是换了个错法？——换错法，就是冲突
+3. 把它的上一轮回答删掉、只留原始材料，它还这么答吗？——答法变了，就是冲突
+</code></pre>
+<p>三个问题里任何一个踩中，就是冲突型。三问全过还是乱，那多半不在上下文里，在需求本身自相矛盾（见第三节：重开两次还错，是需求自相矛盾）。</p>
+<p>第一个问题里的&quot;准确复述&quot;，标准要写死，否则三个人三个判法。合格线是三条同时答对：当前要达成的结果（一句话，可判定）、已经死掉的方案（至少一条）、完成判据（怎么验）。答错一条就算复述失败。</p>
+<p>厂商那边给了一个更粗的阈值，可以直接抄：</p>
+<blockquote>
+<p>If you&#39;ve corrected Claude more than twice on the same issue in one session, the context is cluttered with failed approaches. Run <code>/clear</code> and start fresh with a more specific prompt that incorporates what you learned. <code>[官方文档]</code>（Claude Code 官方文档，取数 2026-10-23，页面未标发布日）</p>
+</blockquote>
+<p>后半句是重点，也是本文第三节的全部内容：重开时要带着&quot;你学到的东西&quot;重写 prompt，不是把同一个问题再问一遍。</p>
+<p><strong>本节要落的一句话</strong>：分诊决定要不要重开，重开的质量取决于任务书，不取决于窗口有多空。</p>
+<h3>冲突型的四种形态（细分诊断）</h3>
+<p>冲突不是一种东西。四种形态的处理动作完全不同，混着治会把该删的留着、该留的删了。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>形态</th>
+<th>窗口里发生了什么</th>
+<th>你看到的信号</th>
+<th>一句话检测</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>版本叠加</strong></td>
+<td>同一对象有 ≥2 个版本并存：原版、你粘贴进来的新版、它自己改过的中间版</td>
+<td>它引用一个已经不存在的函数、行号、段落</td>
+<td>问它&quot;你现在依据的是哪一版&quot;，答不出就是叠加</td>
+</tr>
+<tr>
+<td><strong>决定复活</strong></td>
+<td>已被否决的方案重新成为建议</td>
+<td>它推荐你上周否掉的东西，理由和当时一样</td>
+<td>问&quot;这个方案之前为什么没走&quot;，它给不出理由就是复活</td>
+</tr>
+<tr>
+<td><strong>解释固化</strong></td>
+<td>它上一轮的解释变成了这一轮的前提</td>
+<td>你问&quot;这样对吗&quot;，它答&quot;对，因为……&quot;，不跑测试</td>
+<td>要求它先跑验证再解释，顺序反了就是固化</td>
+</tr>
+<tr>
+<td><strong>约束缺席</strong></td>
+<td>没人说过&quot;不许动&quot;</td>
+<td>diff 里出现你没要求的文件、格式化、重命名</td>
+<td>数一下改动文件数，多于你点名的就是缺席</td>
+</tr>
+</tbody></table></div>
+<p>四种形态对应四个动作，不通用：</p>
+<ul>
+<li><strong>版本叠加</strong> → 新窗口里只放一个版本。其余让新窗口自己去文件系统或 git 读，不要由旧窗口转述。</li>
+<li><strong>决定复活</strong> → 把否决理由写成一条显式约束，附证据。&quot;不许用方案 A&quot;没用，&quot;方案 A 因事务边界不成立被否&quot;才有用，因为后者给了模型判断同类方案的能力。</li>
+<li><strong>解释固化</strong> → 把&quot;你的结论&quot;降格成&quot;一份待审材料&quot;。让它对着 diff 和测试输出找反例，而不是解释设计意图。</li>
+<li><strong>约束缺席</strong> → 先出&quot;改动点清单&quot;（文件、位置、改什么、为什么必须改），人确认后再执行。</li>
+</ul>
+<p><code>[经验]</code> 四种里最常见的是约束缺席，最容易被误诊的也是它：破坏范围大，看起来像&quot;模型能力不行&quot;，实际是&quot;边界没给&quot;。</p>
+<p><a id="deep-s3"></a></p>
+<h2>二、通用解法：四步流程，与 Claude Code 官方工作流对齐</h2>
+<p>不同任务各有各的乱法，解法是同一条流程：裁决输入 → 定目标 → 沟通对齐 → 混乱就重构。它不是本文的发明：Claude Code 官方最佳实践的工作流 Explore → Plan → Implement → Commit 与它逐级对应 <code>[官方文档]</code>，官方理由是 &quot;Separate research and planning from implementation to avoid solving the wrong problem&quot;（把调研规划与实现分开，避免解决错的问题）。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>做什么</th>
+<th>容易做错的地方</th>
+<th>Claude Code 对应</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>① 裁决输入</td>
+<td>输入里全是冲突信息：日志、旧猜测、过时文档、互相矛盾的说法。先裁决&quot;什么算数&quot;，每类任务有自己的权威来源（见第三部分）</td>
+<td>不裁决就开工，模型替你裁决，按最先读到的算</td>
+<td>Explore：plan mode 只读探索，&quot;Claude reads files and answers questions without making changes&quot;</td>
+</tr>
+<tr>
+<td>② 定目标</td>
+<td>要解决什么、现状是什么、要做成什么样子、为什么。目标要带验收：怎么算修好、怎么算调研完、怎么算架构合格</td>
+<td>只写&quot;要什么&quot;不写&quot;怎么算对&quot;，模型只能靠&quot;看起来对&quot;</td>
+<td>Plan：&quot;create a detailed implementation plan&quot;；验收：&quot;Give Claude a check it can run: tests, a build, a screenshot to compare.&quot;</td>
+</tr>
+<tr>
+<td>③ 沟通对齐</td>
+<td>动手前先让它复述目标、约束、已否决项、完成判据；然后小步走，看到跑偏马上纠正，不攒到第四次</td>
+<td>一次说完全部要求就放手不管，纠偏成本随轮次涨</td>
+<td>Implement：&quot;Course-correct early and often... Correct Claude as soon as you notice it going off track.&quot;</td>
+</tr>
+<tr>
+<td>④ 混乱就重构</td>
+<td>不做第四次纠正，回到①–③重新来。同一个窗口里能做就叫重写任务书；窗口堆死了就开新窗口，只带结论不带过程</td>
+<td>把&quot;再想想&quot;&quot;再试一次&quot;当第四步，那是在原地加轮次</td>
+<td>/clear + 重写更具体的 prompt；Esc Esc 或 /rewind 回到出错前。&quot;A clean session with a better prompt almost always outperforms a long session with accumulated corrections.&quot;</td>
+</tr>
+</tbody></table></div>
+<p><code>[官方文档]</code> 官方还给了阈值：同一问题纠正超过两次，就该 /clear 并带着学到的东西重写 prompt。如实交代：官方没有给&quot;这套流程提升成功率&quot;的量化数字，四步与 Explore → Plan → Implement → Commit 的对应关系是本文标注的，不作为实验结论引用。</p>
+<p><a id="deep-s4"></a></p>
+<h2>三、重开不是清空</h2>
+<p>官方文档给了两个动作，大部分人只做了前半个：</p>
+<ul>
+<li><strong>动作一</strong>：<code>/clear</code>，重开。</li>
+<li><strong>动作二</strong>：带着你学到的东西，重写一个更具体的 prompt。</li>
+</ul>
+<p>只做动作一，就是把同一个问题重新问一遍。第五次还是错，因为任务书没变。</p>
+<h3>3.1 交接四件事</h3>
+<pre><code class="language-markdown">## 不能变的结果
+一句话，能判定对错的那种。
 
-    <h2 class="sec">场景三：架构设计（平衡的艺术）</h2>
-    <p><strong>是什么：</strong>架构设计的目标不是"最优架构"，是<strong>平衡</strong>：让成本、性能、复杂度（可维护性）维持在可控范围，得到一个<strong>可控可用</strong>的系统（"不可能三角"的例子在图 6 右上）。没有哪个选项全对，只有取舍依据对不对。</p>
-    <p><strong>第一步裁决什么：</strong>权威是<strong>核心原则 + 权威来源</strong>：先定哪条优先、什么不可妥协，取舍才有依据；再去核对约束的真实性（真实流量、预算、团队能力）。照搬五年前的"最佳实践"，可能正撞上正被推翻的那一批。</p>
-    <p><strong>四步怎么走：</strong>① 定原则，与收集信息分开做，别边聊边定；② 写清约束（规模、预算、团队）与"可控"的验收：哪些指标不允许越界；③ 让它出 A/B 两个方案、各自列出三角上的取舍，人对照原则裁决，别让它直接给"推荐方案"；④ 方案讨论超过五六轮、开始自相矛盾时重开，新窗口只带三样：原则 + 约束 + 已否决方案及否决理由。</p>
-    <figure>
-      <svg viewBox="0 0 900 350" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="架构设计：成本、性能、复杂度的平衡三角">
-        <defs>
-          <marker id="arw6g3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-        </defs>
-        <!-- 三角 -->
-        <polygon points="280,80 110,290 450,290" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" opacity="0.9"/>
-        <rect x="205" y="40" width="150" height="44" rx="10" fill="#3b82f6"/>
-        <text x="280" y="62" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">成本（便宜）</text>
-        <text x="280" y="79" font-size="11" fill="#dbeafe" text-anchor="middle">机器 · 人力 · 时间</text>
-        <rect x="20" y="290" width="180" height="44" rx="10" fill="#10b981"/>
-        <text x="110" y="312" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">性能（快速）</text>
-        <text x="110" y="329" font-size="11" fill="#d1fae5" text-anchor="middle">延迟 · 吞吐 · 扩展性</text>
-        <rect x="360" y="290" width="180" height="44" rx="10" fill="#f59e0b"/>
-        <text x="450" y="312" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">复杂度（好维护）</text>
-        <text x="450" y="329" font-size="11" fill="#fef3c7" text-anchor="middle">可维护性 · 团队认知负担</text>
-        <!-- 中心：核心原则 -->
-        <circle cx="280" cy="210" r="52" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
-        <text x="280" y="202" font-size="13" font-weight="700" fill="#ef4444" text-anchor="middle">核心原则</text>
-        <text x="280" y="220" font-size="11" fill="#1f2328" text-anchor="middle">先定哪条优先</text>
-        <text x="280" y="236" font-size="11" fill="#1f2328" text-anchor="middle">什么不可妥协</text>
-        <!-- 边注 -->
-        <text x="150" y="170" font-size="11" fill="#6b7280" text-anchor="middle">加缓存/加机器</text>
-        <text x="150" y="185" font-size="11" fill="#6b7280" text-anchor="middle">提性能 · 抬成本</text>
-        <text x="400" y="170" font-size="11" fill="#6b7280" text-anchor="middle">性能压到位</text>
-        <text x="400" y="185" font-size="11" fill="#6b7280" text-anchor="middle">常推高复杂度</text>
-        <text x="280" y="272" font-size="11" fill="#6b7280" text-anchor="middle">复杂度降 → 维护成本降</text>
-        <!-- 右侧注释 -->
-        <rect x="590" y="60" width="280" height="130" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="730" y="88" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">不可能三角的一个例子</text>
-        <text x="730" y="114" font-size="12" fill="#1f2328" text-anchor="middle">便宜 · 好用 · 快速，最多同时占两头。</text>
-        <text x="730" y="136" font-size="12" fill="#1f2328" text-anchor="middle">医疗系统：可靠可维护 + 够快，</text>
-        <text x="730" y="154" font-size="12" fill="#1f2328" text-anchor="middle">为它付成本；demo 工具：便宜 + 快，</text>
-        <text x="730" y="172" font-size="12" fill="#1f2328" text-anchor="middle">接受难维护。取舍由原则裁决。</text>
-        <rect x="590" y="210" width="280" height="124" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="730" y="238" font-size="13" font-weight="700" fill="#1f2328" text-anchor="middle">第一步的裁决依据</text>
-        <text x="730" y="262" font-size="12" fill="#1f2328" text-anchor="middle">核心原则（哪条优先）+ 权威来源</text>
-        <text x="730" y="280" font-size="12" fill="#1f2328" text-anchor="middle">（真实流量、预算、团队能力）。</text>
-        <text x="730" y="302" font-size="12" fill="#1f2328" text-anchor="middle">AI 时代：旧设计有的还有效、有的正被</text>
-        <text x="730" y="320" font-size="12" fill="#1f2328" text-anchor="middle">推翻，"最佳实践"要核对时效再信。</text>
-      </svg>
-      <figcaption>图 6 · 架构的第一步：三角上没有全对的选项，先定原则再谈取舍，架构是平衡的艺术，目标不是最优，是可控可用</figcaption>
-    </figure>
+## 已经证明走不通的路
+方案 + 否决理由 + 证据。只留结论，不留十二次试错的过程。
 
-    <h2 class="sec">重开不是清空：先重写任务书，再开新窗口</h2>
-    <p>官方文档给了完整动作，多数人只做了前半个：<code>/clear</code> 是动作一，动作二是<strong>带着你学到的东西，重写一个更具体的 prompt</strong>。只做动作一，就是把同一个问题重新问一遍，第五次还是错，因为任务书没变。</p>
-    <p>重开前要交四件事，顺序有讲究：</p>
-    <ul class="plain">
-      <li><strong>不能变的结果</strong>：一句话，能判定对错的那种；</li>
-      <li><strong>已经证明走不通的路</strong>：方案 + 否决理由 + 证据，只留结论，不留十二次试错的过程；</li>
-      <li><strong>现在客观是什么</strong>：不要转述，让它自己读代码、读 diff；</li>
-      <li><strong>怎么算完成</strong>：可执行的验证方式。</li>
-    </ul>
-    <p>先写"不能变"再写"要做什么"，顺序反了，模型会先形成一个方案，再拿约束去迁就它。三条容易搞反的做法：要删的是<strong>过程</strong>，不是证据（"方案 A 因事务边界不成立被否"要留，十二次报错记录不留）；重开后的第一条消息该是"先复述：目标、约束、已否决项、完成判据"；重开两次还错，就别再重开了，那是需求自相矛盾，得人来裁决。</p>
+## 现在客观是什么
+不要转述。让它自己读代码、读 diff、读文件。
 
-    <figure>
-      <svg viewBox="0 0 900 400" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="从分诊到重开的完整流程图">
-        <defs>
-          <marker id="arw6-gray3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-          <marker id="arw6-green3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
-          </marker>
-        </defs>
-        <rect x="40" y="80" width="110" height="48" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="95" y="109" font-size="14" fill="#1f2328" text-anchor="middle">答不对</text>
-        <line x1="150" y1="104" x2="196" y2="104" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray3)"/>
-        <rect x="200" y="76" width="140" height="56" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
-        <text x="270" y="99" font-size="14" font-weight="600" fill="#b45309" text-anchor="middle">三问分诊</text>
-        <text x="270" y="119" font-size="11" fill="#6b7280" text-anchor="middle">缺料 / 歧义 / 冲突 / 能力</text>
-        <!-- 三条出路 -->
-        <line x1="340" y1="90" x2="406" y2="52" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray3)"/>
-        <line x1="340" y1="104" x2="406" y2="104" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray3)"/>
-        <line x1="340" y1="118" x2="406" y2="160" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray3)"/>
-        <rect x="410" y="30" width="200" height="44" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="510" y="57" font-size="13" fill="#1f2328" text-anchor="middle">缺料/歧义 → 补材料、写判定条件</text>
-        <rect x="410" y="84" width="200" height="44" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
-        <text x="510" y="111" font-size="13" fill="#1f2328" text-anchor="middle">能力 → 换模型或拆任务</text>
-        <rect x="410" y="140" width="200" height="44" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="510" y="167" font-size="13" font-weight="600" fill="#3b82f6" text-anchor="middle">冲突 → 停手，不加轮次</text>
-        <!-- 重开流程 -->
-        <line x1="610" y1="162" x2="656" y2="162" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray3)"/>
-        <rect x="660" y="140" width="200" height="44" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="760" y="167" font-size="13" fill="#1f2328" text-anchor="middle">写交接四件事 → 开新窗口</text>
-        <path d="M 760 184 V 220" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arw6-gray3)"/>
-        <rect x="660" y="224" width="200" height="44" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="760" y="251" font-size="13" fill="#1f2328" text-anchor="middle">第一条消息：先复述任务</text>
-        <path d="M 660 246 H 614 V 120 H 614" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 4"/>
-        <text x="600" y="290" font-size="11" fill="#f59e0b" text-anchor="end">复述不对 → 改任务书，回上一步</text>
-        <path d="M 760 268 V 300" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arw6-green3)"/>
-        <rect x="660" y="304" width="200" height="44" rx="10" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="760" y="331" font-size="13" fill="#1f2328" text-anchor="middle">执行 + 阴性验收（三条）</text>
-        <!-- 需求侧出口 -->
-        <path d="M 660 326 H 470 V 356 H 300" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arw6-red)"/>
-        <rect x="120" y="336" width="180" height="44" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="210" y="356" font-size="13" font-weight="600" fill="#ef4444" text-anchor="middle">仍然错 → 需求自相矛盾</text>
-        <text x="210" y="374" font-size="11" fill="#6b7280" text-anchor="middle">人来裁决，换十个窗口也没用</text>
-        <text x="480" y="348" font-size="12" fill="#ef4444">重开两次还错，出口不在上下文里</text>
-      </svg>
-      <figcaption>图 7 · 从分诊到重开：冲突型才走重开线，重开前先写交接四件事，复述通过才动手；最下面那条红色虚线是防无穷循环的出口</figcaption>
-    </figure>
-
-    <p style="font-size:13px;color:#6b7280;"><strong>附注 · 三个场景之外，这几类"答不对"也常见</strong>（同一套四步流程套用，只列关键动作）：</p>
-    <table style="font-size:13px;">
-      <tr><th>场景</th><th>关键动作</th></tr>
-      <tr><td>同一问题纠正两次以上</td><td>该重开，官方给的阈值，别试第四次</td></tr>
-      <tr><td>已定稿产物上追加需求</td><td>"新增要求"与"因此作废的旧决定"分两栏写</td></tr>
-      <tr><td>长文改稿</td><td>先只标注哪几句该改、往哪个方向改，人圈定范围再动笔</td></tr>
-      <tr><td>方案被否后重做</td><td>只给否决理由和约束，不给旧方案全文</td></tr>
-      <tr><td>一个窗口干多件事</td><td>一个窗口一件事，切换前把结论落盘（/clear between unrelated tasks）</td></tr>
-    </table>
-    <p style="font-size:13px;color:#6b7280;">原有的"最小修改""多来源合并""错前提"三类，已分别被场景一的第一步、场景二的第一步、四步流程的①吸收，不再单列。</p>
-
-    <div class="quote">新建是"照着目标造一个东西"，更新是"在三份互相打架的材料之间裁决，再造一个东西"。前者模型擅长，后者它只能装作擅长。</div>
-  </main>
-
-  <!-- ⑤ 面试官加分区 -->
-  <section class="interview">
-    <h2>面试官可能会追问</h2>
-    <details>
-      <summary>Q1："更新比新建难"，证据是什么？</summary>
-      <div class="ans">拆两层答。能力版本（更新必然更差）没有对照实验，本文不主张；结构版本（更新天然带更多冲突源）有多轮实验间接支持：信息分轮给出平均掉 39%，持续施压下 76.74% → 30.23%。反面也要主动交代：Aider 显示表达格式能救走一大块（20% → 61%），格式解释不了的部分才归结构。</div>
-    </details>
-    <details>
-      <summary>Q2：为什么不继续纠正，而要重开？纠正便宜啊。</summary>
-      <div class="ans">纠正不改结构，只加内容：上一轮的错解和它的解释都还在窗口里，你的纠正又是一条必须相容的信息。官方阈值：同一问题纠正超过两次就 /clear。注意原话同时要求重写 prompt，且删的是过程不是证据，失败结论要留，十二次报错记录不留。</div>
-    </details>
-    <details>
-      <summary>Q3：什么情况下不该重开？</summary>
-      <div class="ans">三种：要求不看历史就能写清的，去改任务书；"没提的就是不变"还没交代的，先试"只改这个函数、其他一律不动"；它还能准确复述目标、已否决项、完成判据的，留着继续。重开两次还错，问题在需求自相矛盾，出口在人这边。</div>
-    </details>
-  </section>
-
-  <!-- ⑥ 出口 -->
-  <footer class="exit">
-    <h2>下一步</h2>
-    <p><strong>想动手：</strong>按四步流程改手头的任务，从"动手前先让它复述目标"这一条开始。<strong>想核对证据与完整论证？</strong>深入版在这里：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/为什么和%20AI%20越聊越乱.md">深入版全文</a>（四步流程见第二节、三个场景见第七节，场景速查与证据边界在附录 A/B，含 7 篇参考文献与每条断言的证据标签）。</p>
-    <p style="margin-top:8px;">版本标注：讲解版 v3（2026-10-23），场景部分为「四步流程（图 3）+ 三个深写场景」，与 Claude Code 官方工作流对齐并标注对应关系；<strong>深入版 md 已升至 v1.2</strong>（四层结构：结论层前置，场景速查与证据边界收进附录），两版结论一致。类比均已标注边界。</p>
-    <p style="margin-top:14px;display:flex;justify-content:space-between;gap:16px;font-size:14px;"><a href="讲解-05-为什么最好用的是 Claude Code.html">← 上一篇：为什么最好用的是 Claude Code</a><span style="color:#cbd5e1">这是最后一篇</span></p>
-  </footer>
-
-</div>
-</body>
-</html>
+## 怎么算完成
+可执行的验证方式，不是&quot;看起来对&quot;。
+</code></pre>
+<p>顺序有讲究：先&quot;不能变&quot;，再&quot;走不通&quot;，最后才是&quot;要做什么&quot;。反过来写，模型会先形成一个方案，再拿约束去迁就它，这时约束已经变成了事后装饰。</p>
+<p>这套清单用于冲突轴的重开。如果你的问题在噪声轴——信息变旧、约束悄悄丢失——第 01 篇 §七的&quot;证据式复盘&quot;输入模板更对症：它多了&quot;审查任务&quot;一段，专管让新上下文找被绕过的约束。</p>
+<h3>3.2 三条容易搞反的做法</h3>
+<p><strong>第一条：要删的是过程，不是证据。</strong>
+Manus 的工程博客写过一句很硬的话：&quot;erasing failure removes evidence&quot; <code>[工程博客]</code>。把失败痕迹擦干净，模型就失去了从失败里学习的材料。所以要留&quot;方案 A 因事务边界不成立被否&quot;，删掉&quot;我们试了 12 次，每次的报错是……&quot;。判断标准：这条信息还能不能约束未来的选择。</p>
+<p><strong>第二条：重开后的第一条消息不该是&quot;帮我改 X&quot;。</strong>
+该是&quot;先复述：目标、约束、已否决项、完成判据&quot;。复述错了，说明任务书错了。这时候改任务书，比改完一版代码再回滚要省得多。复述这一步不能省，它是一次廉价的一致性检查。</p>
+<p><strong>第三条：重开两次还错，就别再重开了。</strong>
+那不是上下文问题，是需求内部自相矛盾，得人来裁决。这条边界很重要：把重开当万能药，会掩盖真正的问题在需求侧。一个需求如果同时要求&quot;极致简单&quot;和&quot;支持任意扩展&quot;，任何窗口都答不出来，换十个窗口也一样。</p>
+<h3>3.3 重开的成本</h3>
+<p>重开不免费。</p>
+<ul>
+<li>Manus 的工程博客给了具体差价：用 Claude Sonnet 时，缓存输入 0.30 美元/百万 token，未缓存 3 美元/百万 token，差 10 倍。新窗口意味着前缀缓存失效，首轮按全价算 <code>[工程博客]</code>。</li>
+<li>Claude Code 官方文档也承认这件事：新开会话需要重新读文件，&quot;which would be slower and more expensive&quot; <code>[官方文档]</code>。</li>
+</ul>
+<p>所以判据不该是&quot;感觉有点乱&quot;。用一个可判定的标准：<strong>它还能不能准确复述任务模型</strong>。复述得出，留着继续；复述不出，重开。</p>
+<h3>3.4 一图收口</h3>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;答不对&quot;] --&gt; B{&quot;三问分诊&quot;}
+    B --&gt;|&quot;缺料 / 歧义&quot;| C[&quot;补材料、写判定条件&quot;]
+    B --&gt;|&quot;能力&quot;| D[&quot;换模型或拆任务&quot;]
+    B --&gt;|&quot;冲突&quot;| E[&quot;停手，不继续加轮次&quot;]
+    E --&gt; F[&quot;写交接四件事&quot;]
+    F --&gt; G[&quot;开新窗口&quot;]
+    G --&gt; H[&quot;先复述，后动手&quot;]
+    H --&gt;|&quot;复述不对&quot;| F
+    H --&gt;|&quot;复述通过&quot;| I[&quot;执行 + 阴性验收&quot;]
+    I --&gt;|&quot;仍然错&quot;| J[&quot;判定：需求自相矛盾，人来裁决&quot;]
+</code></pre>
+<p>图里最值得看的是最后那个分岔：重开之后仍然错，出口不在上下文里，回到需求侧。这条出口如果不画出来，&quot;重开&quot;就会变成一个无穷循环。</p>
+<hr>
+<h1>第二部分 · 机制：为什么会这样</h1>
+<p><a id="deep-s5"></a></p>
+<h2>四、机制一：新增与更新的信息结构不对称</h2>
+<p>同一句&quot;帮我做一个 X&quot;和&quot;帮我改一下这个 X&quot;，看起来只差两个字，实际上请求里装的东西差了三倍。</p>
+<p>先把这条主张的强度说清楚，免得它被当成一个已经证过的能力断言。</p>
+<ul>
+<li><strong>本文主张的是结构版本</strong>：更新请求天然携带更多冲突源（现状、旧决定的理由、缺席的约束），所以更容易在窗口里攒出互相矛盾的版本。这条属 <code>[综合推断]</code>：第五节的多轮实验支持&quot;冲突会被积累并锚定&quot;，第六节 Aider 的实验支持&quot;格式能救走一大块，剩下没法用格式解释的部分才归结构&quot;。</li>
+<li><strong>本文不主张能力版本</strong>：&quot;同一模型在等价任务上，更新必然比新建差&quot;。这个强版本没有直接对照实验支撑，本文也没做，原因写在&quot;本文没做的事&quot;里。</li>
+<li>两者差别不小。结构版本能推出&quot;先查表达、再查冲突&quot;的排查顺序；能力版本只能推出&quot;别让它改&quot;，而这句话在工程上没法执行。</li>
+</ul>
+<h3>4.1 值个数：一个目标，还是三个值</h3>
+<p>新建的请求可以写成：目标 G → 产物 X。</p>
+<p>更新的请求要写成：现状 S + 旧决定的理由 R + 新目标 G&#39; → 产物 X&#39;，并且 X&#39; 必须与 S 里&quot;没被提到的那部分&quot;保持兼容。</p>
+<p>兼容性是隐式约束。命名习惯、错误处理风格、兼容版本、性能假设，这些都在 S 里，从没被写进任何一次请求。模型只能从现状推断，推断错了就是<strong>改动溢出</strong>（collateral change）：你只要一个开关，它给了你一次重构。</p>
+<pre><code class="language-mermaid">flowchart TB
+    subgraph N[&quot;新建：一条力线&quot;]
+        G1[&quot;目标 G&quot;] --&gt; X1[&quot;产物 X&quot;]
+    end
+    subgraph U[&quot;更新：三股力，一股缺席&quot;]
+        S[&quot;现状 S&lt;br/&gt;（含未说出口的约束）&quot;] --&gt; X2[&quot;产物 X&#39;&quot;]
+        R[&quot;旧决定的理由 R&quot;] --&gt; X2
+        G2[&quot;新目标 G&#39;&quot;] --&gt; X2
+        S -.-&gt;|&quot;这条从没写进请求&quot;| C[&quot;兼容性约束&quot;]
+        C -.-&gt; X2
+    end
+</code></pre>
+<p>图里那条虚线是全图的关键：它不在请求里，只在现状里。新建时它不存在，更新时它一直在。</p>
+<h3>4.2 缺席约束：没提的就是不变，但模型没有这个默认</h3>
+<p>人写更新请求时会把不变的部分省掉，因为重复对称信息没意义。这个省略对人是成立的，对模型不成立：它拿到的不是&quot;一份只许改这一处的材料&quot;，是&quot;一份可以被重写的材料&quot;。</p>
+<p>推论很直接：更新请求里，写清&quot;不许动什么&quot;的价值，通常高于把&quot;要改什么&quot;写得更细。这条在代码场景里当场可验——你说&quot;只改这个函数&quot;，它仍然可能重排 import、重命名局部变量、顺手格式化整个文件。</p>
+<p>写作场景同理。你说&quot;改语气&quot;，它可能连结构一起改；你说&quot;只改语气，段落顺序和数据一律不动&quot;，改动范围立刻收窄。</p>
+<h3>4.3 验收是阴性证明</h3>
+<p>新建的验收是阳性命题：能跑、能满足需求、测试能过。
+更新的验收是否定命题：改对了，而且没改坏别的地方。</p>
+<p>证明一个否定命题更贵，也更容易漏。这解释了为什么更新场景里&quot;看起来对&quot;的破坏力更大：它顺利通过了你能想到的检查，破坏的是你没想到的那部分。</p>
+<p>所以更新场景的验收清单至少三条：目标行为变了、相邻行为没变、构建与测试全绿。注意中间那条，它最容易被省掉，也最容易出事。</p>
+<p>阴性证明没有便宜做法，只有笨做法，三步：</p>
+<ol>
+<li><strong>列相邻行为清单</strong>：谁在调它、边界输入是什么、错误路径怎么走。清单从代码里搜，不要凭记忆写。</li>
+<li><strong>逐条跑</strong>：有测试跑测试；没有测试就跑一次构建，再手动验三条边界。</li>
+<li><strong>把清单和结果写进交接材料</strong>。下一次改动时，这份清单就是新的&quot;不许动&quot;。</li>
+</ol>
+<p><strong>本节要落的一句话</strong>：更新的难度不来自&quot;改&quot;，来自同时维护三个值，其中一个还没人说出口。</p>
+<p><a id="deep-s6"></a></p>
+<h2>五、机制二：冲突不会暴露，它会被解释成自洽</h2>
+<p>矛盾进入上下文之后，模型很少主动报告矛盾。它通常会选一个版本继续，然后给这个选择配一套理由。这一节是全文的核心，三份证据。</p>
+<h3>5.1 早期的错误会变成后续的前提</h3>
+<p>Laban 等 2025-05-09 的实验把同一份完整提示拆成多轮对话，六个生成任务上，多轮比单轮平均低 39%；分析 20 万多条模拟对话后，退化主要不是能力下降，而是不可靠性上升。原文两句值得原样抄下来 <code>[论文]</code>：</p>
+<blockquote>
+<p>LLMs often make assumptions in early turns and prematurely attempt to generate final solutions, on which they overly rely.</p>
+</blockquote>
+<blockquote>
+<p>When LLMs take a wrong turn in a conversation, they get lost and do not recover.</p>
+</blockquote>
+<p>第一句是机制，第二句是后果。&quot;过早给出最终答案&quot;意味着：在信息还不全的时候，模型已经在窗口里写下了一份方案。这份方案不会消失，它变成了后续推理必须相容的前例。</p>
+<p>同一组实验里，把一份完整提示拆散，o3 的分数从 98.1 掉到 64.1（同论文，2025-05-09）。信息一个字没少，只是分了几轮说。</p>
+<h3>5.2 这个失效有名字，但名字和成因对不上</h3>
+<p>Breunig 在 2025-06-22 把长上下文的失效分成四类，其中一类叫<strong>上下文冲突</strong>（context clash）：&quot;when you accrue new information and tools in your context that conflicts with other information in the context&quot; <code>[工程博客]</code>。</p>
+<p>有意思的是他正文里的归因：他先写&quot;The answer is Context Confusion&quot;，小标题却是 Context Clash。这个混用恰好说明两件事挨得太近——多余的信息让模型分心，矛盾的信息逼它裁决，而裁决失败的样子，和分心一模一样：它答了一个看起来相关、实际不对的东西。</p>
+<p>这套四分类没有被 Anthropic、LangChain、Manus 的官方框架采纳，主要在一手工程圈和二手博客里流通。它的价值是给现象起了名字，不是给出了量化结论。用它的时候要清楚这一点。</p>
+<h3>5.3 顺着错走之后，就回不来了</h3>
+<p>TRUTH DECAY 2025-02-04 测的是另一件事：用户持续施压时，模型会不会改口。结论比预期严重 <code>[论文]</code>：</p>
+<ul>
+<li>Claude 在 TruthfulQA 的静态反馈场景里，第 1 次追问准确率 76.74%，第 7 次是 30.23%；</li>
+<li>Llama 3.1 8B 在 MMLU 上从 29.33% 崩到 5.11%；</li>
+<li>论文给的解释是模型把连贯性排在真实性前面：&quot;once an inaccuracy is introduced, subsequent responses become constrained by prior mistakes rather than being verified against ground truth&quot;。</li>
+</ul>
+<p>注意 30.23% 这个数低于随机猜。它已经不处在&quot;被说服了一半&quot;的中间态，而是稳定地站到了错的一边。</p>
+<h3>5.4 拼起来是什么</h3>
+<p>三份证据说的是同一件事的三个面：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>面</th>
+<th>证据</th>
+<th>说清了什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>冲突怎么产生</td>
+<td>Laban 2025</td>
+<td>信息不全时的早期答案会留在窗口里，成为后续前提</td>
+</tr>
+<tr>
+<td>冲突叫什么</td>
+<td>Breunig 2025</td>
+<td>上下文内部互相矛盾，这一类失效被命名为 clash</td>
+</tr>
+<tr>
+<td>冲突为什么改不回来</td>
+<td>TRUTH DECAY 2025</td>
+<td>模型会锚定已经写下的结论，越纠越顺着走</td>
+</tr>
+</tbody></table></div>
+<p>合起来就是&quot;越聊越乱&quot;的机制：每一轮都在给下一轮加一条&quot;必须与之相容&quot;的前例。轮次越多，可回退的空间越小。到某个点，推翻一条结论的成本高于绕开它，模型就选择绕开。</p>
+<p><code>[推测]</code> 本文补一个机制假设：冲突之下，模型的行为更接近&quot;维持已有解释&quot;而不是&quot;重新裁决&quot;，因为前者只需局部一致，后者要推翻已经写进上下文的结论。验证方式：同一冲突场景分两组，一组要求它在回答前先列出&quot;上下文里互相矛盾的条目&quot;，一组直接回答，比较正确率。若两组无差异，这个假设被削弱。</p>
+<p><strong>本节要落的一句话</strong>：冲突的危险不在它存在，在它安静——模型会把矛盾消化成一套自洽的解释，然后自信地给你。</p>
+<p><a id="deep-s7"></a></p>
+<h2>六、边界：改本身没那么难，难的是版本数</h2>
+<p>如果&quot;改比新建难&quot;成立，最容易的反驳是&quot;把编辑格式做对就行了&quot;。这个反驳有数据。</p>
+<p>Aider 的做法是给同一批任务换&quot;怎么表达这次修改&quot;，模型不动。89 个 Python 重构任务上，GPT-4 Turbo 用旧的 SEARCH/REPLACE 块格式通过率 20%，换成 unified diff 后是 61%，&quot;偷懒注释&quot;从 12 个任务降到 4 个 <code>[工程博客]</code>（2023-12-21，作者 Paul Gauthier）。</p>
+<p>一个模型，一批任务，只换了表达方式，通过率翻三倍。这说明&quot;改&quot;里有一大块是接口问题：只要说清改哪里、改成什么、边界在哪，改并不比写难多少。</p>
+<p>所以排查顺序必须摆正：</p>
+<pre><code class="language-text">改不对
+→ 先怀疑表达：改哪一处、改成什么、什么不许动，说清了没有
+→ 表达没问题仍然乱：怀疑冲突（窗口里有几个版本）
+→ 冲突也排除：才是能力问题
+</code></pre>
+<p>顺序反了会付代价。跳过第一步直接重开，等于每开一个新窗口都把同一个没说清的要求再问一遍，第五次还是错。</p>
+<p><code>[经验]</code> 我的观察是反过来的：绝大多数&quot;改了三次都不对&quot;，第一次就说了要改什么；没说清的是&quot;什么不能变&quot;。这也是 4.2 节那条缺席约束值得单独成节的原因。</p>
+<h3>还有一个反方向的坑</h3>
+<p>有人从这条边界推出&quot;那就不该重开，应该把要求写清楚&quot;。这个推论只在表达能说清的前提下成立。当窗口里已经堆了两个互相矛盾的版本，写多清楚都没用：清楚的新要求会和旧版本并存，冲突照样在，只是换了个位置。</p>
+<p>一条可操作的区分：<strong>不看对话历史，你能不能把要求写清</strong>。能，就别重开，去改任务书；不能——你必须翻回去看&quot;上次为什么否掉 A&quot;才写得出来——说明历史里存着决定，那就重开，并且把那条决定搬进新任务书。</p>
+<hr>
+<h1>第三部分 · 展开：三个场景，把四步走一遍</h1>
+<p>三个场景难的方式不同，第一步裁决的&quot;权威&quot;也不同：修 bug 信数据源和主流程，调研信来源分级，架构信核心原则。每个场景按四步给要点，机制依据见第二部分。</p>
+<p><a id="deep-s8"></a></p>
+<h2>七、三个场景的完整展开</h2>
+<h3>7.1 修复杂 bug：权威是数据源 + 主流程</h3>
+<p>难点在定位：症状、日志、脑中架构图三者互相矛盾，耦合和依赖链让&quot;改这里影响哪里&quot;不可直读。第一步的权威是<strong>数据源 + 主流程</strong>：真实执行的代码路径和数据流向；报错的字面位置、上一轮的猜测、&quot;我觉得这里没依赖&quot;，全降为待验证材料。四步要点：让它先画执行路径、列&quot;已排除原因&quot;清单；验收写&quot;复现用例必须过，且相邻行为不变&quot;；小步改，每步跑用例；同一根因纠正两次还错就重开，新任务书带三样：现象 + 已排除原因 + 验收方式。</p>
+<h3>7.2 调研：权威是来源分级 + 去伪存真</h3>
+<p>结论会被拿去做决策（选型、立项、架构），错代价大；信息来源多且互相冲突，很多已过时。第一步的权威是<strong>来源分级</strong>：官方文档与发布说明 &gt; 源码本身 &gt; 官方 issue 与变更记录 &gt; 一手实践博客 &gt; 论坛与 AI 生成内容。AI 时代多一步去伪存真：旧设计有的还有效、有的正被推翻，概念本身在重新定义，每条关键结论标&quot;截至何时、依据哪个版本&quot;，没标的当待验证材料。四步要点：先做冲突清单、人裁决后再给模型；写清要回答的问题清单与结论形态；结论必须附来源和日期；发现混版本就重开，新窗口只放已裁决的材料。</p>
+<h3>7.3 架构设计：权威是核心原则 + 不可能三角</h3>
+<p>目标不是&quot;最优架构&quot;，是平衡：让成本、性能、复杂度（可维护性）维持在可控范围，得到可控可用的系统。类似&quot;便宜、好用、快速&quot;的不可能三角：医疗系统取&quot;可靠可维护 + 够快&quot;，为它付成本；demo 工具取&quot;便宜 + 快&quot;，接受难维护。第一步的权威是<strong>核心原则 + 权威来源</strong>：先定哪条优先、什么不可妥协，取舍才有依据；再核对约束的真实性（流量、预算、团队能力）。照搬五年前的&quot;最佳实践&quot;，可能正撞上正被推翻的那一批。四步要点：定原则与收集信息分开做；写清约束与&quot;可控&quot;的验收（哪些指标不许越界）；让它出 A/B 方案、各自列三角上的取舍，人对照原则裁决；讨论五六轮开始自相矛盾就重开，新窗口只带原则 + 约束 + 已否决方案及否决理由。</p>
+<p><a id="deep-s9"></a></p>
+<h2>八、通用核心观点</h2>
+<p>从八个场景里抽掉领域细节，剩下六条。</p>
+<ol>
+<li><p><strong>乱的来源是同时有效的版本数，不是信息总量。</strong> 一个窗口里同一件事有三个版本，比三万字无关材料更致命。无关材料让它分心，互相矛盾的版本让它必须裁决，而裁决它不擅长。</p>
+</li>
+<li><p><strong>更新请求的隐性成本在没说出口的约束上。</strong> 说清&quot;要改什么&quot;只解决了三分之一，另外三分之二是&quot;什么不能变&quot;和&quot;原来为什么那样&quot;。第二项是显式信息，第三项藏在现状里。</p>
+</li>
+<li><p><strong>冲突不会自己暴露，它会被解释成自洽。</strong> 所以检测手段是复述和对照证据，不是让它&quot;再想想&quot;。让它再想想，等于让它在同一套解释里写得更长、更自信。</p>
+</li>
+<li><p><strong>重开的交付物是一份更好的任务书，不是一个更空的窗口。</strong> 空窗口配旧问题，只是把失败重放一遍，还多付一次冷启动的钱。</p>
+</li>
+<li><p><strong>判据不是 token 数，是任务模型还稳不稳。</strong> 三个抽查问题：目标是什么、哪条路已被否决、完成需要什么证据。答错任何一个，就不该让它继续扩大改动面。</p>
+</li>
+<li><p><strong>有些乱不在上下文里，在需求里。</strong> 重开治不了自相矛盾的需求。承认这一点，比多开十个窗口有用。</p>
+</li>
+</ol>
+<p>一句收尾：</p>
+<blockquote>
+<p>新建是&quot;照着目标造一个东西&quot;，更新是&quot;在三份互相打架的材料之间裁决，再造一个东西&quot;。前者模型擅长，后者它只能装作擅长。</p>
+</blockquote>
+<hr>
+<h1>附录</h1>
+<p><a id="deep-s10"></a></p>
+<h2>附录 A：八个场景，按优先级排</h2>
+<p>排序依据三条：发生频率、单次代价、后果可逆性。越靠前，越值得先改习惯。修复杂 bug、调研、架构设计三个场景的完整展开见第七节。</p>
+<p>三条打架时按这个顺序取舍：频率优先，其次不可逆，最后才是单次代价。理由是前两条决定&quot;你会不会反复踩&quot;，代价只决定&quot;踩一次多疼&quot;。P7 就是按这条排的：单次代价低、后果可逆，但几乎每天都在踩，所以排在 P6 前面。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>场景</th>
+<th>为什么排这里</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td>同一问题纠正两次以上</td>
+<td>频率最高，且已有官方阈值可抄</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>已有代码上做最小修改</td>
+<td>改动溢出最容易发生，回滚成本中等</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>已定稿产物上追加需求</td>
+<td>旧决定与新增要求正面冲突，返工代价高</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>长文改稿</td>
+<td>写作场景里最常见，边界最模糊</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>方案被否后重做</td>
+<td>频率中等，但对抗性最强</td>
+</tr>
+<tr>
+<td>P6</td>
+<td>多来源材料合并</td>
+<td>冲突在材料之间，模型会替你裁决且不告知</td>
+</tr>
+<tr>
+<td>P7</td>
+<td>一个窗口干多件事</td>
+<td>后果可逆（开新窗口即可），但极常见</td>
+</tr>
+<tr>
+<td>P8</td>
+<td>你自己给了错前提</td>
+<td>频率低，一旦发生整条链路作废</td>
+</tr>
+</tbody></table></div>
+<h3>P1 同一个问题纠正两次以上</h3>
+<p><strong>例子</strong>：一个报错改了三轮。第一轮改错位置，第二轮改到副作用上，第三轮它在改测试。</p>
+<p><strong>冲突在哪</strong>：前两次的错解还在窗口里，而且它已经为&quot;为什么会报错&quot;写过一套解释。第三轮它维护的不是代码，是那套解释。</p>
+<p><strong>重开时怎么重排</strong>：不要重述问题。写&quot;现象（报错原文）+ 已排除的三个原因 + 验收方式&quot;。官方原话就是&quot;start fresh with a more specific prompt that incorporates what you learned&quot;，把&quot;学到的东西&quot;写进去，把&quot;试过的过程&quot;留在外面。</p>
+<h3>P2 已有代码上做最小修改</h3>
+<p><strong>例子</strong>：给四百行的函数加一个开关。它把整个函数重写了，错误处理也换了风格。</p>
+<p><strong>冲突在哪</strong>：约束缺席（风格、兼容、边界条件都没说）叠加版本叠加（它重写出来的版本和原版并存，后续它自己都分不清哪版是基线）。</p>
+<p><strong>重开时怎么重排</strong>：先只读不改，让它输出改动点清单，四列写死：文件、位置、改什么、为什么必须改。人确认后按清单执行。清单本身就是&quot;不许动&quot;的显式化。</p>
+<h3>P3 已定稿产物上追加需求</h3>
+<p><strong>例子</strong>：PRD 定稿后要加一个角色。它把整个权限模型重写了，因为&quot;加角色&quot;和&quot;原来为什么不做多角色&quot;在文档里同时存在。</p>
+<p><strong>冲突在哪</strong>：决定复活（旧决定还在文档里，但没人重申它是否仍然有效）叠加约束缺席。这是三种信息源的正面冲突：旧文档、旧理由、新要求。</p>
+<p><strong>重开时怎么重排</strong>：把&quot;新增要求&quot;和&quot;因此作废的旧决定&quot;分成两栏写。第二栏是关键，不写这一栏，模型会试图同时满足两套互相矛盾的结论，然后给你一个折中产物。</p>
+<h3>P4 长文改稿</h3>
+<p><strong>例子</strong>：让它&quot;改得口语一点&quot;。语气改了，论证顺序也变了，两个数字没了。</p>
+<p><strong>冲突在哪</strong>：目标从&quot;风格&quot;漂到&quot;重写&quot;。原因是&quot;改风格&quot;没有可判定的边界，模型只能自己划一条，划得比你宽。</p>
+<p><strong>重开时怎么重排</strong>：先只标注，不动笔——哪几句该改、往哪个方向改、改完大概什么效果。你圈定范围后，再让它按圈定的范围改。写作场景里，先标注后改写通常比&quot;直接重写一版我看看&quot;少两轮返工。</p>
+<p><code>[经验]</code> 这条还有一层：改稿时人对&quot;好&quot;的判断也在漂。第一轮你觉得太正式，第二轮改完你觉得太油。这时候问题不在模型，在你没先定下标准。定标准这件事，只能人做。</p>
+<h3>P5 方案被否后重做</h3>
+<p><strong>例子</strong>：方案 A 被否，让它出方案 B。B 里一半是 A 的旧论证，只是换了措辞。</p>
+<p><strong>冲突在哪</strong>：解释固化叠加决定复活。它要维护自己上一版的立场，因为那套立场已经写进了上下文。</p>
+<p><strong>重开时怎么重排</strong>：新窗口只给&quot;否决理由&quot;和&quot;约束&quot;，不给旧方案全文。给全文等于给它一份需要维护的立场；给否决理由，等于给它一份需要避开的地形图。</p>
+<h3>P6 多来源材料合并</h3>
+<p><strong>例子</strong>：三份材料对同一件事说法不同。它按最先读到的那份写结论，另外两份被当成补充细节。</p>
+<p><strong>冲突在哪</strong>：材料之间的矛盾没有被裁决。模型替你做了一次隐式裁决，而且不会告诉你它裁决过。这类问题在情报整理、调研汇总、合同比对里最常见，也最危险，因为结论看起来毫无瑕疵。</p>
+<p><strong>重开时怎么重排</strong>：先单独做一轮&quot;冲突清单&quot;，只产出矛盾不产出结论：哪几条互相矛盾、各自出处、材料时间。人裁决完，再让它写。这一轮的输出物是一张表，不是一段话。</p>
+<h3>P7 一个窗口干多件事</h3>
+<p><strong>例子</strong>：先查日志，再改代码，再写周报。写周报时它带着日志里的结论，把一次偶发超时写成了系统性问题。</p>
+<p><strong>冲突在哪</strong>：无关信息进入上下文，就变成了&quot;必须被考虑&quot;的材料。官方文档管这叫&quot;什么都往里倒的会话&quot;（kitchen sink session），给的解法是一句：<code>/clear</code> between unrelated tasks。</p>
+<p><strong>重开时怎么重排</strong>：一个窗口一件事。切换前先把结论落盘（写进文件或工单），不要靠对话历史传递状态。文件是可检索的，对话历史是会腐烂的。</p>
+<h3>P8 你自己给了错前提</h3>
+<p><strong>例子</strong>：你说&quot;这个接口是幂等的&quot;，其实不是。后面所有设计都建在这个前提上，包括重试策略和去重逻辑。</p>
+<p><strong>冲突在哪</strong>：错的假设被当事实，而且是你给的，模型更不敢质疑。这是谄媚（sycophancy，指模型倾向于附和用户说法，哪怕用户说错了）最容易触发的条件：你的陈述越肯定，它越倾向于配合。</p>
+<p><strong>重开时怎么重排</strong>：不要只纠正那一句。要显式写&quot;此前基于 X 的判断全部作废，重新评估受影响的部分&quot;，并让它先列出受影响清单，你确认范围后再改。只改那一句，等于在错的架构上加一块对的砖。</p>
+<p><a id="deep-s11"></a></p>
+<h2>附录 B：证据边界与参考资料</h2>
+<p><strong>这份声明管什么</strong>：正文所有带标注的判断，以及未标注但涉及模型行为的描述。</p>
+<ul>
+<li><strong>主命题的强度</strong>：本文主张的是结构判断（更新请求天然携带更多冲突源，所以更容易攒出矛盾版本），不是能力判断（更新必然比新建差）。结构判断由多轮实验间接支持；Aider 那个实验划出的是&quot;格式能救走多少&quot;的边界，不是难度差本身。能力判断没有直接对照实验，本文不主张；</li>
+<li><code>[论文]</code> 三项均为英文公开研究，实验在受控或半受控条件下完成，能支持&quot;多轮显著差于单轮&quot;&quot;错误会被锚定&quot;这类机制判断，不能直接给出某款编码 Agent 在真实仓库中的失败率；</li>
+<li><code>[官方文档]</code> 是厂商操作指引，证明&quot;官方建议两次就重开&quot;，不证明&quot;两次是最优阈值&quot;；</li>
+<li><code>[工程博客]</code> 是一手经验，未受控，样本有限；</li>
+<li><code>[经验]</code> 是本文作者的实践观察，不可外推为普遍规律；</li>
+<li><code>[推测]</code> 目前只有一处（5.4 节），已附证伪方式，在获得直接证据前应视为未定；</li>
+<li>第八节六条观点、附录 A 的场景优先级排列，都是经验判断，没有统计支撑，换技术栈或任务类型，顺序会变。</li>
+</ul>
+<h3>这些来源分别能支持什么</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>能支持的判断</th>
+<th>不能直接证明的判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLMs Get Lost（arXiv 2505.06120，2025-05-09）</td>
+<td>同一信息分多轮给出，六个任务平均掉 39%；早期假设会被后续过度依赖</td>
+<td>所有长会话都该重开；真实工程任务的退化幅度</td>
+</tr>
+<tr>
+<td>How Long Contexts Fail（2025-06-22）</td>
+<td>上下文内部矛盾是一类独立失效，有明确现象描述</td>
+<td>四分类的完整性与量化结论；厂商是否采纳这套命名</td>
+</tr>
+<tr>
+<td>TRUTH DECAY（arXiv 2503.11656，2025-02-04）</td>
+<td>持续施压下模型会顺着错误走并锚定，Claude 第 7 次追问降到 30.23%</td>
+<td>真实协作里用户压力的分布；其他模型的具体衰减曲线</td>
+</tr>
+<tr>
+<td>Aider 编辑格式实验（2023-12-21）</td>
+<td>表达方式能把同一模型的编辑通过率从 20% 拉到 61%</td>
+<td>2026 年模型上的同类效果；新建与更新的难度差</td>
+</tr>
+<tr>
+<td>Manus 上下文工程博客</td>
+<td>缓存命中率直接影响成本，缓存与未缓存差 10 倍；失败证据应保留</td>
+<td>所有产品的定价结构；该倍数长期成立</td>
+</tr>
+<tr>
+<td>Claude Code 官方文档（取数 2026-10-23）</td>
+<td>官方建议同一问题纠正两次后重开，且要重写 prompt</td>
+<td>该阈值的实验依据</td>
+</tr>
+</tbody></table></div>
+<h3>本文没做的事</h3>
+<ul>
+<li>没有做&quot;同一任务、新建 vs 更新&quot;的对照实验。这类实验需要控制需求等价性、采样数量与评分口径，做了也未必比公开论文可信。想自己跑的话，最小方案是：同一需求分别用&quot;从零写&quot;和&quot;改已有实现&quot;两条路径，各采样 10 次，只比&quot;首次通过率&quot;和&quot;改动溢出率&quot;两个指标，并把提示词原文一起存档。</li>
+<li>没有覆盖多 Agent 协作下的冲突传播。那是另一个机制，需要单独的失败模式分析。</li>
+</ul>
+<h3>参考资料清单</h3>
+<ul>
+<li><a href="https://arxiv.org/abs/2505.06120">LLMs Get Lost In Multi-Turn Conversation（arXiv 2505.06120，2025-05-09）</a></li>
+<li><a href="https://arxiv.org/abs/2503.11656">TRUTH DECAY: Quantifying Multi-Turn Sycophancy in Language Models（arXiv 2503.11656，2025-02-04）</a></li>
+<li><a href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html">How Long Contexts Fail — Drew Breunig（2025-06-22）</a></li>
+<li><a href="https://aider.chat/2023/12/21/unified-diffs.html">Unified diffs make GPT-4 Turbo 3X less lazy — Aider（2023-12-21）</a></li>
+<li><a href="https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus">Context Engineering for AI Agents: Lessons from Building Manus</a></li>
+<li><a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices（官方文档，取数 2026-10-23）</a></li>
+<li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Effective context engineering for AI agents — Anthropic</a></li>
+</ul>
+<p><a id="deep-s12"></a></p>
+<h2>下一步</h2>
+<ul>
+<li><strong>想动手</strong>：只读第一部分加附录 A。从两个成本最低的动作开始：每次更新请求写清&quot;什么不许动&quot;；同一问题纠正第二次时停下来做三问分诊，而不是纠正第三次。</li>
+<li><strong>想核对</strong>：正文每个数字的口径、来源与&quot;能支持什么、不能证明什么&quot;，全在附录 B 的表里。</li>
+<li><strong>想快速讲给别人</strong>：用同目录的讲解版 html（<code>阅读/讲解-06-越聊越乱.html</code>），六张图承载全部骨架。</li>
+</ul>
+<p><a id="deep-s13"></a></p>
+<h2>Changelog</h2>
+<ul>
+<li><strong>v1.3（2026-11-27，与 01 篇去重修剪）</strong><ul>
+<li>§3.1 末补噪声轴/冲突轴指路：噪声轴的复盘输入模板在第 01 篇 §七；</li>
+<li>未改：正文其余部分与全部数字口径。</li>
+</ul>
+</li>
+<li><strong>v1.2（2026-10-23，结构重排）</strong><ul>
+<li>四层重排：结论层（分诊+四形态、四步流程、重开）前置，机制层随后，三个场景独立成第三部分，八个场景速查与证据边界降为附录 A/B；新增&quot;太长不看&quot;块。</li>
+<li>冲突四形态并入第一节，作为冲突型的细分诊断；修复章号顺延后遗留的小节编号（7.1–7.4 → 3.1–3.4）与全部交叉引用。</li>
+<li>讲解版 html 同步删除页首施工注释，版本指针更新为 v1.2。</li>
+</ul>
+</li>
+<li><strong>v1.1（2026-10-23，回填）</strong><ul>
+<li>新增第六节&quot;通用解法：四步流程，与 Claude Code 官方工作流对齐&quot;：四步表（含完整官方引文与&quot;容易做错的地方&quot;列）+ 三个场景的第一步裁决依据（修复杂 bug / 调研 / 架构设计）。内容先落地在讲解版 html v2–v3，按&quot;砍掉的内容必须回到深入版&quot;回填至此；原六七八节顺延为七八九节，交叉引用已同步。</li>
+</ul>
+</li>
+<li><strong>v1（2026-10-23，初稿）</strong><ul>
+<li>结构：引子 → 四种答不对的分诊 → 两个机制 → 边界（Aider 反例）→ 四种冲突形态 → 八个场景 → 重开与交接 → 六条观点 → 证据边界。</li>
+<li>与第 01 篇的分工写在文首：那篇走噪声轴，本篇走冲突轴，不重述腐烂、自我纠错盲区、交接成本。</li>
+<li>数字口径全部标注到日期与来源；<code>[推测]</code> 一处，附证伪方式；未做的实验写在&quot;本文没做的事&quot;里。</li>
+</ul>
+</li>
+</ul>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 1.4-review · 2026-11-27</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>

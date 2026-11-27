@@ -1,0 +1,64 @@
+<section class="content-section" id="cx-tldr"><p class="kicker">太长不看</p><h2>乱的来源是"同时有效的版本数"在涨，不是信息总量在涨</h2>
+<p><strong>现象</strong>：从零写一个东西往往顺利，改一个已有的东西却越改越歪。差异不在"改"这个动作，在请求里的信息结构。</p>
+<p><strong>机制一句话</strong>：更新请求天然携带三股力——现状、旧决定的理由、新目标，外加一条从没写进请求的约束；矛盾进入上下文后，模型不会举手报告，它挑一个版本，然后为这个选择编一套解释。</p>
+<p><strong>怎么判断（三问分诊，一分钟）</strong>：① 它能不能准确复述当前目标、已否决的方案、完成判据？② 纠正第二次之后，是改对了，还是换了个错法？③ 删掉它的上一轮回答、只留原始材料，它还这么答吗？任一踩中＝冲突型，该重开；三问全过还是乱＝需求自相矛盾，人来裁决。</p>
+<p><strong>怎么解（四步）</strong>：① 裁决输入 → ② 定目标（带验收）→ ③ 沟通对齐（先复述再动手）→ ④ 混乱了就重构，/clear 并重写任务书，不做第四次纠正。</p>
+<p><strong>重开时交接四件事</strong>：不能变的结果 / 已经证明走不通的路 / 现在客观是什么 / 怎么算完成。重开两次还错，问题在需求侧，出口不在上下文里。</p>
+<p class="callout">要动手，读第一部分加附录 A 就够；要理解为什么，读第二、三部分。本文走<strong>冲突轴</strong>（同一件事有两个以上互相矛盾的版本），噪声轴（信息变多变旧）在第 01 篇。</p><a class="deep" href="?view=deep#s0">查看太长不看全文 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-intro"><p class="kicker">引子</p><h2>三种乱法，同一个共同点：它改的不是你要改的那一处</h2>
+<p>三种开场：改一个报错，它改了一处、报错换个地方、第三轮开始改测试；让它"改得口语一点"，语气对了，论证顺序变了、两个数字没了；给四百行的函数加开关，它把整个函数重写，连错误处理都换了风格。三次都不是"它不会"，三次都是"它把整个对象当成了一份可重写的材料"。</p>
+<p class="callout"><strong>一句话答案</strong>：新建时，上下文里只有一个方向的力，就是目标；更新时，至少有三股力——现状、旧决定的理由、新目标，它们经常互相打架。模型不会举手说"这里有两个版本"，它挑一个，然后为这个选择编一套解释。你看到的是它很自信地答错。</p>
+<p>你正在经历它的时候会看到：它引用已经不存在的函数名、行号；纠正第二次后换了一种错法；问"这样对吗"它答"对，因为……"但不跑测试；它推荐你上周否掉的方案。最费人的一个信号：你开始替它记事情——当人开始充当版本管理器，说明窗口里的版本已经管不住了。</p><a class="deep" href="?view=deep#s1">查看引子全文 ↗</a> <a class="md-source" href="{{MD_URL}}#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-triage"><p class="kicker">分诊</p><h2>先把"答不对"分成四种：只有"冲突"该重开</h2>
+<p>不是所有"答不对"都值得重开。混着治，会把"你没说清"误诊成"上下文有病"，然后每开一个新窗口都重复同一个错误。四种：缺料（补材料）、歧义（改写成可判定条件）、冲突（重开并重写任务书）、能力（换模型或拆任务）。</p>
+<figure><div class="figure-top"><span>分诊</span><b>图 02｜四种"答不对"与三问检测</b></div><div class="diagram-scroll"><img src="配图/06/fig02.svg" alt="缺料、歧义、冲突、能力四种类型各带症状与处置，冲突用三个问题一分钟分诊，任一踩中就是冲突型" loading="lazy" decoding="async"></div><figcaption>复述的合格线要写死：当前要达成的结果、已经死掉的方案、完成判据，三条同时答对才算复述通过；官方阈值可抄——同一问题纠正超过两次就 /clear。</figcaption></figure>
+<p>冲突型内部还有四种形态，动作不通用：<strong>版本叠加</strong>（新窗口只放一个版本，其余让它自己去文件系统读）、<strong>决定复活</strong>（把否决理由写成显式约束，"方案 A 因事务边界不成立被否"才有用）、<strong>解释固化</strong>（把"你的结论"降格成"一份待审材料"，让它对着 diff 找反例）、<strong>约束缺席</strong>（先出改动点清单，人确认后再执行）。四种里最常见的是约束缺席，最容易被误诊的也是它。</p><a class="deep" href="?view=deep#s2">查看四种类型、三问分诊与冲突四形态 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-steps"><p class="kicker">通用解法</p><h2>四步流程，与 Claude Code 官方工作流对齐</h2>
+<p>不同任务各有各的乱法，解法是同一条流程：<strong>裁决输入 → 定目标 → 沟通对齐 → 混乱就重构</strong>。它逐级对应官方的 Explore → Plan → Implement → Commit，官方理由是"把调研规划与实现分开，避免解决错的问题"。</p>
+<figure><div class="figure-top"><span>流程</span><b>图 04｜四步流程与官方对应</b></div><div class="diagram-scroll"><img src="配图/06/fig04.svg" alt="裁决输入、定目标、沟通对齐、混乱就重构四步卡片，分别对应官方 Explore、Plan、Implement 与 /clear" loading="lazy" decoding="async"></div><figcaption>如实交代：官方没给"这套流程提升成功率"的量化数字，四步与官方工作流的对应关系是本文标注的，不作为实验结论引用。</figcaption></figure>
+<p class="callout">每一步最容易做错的地方：不裁决就开工（模型按最先读到的算）；只写"要什么"不写"怎么算对"；一次说完全部要求就放手不管；把"再想想"当第四步——那是在原地加轮次。</p><a class="deep" href="?view=deep#s3">查看四步表、官方引文与易错点 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-restart"><p class="kicker">重开</p><h2>重开不是清空：交付物是一份更好的任务书</h2>
+<p>官方给了两个动作，大部分人只做了前半个：/clear 重开，以及带着你学到的东西重写一个更具体的 prompt。只做动作一，就是把同一个问题重新问一遍，第五次还是错。</p>
+<figure><div class="figure-top"><span>交接</span><b>图 05｜交接四件事与需求侧出口</b></div><div class="diagram-scroll"><img src="配图/06/fig05.svg" alt="交接四件事：不能变的结果、走不通的路、现在客观是什么、怎么算完成；重开两次还错说明问题在需求侧" loading="lazy" decoding="async"></div><figcaption>顺序有讲究：先"不能变"，再"走不通"，最后才是"要做什么"；反过来写，约束会变成事后装饰。重开不免费：新窗口前缀缓存失效，缓存与未缓存差 10 倍（Manus）。</figcaption></figure>
+<p class="callout">三条容易搞反的做法：要删的是过程不是证据（erasing failure removes evidence）；重开后第一条消息是"先复述"不是"帮我改 X"；重开两次还错就别再重开——那不是上下文问题，是需求内部自相矛盾。判据不该是"感觉有点乱"，是<strong>它还能不能准确复述任务模型</strong>。</p><a class="deep" href="?view=deep#s4">查看交接清单、三条搞反的做法与重开成本 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-mech1"><p class="kicker">机制一</p><h2>新增与更新的信息结构不对称：一个目标，还是三个值</h2>
+<p>同一句"帮我做一个 X"和"帮我改一下这个 X"，请求里装的东西差了三倍。新建写成：目标 G → 产物 X；更新要写成：现状 S ＋ 旧决定的理由 R ＋ 新目标 G' → 产物 X'，并且 X' 必须与现状里"没被提到的那部分"保持兼容。本文主张的是这个<strong>结构版本</strong>，不是"更新必然比新建差"的能力版本——后者没有直接对照实验。</p>
+<figure><div class="figure-top"><span>结构</span><b>图 01｜新建一条力线，更新三股力加一条缺席约束</b></div><div class="diagram-scroll"><img src="配图/06/fig01.svg" alt="新建请求只有目标一条力线；更新请求携带现状、旧决定的理由与新目标三股力，外加一条从没写进请求的兼容性约束" loading="lazy" decoding="async"></div><figcaption>图里那条虚线是全图的关键：它不在请求里，只在现状里——命名习惯、错误处理风格、兼容版本，从没被写进任何一次请求。推断错了就是改动溢出。</figcaption></figure>
+<p>更新的验收是阴性命题：改对了，<strong>而且没改坏别的地方</strong>。验收清单至少三条：目标行为变了、相邻行为没变、构建与测试全绿——中间那条最容易被省掉，也最容易出事。阴性证明没有便宜做法，只有笨做法：列相邻行为清单（从代码里搜，不凭记忆）、逐条跑、把清单写进交接材料。</p><a class="deep" href="?view=deep#s5">查看值个数、缺席约束与阴性验收 ↗</a> <a class="md-source" href="{{MD_URL}}#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-mech2"><p class="kicker">机制二</p><h2>冲突不会暴露，它会被解释成自洽</h2>
+<p>矛盾进入上下文之后，模型很少主动报告矛盾。它通常会选一个版本继续，然后给这个选择配一套理由。三份证据：</p>
+<figure><div class="figure-top"><span>证据链</span><b>图 03｜三份证据：早期答案变前提、失效有名字、顺着错走回不来</b></div><div class="diagram-scroll"><img src="配图/06/fig03.svg" alt="Laban 多轮实验平均低 39%，Breunig 命名上下文冲突，TRUTH DECAY 第 7 次追问降到 30.23%" loading="lazy" decoding="async"></div><figcaption>三份证据说的是同一件事的三个面：冲突怎么产生、冲突叫什么、冲突为什么改不回来。TRUTH DECAY 的 30.23% 低于随机猜——它已经稳定站到了错的一边。</figcaption></figure>
+<p class="callout">合起来就是"越聊越乱"的机制：每一轮都在给下一轮加一条"必须与之相容"的前例，轮次越多，可回退的空间越小。冲突的危险不在它存在，在它安静——模型会把矛盾消化成一套自洽的解释，然后自信地给你。</p><a class="deep" href="?view=deep#s6">查看三份证据与机制假设的证伪方式 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-boundary"><p class="kicker">边界</p><h2>改本身没那么难，难的是版本数</h2>
+<p>Aider 的实验划出了这条边界：89 个 Python 重构任务上，同一批任务只换"怎么表达这次修改"，GPT-4 Turbo 用 SEARCH/REPLACE 块格式通过率 20%，换成 unified diff 后 61%——只换了表达方式，通过率翻三倍。"改"里有一大块是接口问题。</p>
+<p>所以排查顺序必须摆正：<strong>先怀疑表达</strong>（改哪一处、改成什么、什么不许动，说清了没有）→ <strong>表达没问题仍然乱，怀疑冲突</strong>（窗口里有几个版本）→ <strong>冲突也排除，才是能力问题</strong>。顺序反了会付代价：跳过第一步直接重开，等于每开一个新窗口都把同一个没说清的要求再问一遍。</p>
+<p class="callout">反方向的坑也要防：窗口里已经堆了两个互相矛盾的版本时，写多清楚都没用。一条可操作的区分——<strong>不看对话历史，你能不能把要求写清</strong>？能，就别重开，去改任务书；不能，说明历史里存着决定，那就重开，并把那条决定搬进新任务书。</p><a class="deep" href="?view=deep#s7">查看 Aider 实验与排查顺序 ↗</a> <a class="md-source" href="{{MD_URL}}#s7">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-scenes"><p class="kicker">展开</p><h2>三个场景，把四步走一遍：权威各不相同</h2>
+<p>三个场景难的方式不同，第一步裁决的"权威"也不同：</p>
+<p><strong>修复杂 bug</strong>——权威是数据源＋主流程：真实执行的代码路径和数据流向算数，报错字面位置、上一轮的猜测、"我觉得这里没依赖"全降为待验证材料。让它先画执行路径、列"已排除原因"清单，验收写"复现用例必须过，且相邻行为不变"。</p>
+<p><strong>调研</strong>——权威是来源分级：官方文档与发布说明 &gt; 源码 &gt; 官方 issue 与变更记录 &gt; 一手实践博客 &gt; 论坛与 AI 生成内容。AI 时代多一步去伪存真：每条关键结论标"截至何时、依据哪个版本"，没标的当待验证材料；先做冲突清单，人裁决后再给模型。</p>
+<p><strong>架构设计</strong>——权威是核心原则＋不可能三角：先定哪条优先、什么不可妥协，取舍才有依据；让它出 A/B 方案、各自列成本性能复杂度上的取舍，人对照原则裁决。讨论五六轮开始自相矛盾就重开，新窗口只带原则＋约束＋已否决方案及否决理由。</p><a class="deep" href="?view=deep#s8">查看三个场景的四步要点 ↗</a> <a class="md-source" href="{{MD_URL}}#s8">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-views"><p class="kicker">通用观点</p><h2>从八个场景里抽掉领域细节，剩下六条</h2>
+<p>① 乱的来源是同时有效的版本数，不是信息总量；② 更新请求的隐性成本在没说出口的约束上——"要改什么"只解决了三分之一；③ 冲突不会自己暴露，它会被解释成自洽，检测靠复述和对照证据；④ 重开的交付物是一份更好的任务书，不是一个更空的窗口；⑤ 判据不是 token 数，是任务模型还稳不稳；⑥ 有些乱不在上下文里，在需求里。</p>
+<p class="callout">一句收尾：新建是"照着目标造一个东西"，更新是"在三份互相打架的材料之间裁决，再造一个东西"。前者模型擅长，后者它只能装作擅长。</p><a class="deep" href="?view=deep#s9">查看六条观点全文 ↗</a> <a class="md-source" href="{{MD_URL}}#s9">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-appendixa"><p class="kicker">附录 A</p><h2>八个场景，按优先级排</h2>
+<p>排序依据三条：发生频率、单次代价、后果可逆性；三条打架时频率优先，其次不可逆。P1 同一问题纠正两次以上（有官方阈值可抄）；P2 已有代码上做最小修改（改动溢出最容易发生）；P3 已定稿产物上追加需求（旧决定与新增要求正面冲突）；P4 长文改稿（边界最模糊）；P5 方案被否后重做（对抗性最强）；P6 多来源材料合并（模型会替你裁决且不告知）；P7 一个窗口干多件事（kitchen sink session，/clear between unrelated tasks）；P8 你自己给了错前提（谄媚最易触发，要显式作废受影响的判断）。</p><a class="deep" href="?view=deep#s10">查看 P1–P8 的冲突点与重开重排 ↗</a> <a class="md-source" href="{{MD_URL}}#s10">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-appendixb"><p class="kicker">附录 B</p><h2>证据边界：每个来源能支持什么、不能证明什么</h2>
+<p>主命题是结构判断（更新请求天然携带更多冲突源），不是能力判断——后者没有直接对照实验，本文不主张。三项论文实验能支持"多轮显著差于单轮""错误会被锚定"，不能直接给出真实仓库里的失败率；官方文档证明"官方建议两次就重开"，不证明"两次是最优阈值"；工程博客与作者经验未受控。本文没做的事：没做"新建 vs 更新"对照实验，没覆盖多 Agent 协作下的冲突传播。</p><a class="deep" href="?view=deep#s11">查看来源表与参考资料清单 ↗</a> <a class="md-source" href="{{MD_URL}}#s11">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-next"><p class="kicker">下一步</p><h2>两个成本最低的动作</h2>
+<p>每次更新请求写清"什么不许动"；同一问题纠正第二次时停下来做三问分诊，而不是纠正第三次。想核对数字口径，全在附录 B 的表里。</p><a class="deep" href="?view=deep#s12">查看下一步全文 ↗</a> <a class="md-source" href="{{MD_URL}}#s12">Markdown 对应段落</a></section>
+
+<section class="content-section" id="cx-changelog"><p class="kicker">版本</p><h2>Changelog</h2>
+<p>当前 v1.3（2026-11-27，与 01 篇去重修剪）：§3.1 末补噪声轴/冲突轴指路，正文其余部分与全部数字口径未改。v1.2 结构重排：结论层前置，八个场景速查与证据边界降为附录 A/B。完整变更记录见深入版。</p><a class="deep" href="?view=deep#s13">查看完整 Changelog ↗</a> <a class="md-source" href="{{MD_URL}}#s13">Markdown 对应段落</a></section>

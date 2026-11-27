@@ -1,317 +1,396 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>讲解 · AI 让"看起来正确"变得廉价</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: #ffffff; color: #1f2328; line-height: 1.75; font-size: 16px;
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-id" content="show-02"><meta name="document-version" content="3.1-review">
+<meta name="description" content="从似真产出到证据化工程：假成功状态、四种替身与门禁拦截的确定性失败。"><meta name="color-scheme" content="dark">
+<title>AI 让「看起来正确」变得廉价 · 铁甲依然在</title><link rel="icon" href="../工程/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../工程/assets/article.css"><script src="../工程/assets/article.js" defer></script></head>
+<body id="article-top" data-article="show-02">
+<a class="skip-link" href="#article-content">跳到正文</a>
+<header class="article-nav"><div class="article-shell"><a class="article-brand" href="../index.html"><img src="../工程/assets/mark.svg" width="29" height="29" alt=""><span>铁甲依然在</span></a><a href="../index.html#recommended">← 推荐阅读</a></div></header>
+<div class="article-shell article-heading"><p class="article-eyebrow">Agent 可靠性研究</p><h1>AI 让「看起来正确」变得廉价</h1><p class="article-summary">从似真产出到证据化工程：假成功状态、四种替身与门禁拦截的确定性失败。</p><div class="reader-tabs" aria-label="阅读方式"><a href="?view=quick#article-top" data-view-link="quick">图解讲解</a><a href="?view=deep#deep-overview" data-view-link="deep">完整深入版</a><a class="markdown-link" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md">Markdown 原文 ↗</a></div></div>
+<div class="article-shell article-layout"><aside class="article-toc"><details open><summary>阅读导航</summary><nav aria-label="本文目录"><a href="#ev-gap">&quot;看起来正确&quot;变得廉价，&quot;证明正确&quot;没有</a><a href="#ev-case">一个总结卡功能，两次推倒重来</a><a href="#ev-standins">四种&quot;正确替身&quot;：每种都对应一道证真机制</a><a href="#ev-vigilance">&quot;以后仔细一点&quot;不是工程方案</a><a href="#ev-mechanisms">把&quot;证真&quot;变成机制：探针、门禁、清单、独立验证</a><a href="#ev-chain">五阶段、四道闸，闭环不是流水线</a><a href="#ev-replay">两次翻盘逐层归位</a><a href="#ev-closing">产出变便宜，工程价值集中在判真假</a></nav></details><p>2026-11-27 讲解版升级：md 正文未改（仅加导航锚点），新增新标准配图与图解片段，讲解版由构建器重建；证据姿态沿用各文自述声明。核对日期：2026-11-27。</p></aside>
+<main id="article-content"><div class="quick-content"><section class="content-section" id="ev-gap"><p class="kicker">先给一句话答案</p><h2>"看起来正确"变得廉价，"证明正确"没有</h2>
+<p>先修正一个容易走偏的立论：<strong>似真产出不是 AI 发明的</strong>——装饰性的工作汇报、听起来专业实则空洞的方案、靠口才过关的验收演示，人类时代一直存在；针对它们的工程纪律（测试、评审、验收标准）也早已存在。AI 改变的是<strong>比例与速率</strong>：产出边际成本趋零，验证成本没有同比例下降，两条成本曲线张开剪刀差。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜两条成本曲线的剪刀差</b></div><div class="diagram-scroll"><img src="配图/02/fig01.svg" alt="产出一条结果的成本随时间趋零，验证真实性的成本基本持平，剪刀差张开，工程重心从生产结果移向建立证据链" loading="lazy" decoding="async"></div><figcaption>过去"做出来"本身就是高成本信号；现在"做出来了"不再携带"大概率做对了"的信息量。本文不讨论如何让模型更会写，只讨论如何让错误结果无法只凭外观过关。</figcaption></figure>
+<p class="callout">一句话答案：<strong>AI 让"看起来正确"变得廉价，却没有让"证明正确"变得廉价；于是最危险的失败不再是明显报错，而是成功地产出了一个错误结果——它可能通过 schema 校验、返回 success: true、页面正常展示，直到有人用真实数据、真实链路核对才发现整个结论建立在错误前提上。</strong></p><a class="deep" href="?view=deep#deep-s0">查看引子与可以直接拿走的四样东西 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-case"><p class="kicker">案例样本</p><h2>一个总结卡功能，两次推倒重来</h2>
+<p><strong>第一版</strong>把生成逻辑挂在"工具调用完成"的 hook 上：名字合理、触发稳定，很快"成功出卡"。抓取运行轨迹才发现——这个 hook 只能看到当前工具的结果，看不到整轮任务的最终回答：生成的是"电影演到一半写出的影评"，整体作废。<strong>第二版</strong>移到一轮结束之后：批量运行产出 14 张卡，按时间范围、数据充分性、证据一致性、展示价值筛选，真正适合给用户看的只有 5 张。</p>
+<figure><div class="figure-top"><span>案例</span><b>图 02｜两次翻盘的画面</b></div><div class="diagram-scroll"><img src="配图/02/fig02.svg" alt="第一版 hook 只见当前工具结果整版作废；第二版 14 张卡筛选后只有 5 张可用，其余包括旧数据写成近期变化、明细描述成趋势、查询失败仍出卡、数据不足补结论" loading="lazy" decoding="async"></div><figcaption>14 → 5 是单次批量运行的数字，不是基准测试 [复盘证据]。两次翻盘表面是集成点选错和质量不足，底层是同一个问题：接受了"足够像真的替身"。</figcaption></figure><a class="deep" href="?view=deep#deep-s1">查看案例完整复盘 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-standins"><p class="kicker">分类</p><h2>四种"正确替身"：每种都对应一道证真机制</h2>
+<p><strong>似真产出</strong>：结构完整、语气自信、状态看起来成功，但真实性未经验证；在关键节点被当作"真"来接受的那份，就是<strong>正确替身</strong>。四类位置：状态字段替代真实成功（外层 success 只表示流程走完了）；原始产出替代有效产出（14 张 ≠ 14 张可用）；名称和先验替代真实能力（"应该能拿到"是语言推理，能力是经验问题）；"做完了"替代可验证完成。</p>
+<figure><div class="figure-top"><span>四宫格</span><b>图 03｜替身、案例画面与对应证真机制</b></div><div class="diagram-scroll"><img src="配图/02/fig03.svg" alt="四种正确替身各配案例画面与对应证真机制：质量门禁、产出分级指标、探针先行、可检验完成条件加独立验证" loading="lazy" decoding="async"></div><figcaption>对应关系给的是"最对症的起点"，不是一一映射：一个替身往往需要多个机制叠加才能拦住，一个机制也常常同时防住多个替身。</figcaption></figure><a class="deep" href="?view=deep#deep-s2">查看四种替身的定义与对应关系表 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-vigilance"><p class="kicker">为什么常规解法失效</p><h2>"以后仔细一点"不是工程方案</h2>
+<p>发现风险后最自然的反应是"以后多检查一下"——这不可靠。一方面，模型不会因为上一次被纠正就永久形成新行为：没有进入系统提示、项目指令、测试或代码门禁的纠正，换个会话很可能重新发生 [经验]。另一方面，人也会忘：系统大多数时候表现正确，反而培养自动化偏见——工具越可靠，人越少核对，偶发的高置信错误越容易穿过整条链路 [经验]。</p>
+<p class="callout">这是剪刀差的另一半：产出端已经自动化，验证端还停在"人靠警觉"的手工模式，速度失配只会越来越大。正确方向是把判断固化成机制：<strong>靠记得检查 → 每次自动检查 → 检查不通过就无法继续。</strong>工程的价值不止降低错误概率，还在于让某些错误没有机会静默通过。</p><a class="deep" href="?view=deep#deep-s3">查看警觉失效与自动化偏见 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-mechanisms"><p class="kicker">四种机制</p><h2>把"证真"变成机制：探针、门禁、清单、独立验证</h2>
+<p><strong>探针先行</strong>：功能依赖 hook、回调、事件或生命周期时，先写一个不承担业务逻辑的最小探针，记录原始载荷和时间顺序；不接受"应该能拿到"，只接受"这段代码传递了这些字段"——案例第一版的整轮返工，理论上一个半小时的探针就能避免。<strong>可检验清单</strong>：让第三方无需理解作者意图也能回答"过还是不过"。<strong>独立验证</strong>：新会话读 diff 和测试，不继承作者前提。</p>
+<figure><div class="figure-top"><span>门禁</span><b>图 04｜质量门禁：五层串联 + 两率并重 + 分层限权</b></div><div class="diagram-scroll"><img src="配图/02/fig04.svg" alt="门禁触发三条件与结构、范围、证据、语义、业务五层检查；误杀误放两个度量口径；模型判别分层限权，高风险由代码规则与人工抽检兜底" loading="lazy" decoding="async"></div><figcaption>"用模型判别模型产出"是风险但可控：模型判别只放低风险语义层并定期人工校准，高风险判断由确定性规则和固定比例人工抽检兜底——模型做初筛，证据和人工做终审。</figcaption></figure>
+<p class="callout">四种机制的共同点：把"信不信"的判断权从生成者手里移交给外部证据——探针移交能力事实，门禁移交规则事实，清单移交验收标准，独立验证移交旁观者视角。每道移交都留下可被下一环消费的产物，所以它们能组合成链条。</p><a class="deep" href="?view=deep#deep-s4">查看四种机制细节与误杀度量口径 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-chain"><p class="kicker">证据链</p><h2>五阶段、四道闸，闭环不是流水线</h2>
+<p>四种机制可以组成一条从需求到生产的证据链：需求 → 设计 → 实现 → 交付 → 生产，阶段之间是四道验证闸——闸 1 写成可验收条件和负面用例；闸 2 探针确认集成点真实能力；闸 3 代码测试、schema 与业务门禁；闸 4 独立验证实际产物。生产阶段的失败样本不是终点，而是下一轮需求的输入。</p>
+<figure><div class="figure-top"><span>链路</span><b>图 05｜五阶段四道闸 + 回流闭环</b></div><div class="diagram-scroll"><img src="配图/02/fig05.svg" alt="需求设计实现交付生产五阶段，四道验证闸，生产失败样本回流为下一轮需求输入" loading="lazy" decoding="async"></div><figcaption>每层断掉时的症状不同：验收靠形容词、集成点"应该能拿到"、只测 happy path、作者自证清白、问题靠用户投诉发现。同一症状可能由多层同时断裂引起，修复要回到具体链路确认。</figcaption></figure>
+<p class="callout">判据只有一条：<strong>如果某一层只能提供一句"应该没问题"，证据链就在那里断了。</strong>证据链回答的不是"这次结果对不对"，而是"我凭什么能持续知道对不对"。</p><a class="deep" href="?view=deep#deep-s5">查看证据链分层表与断链症状 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-replay"><p class="kicker">回扣案例</p><h2>两次翻盘逐层归位</h2>
+<p><strong>第一版断在闸 2（设计层）</strong>：hook 没经过探针验证，直接基于名称先验做设计——先放探针，"看不到整轮最终回答"会在半小时内暴露。<strong>第二版断在闸 1 和闸 3（需求层 + 实现层）</strong>：需求层，"高质量总结卡"不可验收，查询失败、数据不足等负面场景从未写成用例；实现层，没有产出分级指标和门禁，14 张卡全部直接放行。</p>
+<p class="callout">成本对比 [复盘证据]：实际路线 = 两次整体返工 + 一轮人工筛卡；证据链路线 = 一个探针 + 一张分级指标表 + 一组可验收条件。剪刀差存在，但方向可以选择：<strong>要么把成本花在事前闸门，要么花在事后返工——前者买回可持续的判断能力，后者每次都要重新付一遍。</strong></p><a class="deep" href="?view=deep#deep-s6">查看两次翻盘的逐层定位 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-closing"><p class="kicker">结语</p><h2>产出变便宜，工程价值集中在判真假</h2>
+<p>更稀缺的能力转移到判真假这一侧：找到似真与真最容易分家的位置；把模糊的"好"改造成可执行标准；为概率组件设计确定性边界；保留能被第三方复核的原始证据；让一次事故变成以后每次都会执行的门禁。</p>
+<p class="closing">一句话总结：<strong>AI 让产出变得便宜，所以工程价值越来越集中在判真假；而判真假不能靠每次自觉，必须靠证据和机制。</strong></p><a class="deep" href="?view=deep#deep-s7">查看结语与证据边界声明 ↗</a> <a class="md-source" href="../%E5%8E%9F%E6%96%87/AI%20%E8%AE%A9%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%AD%A3%E7%A1%AE%E5%8F%98%E5%BE%97%E5%BB%89%E4%BB%B7%EF%BC%9A%E4%BB%8E%E4%BC%BC%E7%9C%9F%E4%BA%A7%E5%87%BA%E5%88%B0%E8%AF%81%E6%8D%AE%E5%8C%96%E5%B7%A5%E7%A8%8B.md#s7">Markdown 对应段落</a></section>
+</div><details class="deep-pane" id="deep-article"><summary>展开完整深入版</summary><article class="deep-content"><p><a id="deep-overview"></a></p>
+<h1>AI 让“看起来正确”变得廉价：从似真产出到证据化工程</h1>
+<blockquote>
+<p><strong>讲解版入口</strong>：配套图文版在 <code>阅读/讲解-02-证据化工程.html</code>；四种替身对应本文 §二，四种机制对应 §四，证据链对应 §五，案例逐层复盘对应 §六。</p>
+</blockquote>
+<blockquote>
+<p><strong>断言标注约定</strong>：本文关键判断按三分法标注——<code>[复盘证据]</code>（作者真实项目复盘，已匿名化，属单案例经验）、<code>[官方方法]</code>（厂商或社区公开的工程方法论，属经验性证据）、<code>[经验]</code>（作者实践观察，样本有限）、<code>[推测]</code>（本文提出的判断，附验证思路）。无标注的为可直接核对的定义或流程描述。</p>
+</blockquote>
+<p><a id="deep-s0"></a></p>
+<h2>引子：一句话答案</h2>
+<p>先修正一个容易走偏的立论：<strong>似真产出不是 AI 发明的</strong>。装饰性的工作汇报、听起来专业实则空洞的方案、靠口才过关的验收演示，人类时代一直存在；针对它们的工程纪律——测试、评审、验收标准——也早已存在。AI 改变的不是问题的有无，而是<strong>比例与速率</strong>：过去&quot;做出来&quot;本身就是高成本信号，一个能运行的功能默认意味着有人投入了数天，产出与正确之间的距离通常不远；现在产出边际成本趋零，&quot;做出来了&quot;不再携带&quot;大概率做对了&quot;的信息量，而验证成本没有同比例下降。两条成本曲线张开剪刀差，工程重心随之从&quot;生产结果&quot;移向&quot;建立证据链&quot;。</p>
+<p><strong>一句话答案</strong>：AI 让&quot;看起来正确&quot;变得廉价，却没有让&quot;证明正确&quot;变得廉价；于是最危险的失败不再是明显报错，而是<strong>成功地产出了一个错误结果</strong>——它可能通过 schema 校验，接口返回 <code>success: true</code>，页面正常展示，直到有人用真实数据、真实链路或真实业务边界去核对，才发现整个结论建立在错误前提上。</p>
+<p>对实际团队而言，这不是抽象的&quot;AI 幻觉&quot;问题，而是三个直接消耗工程时间的问题：集成点的能力靠猜、批量产出用数量冒充质量、Agent 用完成声明替代可复核结果。本文不讨论如何让模型更会写，只讨论如何让错误结果无法只凭外观过关。</p>
+<h3>读完可以直接拿走什么</h3>
+<ul>
+<li>一个判断集成点是否真的可用的最小探针；</li>
+<li>一组区分 raw、valid、grounded、useful 的产出指标；</li>
+<li>一条从需求、实现到生产抽检的证据链，以及每层断掉时的典型症状；</li>
+<li>一个决定何时用代码、模型判别或人工抽检的门禁分层，含误杀度量思路。</li>
+</ul>
+<p><a id="deep-s1"></a></p>
+<h2>一、案例：一个总结卡功能为什么两次推倒重来</h2>
+<p>考虑这样一个功能：Agent 完成一轮任务后，自动给用户生成一张总结卡。下面的复盘来自真实项目，业务名称、内部接口与可识别数据已移除 <code>[复盘证据]</code>。</p>
+<p><strong>第一版</strong>把生成逻辑挂在一个工具调用完成后的 hook 上。这个位置名字合理、触发稳定，也确实能拿到工具返回，于是系统很快&quot;成功出卡&quot;。真正抓取运行轨迹后才发现：这个 hook 只能看到当前工具的结果，看不到整轮任务的最终回答，也看不到同一轮其他工具的完整信息。它生成的不是总结，而是&quot;电影演到一半写出的影评&quot;。第一版整体作废。</p>
+<p><strong>第二版</strong>把生成位置移到一轮结束之后，终于能拿到完整结果。批量运行时，系统产出了 14 张卡。单看数量，功能已经完成；但按时间范围、数据充分性、证据一致性和展示价值筛选后，真正适合给用户看的只有 5 张。其余结果包括：</p>
+<ul>
+<li>把旧数据写成近期变化；</li>
+<li>把一批明细描述成趋势；</li>
+<li>查询失败后仍然生成一张&quot;暂无异常&quot;的卡；</li>
+<li>数据不足，却用流畅语言补出结论。</li>
+</ul>
+<p>两次翻盘表面上分别是集成点选错和质量不足，底层却是同一个问题：</p>
+<blockquote>
+<p>团队在关键节点接受了一个&quot;足够像真的替身&quot;，没有继续追问真实能力和真实证据。</p>
+</blockquote>
+<p>记住这个案例：第二节从它提炼出四种替身的分类，第六节回到它做一次证据链复盘——两次翻盘各自断在哪一层，届时可以逐层对号。</p>
+<p><a id="deep-s2"></a></p>
+<h2>二、四种“正确替身”：从案例提炼的分类</h2>
+<p>先定义术语。<strong>似真产出</strong>：结构完整、语气自信、状态看起来成功，但真实性未经验证的结果。<strong>正确替身</strong>：在某个关键节点上被当作&quot;真&quot;来接受的那份似真产出。替身不是随机出现的，在 AI 系统里它经常藏在四类位置——下面每一类都能在案例里找到对应画面。</p>
+<h3>1. 状态字段替代真实成功</h3>
+<p>最外层的 <code>success</code>、<code>done</code>、<code>completed</code> 很容易被当成结论。但一个多层系统可能出现这样的返回：</p>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;success&quot;,
+  &quot;data&quot;: {
+    &quot;tool_result&quot;: {
+      &quot;message&quot;: &quot;upstream timeout&quot;
+    }
   }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
-  a { color: #3b82f6; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .hero { border-left: 4px solid #3b82f6; padding: 4px 0 4px 20px; margin-bottom: 36px; }
-  .hero h1 { font-size: 28px; line-height: 1.4; margin-bottom: 10px; }
-  .hero .core { font-size: 18px; font-weight: 600; color: #1f2328; margin-bottom: 12px; }
-  .hero .why { color: #6b7280; font-size: 15px; }
-  .hero .why strong { color: #1f2328; }
-  .toplink { text-align: right; font-size: 13px; margin-bottom: 8px; }
-  .quick { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
-  .quick h2 { font-size: 18px; color: #3b82f6; margin-bottom: 12px; }
-  .quick ol { padding-left: 22px; }
-  .quick li { margin-bottom: 8px; }
-  .quick li:last-child { margin-bottom: 0; }
-  h2.sec { font-size: 21px; margin: 44px 0 16px; padding-bottom: 6px; border-bottom: 2px solid #dbeafe; }
-  h2.sec .back { float: right; font-size: 12px; font-weight: 400; color: #9ca3af; padding-top: 8px; }
-  h3 { font-size: 17px; margin: 26px 0 10px; }
-  p { margin-bottom: 12px; }
-  .sqa { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
-  .sqa .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; margin-right: 8px; }
-  .analogy { border-radius: 10px; padding: 18px 22px; margin: 18px 0; border: 1px solid; }
-  .analogy.blue  { background: #eff6ff; border-color: #93c5fd; }
-  .analogy.yellow{ background: #fffbeb; border-color: #fcd34d; }
-  .analogy.green { background: #ecfdf5; border-color: #86efac; }
-  .analogy h3 { margin-top: 0; }
-  .analogy .row { margin-bottom: 8px; }
-  .analogy .row:last-child { margin-bottom: 0; }
-  .analogy .label { font-weight: 700; font-size: 13px; margin-right: 6px; }
-  .blue .label  { color: #3b82f6; }
-  .yellow .label{ color: #f59e0b; }
-  .green .label { color: #10b981; }
-  .edge { font-size: 14px; color: #6b7280; }
-  .edge strong { color: #1f2328; }
-  .quote { border-left: 3px solid #f59e0b; background: #fffbeb; padding: 12px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-weight: 600; }
-  .evidence { font-size: 13px; color: #6b7280; background: #f9fafb; border-radius: 6px; padding: 8px 14px; margin: 12px 0; }
-  code { background: #f3f4f6; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
-  ul.plain { padding-left: 22px; margin-bottom: 12px; }
-  ul.plain li { margin-bottom: 6px; }
-  figure { margin: 24px 0; }
-  figure svg { width: 100%; height: auto; display: block; }
-  figcaption { text-align: center; font-size: 13px; color: #6b7280; margin-top: 8px; }
-  .figread { font-size: 14px; color: #374151; background: #f9fafb; border-radius: 6px; padding: 10px 14px; margin-top: -8px; }
-  .interview { background: #fefce8; border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 44px 0; }
-  .interview h2 { font-size: 19px; color: #b45309; margin-bottom: 14px; }
-  .interview details { margin-bottom: 12px; background: #ffffff; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 16px; }
-  .interview details:last-of-type { margin-bottom: 0; }
-  .interview summary { cursor: pointer; font-weight: 600; }
-  .interview details[open] summary { margin-bottom: 8px; }
-  .interview .ans { font-size: 15px; color: #374151; }
-  .interview .ref { display: block; margin-top: 8px; font-size: 13px; color: #9ca3af; }
-  .exit { border-top: 2px solid #e5e7eb; margin-top: 44px; padding-top: 20px; font-size: 14px; color: #6b7280; }
-  .exit strong { color: #1f2328; }
-</style>
-</head>
-<body>
-<div class="wrap">
-
-  <div class="toplink"><a href="../index.html">← 阅读目录</a>　｜　<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/AI%20让看起来正确变得廉价：从似真产出到证据化工程.md" target="_blank" rel="noopener">深入版（含完整证据链）→</a></div>
-
-  <header class="hero">
-    <h1>AI 让"看起来正确"变得廉价，然后呢？</h1>
-    <p class="core">看起来正确从来都廉价，AI 改变的是比例——产出成本趋零、验证成本不降，剪刀差张开；工程重心从"生产结果"转向"建立证据链"，让错误结果无法只凭外观过关。</p>
-    <p class="why"><strong>为什么值得读：</strong>AI 能几秒钟生成格式漂亮、语气自信、状态成功的结果，其中混着错的，而且错的看起来和对的一样好。这篇用一次真实项目的两次返工，把"怎么分辨真假"从个人警觉变成一套机制：探针、门禁、可验收的完成条件、独立验证。<strong>不需要懂代码</strong>：一个样板间与交房验收的类比贯穿全篇，四个冒充点各有对应画面。</p>
-  </header>
-
-  <section class="quick">
-    <h2>30 秒版</h2>
-    <ol>
-      <li><strong>最危险的失败不是报错，是"成功地输出错误结果"：</strong>schema 通过、接口返回 <code>success: true</code>、页面正常——但结论建立在错误前提上。</li>
-      <li><strong>剪刀差是核心：</strong>似真产出不是 AI 发明的，但 AI 把"做出来"的成本压到近零，"证明它对"的成本没降——"做出来了"从此不再携带"大概率做对了"的信息量。</li>
-      <li><strong>四种"正确替身"：</strong>状态字段冒充成功、原始数量冒充质量、名称先验冒充能力、"做完了"冒充可验证完成——就像样板间冒充房子。</li>
-      <li><strong>四种证真机制：</strong>集成点先放探针再设计；产出边界设分层门禁；完成条件写成第三方能判"过/不过"的清单；验证者从外部证据独立重建判断。</li>
-      <li><strong>一条证据链：</strong>需求 → 设计 → 实现 → 交付 → 生产，五阶段四道验证闸，任何一层只说"应该没问题"，链就在那里断了。</li>
-    </ol>
-  </section>
-
-  <main>
-    <div class="sqa">
-      <p><span class="tag">情境</span>过去做软件，产出本身是稀缺能力：一个能跑的功能、一份像样的方案，都要人投入数天。"做出来了"和"基本做对了"虽然不是一回事，通常也不会离得太远。</p>
-      <p><span class="tag">冲突</span>AI 把"做出来"变成几秒钟的事。一个真实项目里，一个自动总结卡功能连续翻盘两次：第一版挂在一个拿不到完整结果的 hook 上，整体作废；第二版批量产出 14 张卡，人工筛选后只有 5 张能用——其余的把旧数据写成近期变化、把明细说成趋势、查询失败还生成"暂无异常"。系统没有报错，它在成功地生产错误结果。</p>
-      <p><span class="tag">问题</span>团队不够仔细吗？可"以后多检查"为什么从来没管用过？</p>
-      <p><span class="tag">答案</span>因为验证责任还停留在"人的警觉"上，而自动化恰恰放大了警觉的稀缺。解法是把"信不信"从生成者手里移交出去——交给探针、门禁、清单和独立证据。</p>
-    </div>
-
-    <h2 class="sec">贯穿类比：样板间 vs 交房验收<span class="back">深入版 全文</span></h2>
-    <div class="analogy blue">
-      <div class="row"><span class="label">生活类比：</span>看房时你先逛<strong>样板间</strong>：灯光、家具、动线都调到最好，看起来"已经是可以住的房子"。但真正的交付要过<strong>交房验收</strong>：面积实测、水电打压、墙面空鼓，一项项查。样板间生产的是"看起来能住"，验收证明的是"真的能住"。</div>
-      <div class="row"><span class="label">工程锚点：</span>AI 产物天然是样板间——结构完整、语气自信、状态成功。证真机制就是验收工程：<strong>探针是量房，门禁是水电打压，完成条件清单是验收单，独立验证是请第三方验房师。</strong></div>
-      <div class="row edge"><span class="label">类比的边界：</span>房子验收一次基本管住实物，而 AI 产物是<strong>流水的、每次生成都不一样</strong>——所以验收不能一次做完，必须做成持续运转的证据链（见后文）。另外，验收清单本身也可能漏检：门禁会误杀也会误放，需要度量，不是装上就一劳永逸。</div>
-    </div>
-
-    <h2 class="sec">核心图：一条张开剪刀差的成本曲线<span class="back">深入版 引子</span></h2>
-    <p>立论要先摆正：似真产出不是 AI 时代的发明——装饰性汇报、空洞但专业的方案，一直存在，测试、评审、验收这些工程纪律也早已存在。AI 改变的是<strong>比例</strong>：产出成本一条线掉到近零，验证成本一条线基本不动。</p>
-
-    <figure>
-      <svg viewBox="0 0 900 380" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="产出成本与验证成本张开剪刀差">
-        <defs>
-          <marker id="arw-gray1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-        </defs>
-        <line x1="90" y1="40" x2="90" y2="305" stroke="#9ca3af" stroke-width="2" marker-end="url(#arw-gray1)"/>
-        <line x1="90" y1="305" x2="840" y2="305" stroke="#9ca3af" stroke-width="2" marker-end="url(#arw-gray1)"/>
-        <text x="56" y="46" font-size="13" fill="#6b7280">单位成本</text>
-        <text x="800" y="330" font-size="13" fill="#6b7280">时间（示意）</text>
-
-        <line x1="430" y1="44" x2="430" y2="305" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="5 4"/>
-        <text x="430" y="30" font-size="13" fill="#6b7280" text-anchor="middle">AI 大规模进入生产</text>
-        <text x="250" y="330" font-size="12" fill="#9ca3af" text-anchor="middle">前 AI 时代</text>
-        <text x="650" y="330" font-size="12" fill="#9ca3af" text-anchor="middle">AI 时代</text>
-
-        <path d="M 430 126 C 560 186 680 232 810 262 L 810 208 C 680 206 560 204 430 202 Z" fill="#fee2e2" opacity="0.6"/>
-
-        <path d="M 110 90 C 250 126 340 164 430 202 C 560 232 680 250 810 262" fill="none" stroke="#3b82f6" stroke-width="3"/>
-        <path d="M 110 196 C 250 200 340 201 430 202 C 560 206 680 207 810 208" fill="none" stroke="#ef4444" stroke-width="3"/>
-
-        <text x="112" y="78" font-size="14" font-weight="700" fill="#3b82f6">产出一件的成本</text>
-        <text x="560" y="252" font-size="12" fill="#3b82f6">趋近于零</text>
-        <text x="600" y="190" font-size="14" font-weight="700" fill="#ef4444">验证一件的成本</text>
-        <text x="700" y="234" font-size="12" fill="#ef4444">基本不变</text>
-
-        <text x="612" y="104" font-size="15" font-weight="700" fill="#dc2626">剪刀差</text>
-        <text x="612" y="126" font-size="12" fill="#6b7280">"做出来了"不再携带</text>
-        <text x="612" y="144" font-size="12" fill="#6b7280">"大概率做对了"的信息量</text>
-        <line x1="648" y1="152" x2="668" y2="222" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="4 3"/>
-
-        <text x="112" y="126" font-size="12" fill="#6b7280">过去：产出贵</text>
-        <text x="112" y="146" font-size="12" fill="#6b7280">→ 做出来 ≈ 有人</text>
-        <text x="112" y="164" font-size="12" fill="#6b7280">　 认真投入过</text>
-        <text x="112" y="184" font-size="12" fill="#6b7280">→ 两条线几乎贴着走</text>
-      </svg>
-      <figcaption>图 1 · 两条线本来贴得很近；AI 只压低了上面那条（示意图，非定量数据）</figcaption>
-    </figure>
-    <p class="figread">这张图的重点不是数值，是<strong>缝隙的位置</strong>：工程价值从"生产结果"移到了两条线之间那块红色区域——也就是"判断真假"这件没有被自动化的事。看第二眼：红色区域是靠<strong>上面那条线往下掉</strong>张开的，不是靠下面那条线往上升。所以问题从来不是"验证变难了"，而是"生产变便宜了"。</p>
-
-    <h2 class="sec">四种"正确替身"：AI 产物里的样板间<span class="back">深入版 §二</span></h2>
-    <ul class="plain">
-      <li><strong>状态字段替代真实成功</strong>——外层说流程走完，内层说业务失败；异常被捕获、HTTP 200，都不等于用户要的结果成立。案例里查询失败还出的那张"暂无异常"卡，就是状态字段盖出的假章。</li>
-      <li><strong>原始产出替代有效产出</strong>——"生成了 14 个"是吞吐量，"其中 5 个可用"才是质量。指标要分四级：<code>raw → valid → grounded → useful</code>，只统计第一级，系统就会被激励去生产形式完整的垃圾。</li>
-      <li><strong>名称和先验替代真实能力</strong>——<code>post_tool_use</code> 听起来"应该"能拿到完整上下文，但集成点能力是经验问题，答案只来自派发代码、真实载荷、最小探针和运行轨迹。第一版 hook 赌的就是这个"应该"。</li>
-      <li><strong>"做完了"替代可验证完成</strong>——"生成一张高质量总结卡"人人看得懂，却没法验收：什么数据足以支撑趋势？失败时沉默还是降级？没有可观察下落的"完成"，只是漂亮的状态描述。</li>
-    </ul>
-
-    <figure>
-      <svg viewBox="0 0 900 390" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="四种替身与对应证真机制">
-        <defs>
-          <marker id="arw-green2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
-          </marker>
-        </defs>
-        <text x="190" y="28" font-size="14" font-weight="700" fill="#dc2626" text-anchor="middle">正确替身（样板间）</text>
-        <text x="710" y="28" font-size="14" font-weight="700" fill="#059669" text-anchor="middle">证真机制（验收工程）</text>
-
-        <rect x="40" y="46" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="56" y="72" font-size="13" font-weight="700" fill="#ef4444">① 状态字段替代真实成功</text>
-        <text x="56" y="94" font-size="12" fill="#6b7280">查询失败仍出"暂无异常"卡</text>
-        <rect x="560" y="46" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="576" y="72" font-size="13" font-weight="700" fill="#059669">质量门禁（结构 / 证据层）</text>
-        <text x="576" y="94" font-size="12" fill="#6b7280">代码查来源与关键数据，逐层拦</text>
-
-        <rect x="40" y="122" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="56" y="148" font-size="13" font-weight="700" fill="#ef4444">② 原始产出替代有效产出</text>
-        <text x="56" y="170" font-size="12" fill="#6b7280">14 张卡里只有 5 张可用</text>
-        <rect x="560" y="122" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="576" y="148" font-size="13" font-weight="700" fill="#059669">产出分级指标 + 门禁</text>
-        <text x="576" y="170" font-size="12" fill="#6b7280">raw / valid / grounded / useful 漏斗</text>
-
-        <rect x="40" y="198" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="56" y="224" font-size="13" font-weight="700" fill="#ef4444">③ 名称先验替代真实能力</text>
-        <text x="56" y="246" font-size="12" fill="#6b7280">hook 拿不到整轮结果</text>
-        <rect x="560" y="198" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="576" y="224" font-size="13" font-weight="700" fill="#059669">探针先行</text>
-        <text x="576" y="246" font-size="12" fill="#6b7280">先记录真实载荷，再决定设计</text>
-
-        <rect x="40" y="274" width="300" height="64" rx="8" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="56" y="300" font-size="13" font-weight="700" fill="#ef4444">④ "做完了"替代可验证完成</text>
-        <text x="56" y="322" font-size="12" fill="#6b7280">"生成高质量总结卡"无法验收</text>
-        <rect x="560" y="274" width="300" height="64" rx="8" fill="#ecfdf5" stroke="#86efac"/>
-        <text x="576" y="300" font-size="13" font-weight="700" fill="#059669">可检验完成条件 + 独立验证</text>
-        <text x="576" y="322" font-size="12" fill="#6b7280">第三方能判"过／不过"</text>
-
-        <line x1="348" y1="78" x2="552" y2="78" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
-        <line x1="348" y1="154" x2="552" y2="154" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
-        <line x1="348" y1="230" x2="552" y2="230" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
-        <line x1="348" y1="306" x2="552" y2="306" stroke="#10b981" stroke-width="2" marker-end="url(#arw-green2)"/>
-      </svg>
-      <figcaption>图 2 · 四个冒充点各有对症的验收动作</figcaption>
-    </figure>
-    <p class="figread">注意箭头是<strong>单向</strong>的：这个对应关系给的是"最对症的起点"，不是一一映射——一个替身常需要多个机制叠加才拦得住（"暂无异常"卡既要证据层门禁，也要独立验证），一个机制也常同时防住几个替身。找替身的方法反而更简单：问"在这个位置，我凭什么相信它"，答不出证据，那里就是一个替身。</p>
-
-    <h2 class="sec">为什么"以后仔细一点"解决不了问题<span class="back">深入版 §三</span></h2>
-    <p>模型不会因为上一次被纠正就永久改变——没写进系统提示、项目指令、测试或代码门禁的纠正，换个会话大概率重演。人这边更难：系统大部分时候是对的，反而会养出<strong>自动化偏见</strong>，工具越可靠、人越不核对；越不核对，偶发的高置信错误越容易一路穿过去。</p>
-    <p>这就是剪刀差的另一半：产出端已经自动化，验证端还停在"人靠警觉"。所以方向不是"提醒大家认真点"，而是把判断固化成机制——从"靠记得检查"，到"每次自动检查"，再到"检查不通过就无法继续"。工程的价值不只是降低错误概率，更是让某些错误<strong>没有机会静默通过</strong>。</p>
-
-    <h2 class="sec">四种把"证真"变成机制的方法<span class="back">深入版 §四</span></h2>
-    <ul class="plain">
-      <li><strong>探针先行</strong>：依赖 hook、回调、生命周期的地方，先写一个不带业务逻辑的最小探针，记录原始载荷和时序。只接受"这段代码传了这些字段"，不接受"应该能拿到"。案例第一版的整轮返工，本来半小时就能避免。</li>
-      <li><strong>产出边界设分层门禁</strong>：结构、范围、证据三层由代码判；语义（是否误导、是否过度断言）由模型初筛或人工抽检；业务（值不值得展示、失败要不要降级）由产品规则定。五层是串联，低层通过不代表整条链合格。</li>
-      <li><strong>完成条件写成可独立检验的清单</strong>："标题简洁"不能验收，"不超过 32 字符且截断不破坏语义"可以。标准是：第三方不理解你的意图也能判过或不过。</li>
-      <li><strong>让验证者拥有独立视角</strong>：新会话读 diff 和测试结果；评审者对照原始需求逐条查；模型读原始记录而不是作者总结；高风险结果人工抽检。</li>
-    </ul>
-    <p>门禁有一个绕不开的自问：<strong>用模型判别模型产出，算不算循环论证？</strong>是风险，但可控——模型只放在低风险层（语义）做初筛，判别器本身定期用人工标注样本校准；高风险判断（数据真实性、业务价值、最终放行）交给确定性规则和固定比例人工抽检。模型判别的角色是"缩小需要人工复核的范围"，不是最终裁决。</p>
-    <p>门禁也不是越严越好，所以要同时看两个率：<strong>抽检复核率</strong>（拦住的结果里，其实该放行的比例——度量误杀）和<strong>线上缺陷回流率</strong>（放过的结果里，下游才发现问题的比例——度量误放）。只盯误放，门禁会收紧到把产出拦光；只盯误杀，门禁等于没装。健康的门禁是两个率都有数、都被接受。</p>
-
-    <h2 class="sec">一条完整的证据链：五阶段、四道闸<span class="back">深入版 §五</span></h2>
-    <p>四种机制不是四个补丁，可以串成一条从需求到生产的链：五道阶段之间有四道验证闸，每道闸消耗上一阶段的产物、拒收不合格的继续前进。</p>
-
-    <figure>
-      <svg viewBox="0 0 900 250" font-family="-apple-system,PingFang SC,sans-serif" role="img" aria-label="五阶段四道验证闸与失败样本回流">
-        <defs>
-          <marker id="arw-gray3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-          </marker>
-          <marker id="arw-red3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
-          </marker>
-        </defs>
-
-        <rect x="40" y="84" width="140" height="64" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="110" y="110" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">需求</text>
-        <text x="110" y="132" font-size="12" fill="#6b7280" text-anchor="middle">对"正确"有同一个定义吗</text>
-
-        <rect x="210" y="84" width="140" height="64" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="280" y="110" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">设计</text>
-        <text x="280" y="132" font-size="12" fill="#6b7280" text-anchor="middle">依赖的能力真的存在吗</text>
-
-        <rect x="380" y="84" width="140" height="64" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="450" y="110" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">实现</text>
-        <text x="450" y="132" font-size="12" fill="#6b7280" text-anchor="middle">满足确定性约束吗</text>
-
-        <rect x="550" y="84" width="140" height="64" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
-        <text x="620" y="110" font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">交付</text>
-        <text x="620" y="132" font-size="12" fill="#6b7280" text-anchor="middle">结果对得上需求吗</text>
-
-        <rect x="720" y="84" width="140" height="64" rx="8" fill="#ecfdf5" stroke="#10b981"/>
-        <text x="790" y="110" font-size="15" font-weight="700" fill="#047857" text-anchor="middle">生产</text>
-        <text x="790" y="132" font-size="12" fill="#6b7280" text-anchor="middle">真实分布下还可靠吗</text>
-
-        <text x="195" y="58" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">闸1</text>
-        <text x="195" y="74" font-size="11" fill="#9ca3af" text-anchor="middle">可验收条件</text>
-        <text x="365" y="58" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">闸2</text>
-        <text x="365" y="74" font-size="11" fill="#9ca3af" text-anchor="middle">探针</text>
-        <text x="535" y="58" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">闸3</text>
-        <text x="535" y="74" font-size="11" fill="#9ca3af" text-anchor="middle">测试 + 门禁</text>
-        <text x="705" y="58" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">闸4</text>
-        <text x="705" y="74" font-size="11" fill="#9ca3af" text-anchor="middle">独立验证</text>
-
-        <line x1="182" y1="116" x2="206" y2="116" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray3)"/>
-        <line x1="352" y1="116" x2="376" y2="116" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray3)"/>
-        <line x1="522" y1="116" x2="546" y2="116" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray3)"/>
-        <line x1="692" y1="116" x2="716" y2="116" stroke="#6b7280" stroke-width="2" marker-end="url(#arw-gray3)"/>
-
-        <path d="M 790 152 V 200 H 114 V 154" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arw-red3)"/>
-        <text x="452" y="192" font-size="12" fill="#dc2626" text-anchor="middle">生产阶段的失败样本、trace 与抽样评估回流成下一轮需求</text>
-      </svg>
-      <figcaption>图 3 · 五阶段、四道闸、一条回流线</figcaption>
-    </figure>
-    <p class="figread">先看<strong>四道闸的位置</strong>：它们都在阶段之间，不在阶段内部——这意味着一道闸能否起作用，取决于上一阶段有没有交出可被检查的产物。再看<strong>那条红色虚线</strong>：它是整张图唯一往回走的东西，也是"证据链"与"流水线"的分界——流水线把失败当终点，闭环把失败当下一次需求的输入。</p>
-
-    <p>判据只有一条：<strong>如果某一层只能提供一句"应该没问题"，证据链就在那里断了。</strong>同一症状可能由多层同时断裂引起，所以要回到具体链路确认，而不是按症状机械对号。</p>
-
-    <h2 class="sec">回扣案例：两次翻盘各断在哪一层<span class="back">深入版 §六</span></h2>
-    <p><strong>第一版断在闸 2（设计层）</strong>：hook 方案没经过探针，直接基于名字先验做设计。当时若先放一个最小探针，"看不到整轮最终回答"会在半小时内暴露。<strong>第二版断在闸 1 和闸 3（需求层 + 实现层）</strong>：需求层，"高质量总结卡"不可验收，查询失败、数据不足这些负面场景从未写成用例；实现层，没有分级指标和门禁，14 张全部直接放行，筛选被推给事后人工。</p>
-    <p>两条路线的成本对比很直白：实际路线是两次整体返工加一轮人工筛卡；证据链路线是一个探针、一张分级指标表、一组可验收条件。剪刀差存在，但<strong>方向可以选</strong>——要么把钱花在事后返工，要么花在事前闸门。区别是后者买回的是可持续的判断能力，而前者每来一次都得重新付一遍。</p>
-    <div class="quote">AI 让产出变得便宜，所以工程价值越来越集中在判真假；而判真假不能靠每次自觉，必须靠证据和机制。</div>
-  </main>
-
-  <section class="interview">
-    <h2>面试官可能会追问</h2>
-    <details>
-      <summary>Q1：你说的"似真产出"，不就是 AI 幻觉吗？有什么新东西？</summary>
-      <div class="ans">幻觉是"模型说了不存在的事实"，似真产出范围更宽：结构完整、语气自信、状态看起来成功，但真实性未经验证——它可能每句话都真，只是结论建立在错误前提上（比如对一段旧数据做了正确的趋势计算）。更关键的是立论位置：似真产出不是 AI 发明的，人类时代的装饰性汇报、靠口才过关的验收一直存在；AI 改变的是产出的边际成本，让"做出来了"不再携带"大概率做对了"这个信号。
-        <span class="ref">→ 深入版 引子</span></div>
-    </details>
-    <details>
-      <summary>Q2：14 张里只有 5 张可用，这数据能推广吗？</summary>
-      <div class="ans">不能，我在文中明确写了边界：这是单次批量运行的数字，来自一个匿名化项目的复盘，不是基准测试。它能证明"这个失败模式存在"，不能推出行业发生率。它的价值在于可归位——每一张不合格的卡都能对应到某个具体机制（状态字段吞掉失败、原始产出冒充有效产出），而不是"AI 就是不行"这种无法行动的判断。
-        <span class="ref">→ 深入版 §一、证据边界声明</span></div>
-    </details>
-    <details>
-      <summary>Q3：门禁越严越安全吧？多拦一点总没错。</summary>
-      <div class="ans">错，过度拦截会把系统变成沉默机器，用户看到的是"什么都没生成"，而且没人知道为什么。所以我要求同时看两个率：抽检复核率度量误杀，线上缺陷回流率度量误放。只盯误放，门禁会一路收紧到产出归零；只盯误杀，门禁形同虚设。健康的门禁是两个率都有数、都被接受，而不是其中一个趋近于零。这两个口径是本文的设计建议，具体阈值得按业务校准，我没给普适数值。
-        <span class="ref">→ 深入版 §四 第 2 小节</span></div>
-    </details>
-    <details>
-      <summary>Q4：让模型去判别模型产出，这不就是自己证明自己？</summary>
-      <div class="ans">是风险，但可分层化解。模型判别只放在低风险层——语义层（是否误导、是否过度断言、格式是否一致），而且判别器本身要定期用人工标注样本校准；高风险判断（数据真实性、业务价值、最终放行）交给确定性代码规则或固定比例人工抽检。换句话说，模型做初筛、证据和人工做终审，它的作用是把人工复核的范围缩小，不是最终裁决。
-        <span class="ref">→ 深入版 §四 第 2 小节</span></div>
-    </details>
-    <details>
-      <summary>Q5：这套东西说起来都对，落地成本很高吧？</summary>
-      <div class="ans">成本要跟返工比。这个案例里，实际付出的是两次整体返工加一轮人工筛卡；证据链路线付出的是一个探针（约半小时）、一张分级指标表、一组可验收条件。区别不在总量，在于后者可复用：闸门建好之后，下一次同类功能直接受益，而返工每次都要重新付。最小起点也不高——下一步只做一件事就够：给最常出的那个替身，补一道能自动判的闸。
-        <span class="ref">→ 深入版 §六</span></div>
-    </details>
-  </section>
-
-  <footer class="exit">
-    <p><strong>想核对证据与完整论证？</strong>深入版在这里：<a href="https://github.com/zhouxiaohei/show-something/blob/main/原文/AI%20让看起来正确变得廉价：从似真产出到证据化工程.md" target="_blank" rel="noopener">AI 让"看起来正确"变得廉价</a>（含断言标注、证据边界声明与参考资料）。本页每个小节后的灰色标记，指的是深入版里对应的那一节。</p>
-    <p style="margin-top:8px;">版本标注：对应深入版 v3（status: revised，2026-10-27）。本页为讲解版，结论与深入版一致；案例数字与证据强度均已标注边界，未作外推。</p>
-    <p style="margin-top:14px;display:flex;justify-content:space-between;gap:16px;font-size:14px;"><a href="讲解-01-越聊越浅.html">← 上一篇：为什么编码 Agent 越聊越浅</a><a href="讲解-03-PRD契约.html">下一篇：PRD 有了第二类读者 →</a></p>
-  </footer>
-
-</div>
-</body>
-</html>
+}
+</code></pre>
+<p>外层只表示&quot;流程走完了&quot;，内层才表示&quot;业务动作是否成功&quot;。异常可能被捕获，工具调用可能正常结束，HTTP 也可能返回 200，但这些都不能证明用户要的结果已经成立。案例里那张&quot;暂无异常&quot;的卡，正是查询失败被层层吞掉后，由最外层状态字段盖出的假章。</p>
+<p>因此，状态字段只能作为线索，不能独立充当业务事实。判断成功必须深入到产生价值的那一层：数据是否存在、时间范围是否正确、关键动作是否真正执行、结果是否满足业务约束。</p>
+<h3>2. 原始产出替代有效产出</h3>
+<p>&quot;生成了 14 个结果&quot;描述的是吞吐量；&quot;其中 5 个可用&quot;描述的才是质量——这正是案例第二版给出的数字。</p>
+<p>生成系统天然倾向于把&quot;我产生了一个对象&quot;当成&quot;我完成了任务&quot;。如果验收指标只统计原始产出数，系统会被激励去制造更多形式完整的垃圾。更合理的指标至少要区分：</p>
+<pre><code class="language-text">raw output      原始产出
+valid output    通过确定性规则
+grounded output 有足够证据支撑
+useful output   对用户确实有价值
+</code></pre>
+<p>这几个数字之间的差距，比总产出数更能说明系统质量。</p>
+<h3>3. 名称和先验替代真实能力</h3>
+<p><code>post_tool_use</code>、<code>after_action</code>、<code>on_complete</code> 之类的名称，会让人自然推断它们&quot;应该&quot;能拿到完整上下文。LLM 也会根据见过的其他框架，生成一个听起来合理的能力说明。案例第一版的 hook 方案，赌的正是这个&quot;应该&quot;。</p>
+<p>但集成点的能力是经验问题，不是语言推理问题。&quot;整个系统里存在这份数据&quot;不等于&quot;这个回调会把数据传给你&quot;；&quot;大多数框架这样设计&quot;也不等于&quot;当前仓库如此实现&quot;。答案只能来自：</p>
+<ul>
+<li>派发代码；</li>
+<li>函数签名和真实载荷；</li>
+<li>一次最小探针；</li>
+<li>一条完整运行轨迹。</li>
+</ul>
+<p>在一个未经验证的 hook 上继续设计，后续方案越精致，沉没成本越高。</p>
+<h3>4. &quot;做完了&quot;替代可验证完成</h3>
+<p>AI 很擅长生成任务结束时应有的语言：修改完成、问题已解决、测试应该通过。这类表述可能描述的是&quot;它执行了修改动作&quot;，也可能只是&quot;它认为方案足够合理&quot;，两者都不等于功能真的工作。</p>
+<p>同样，PRD 里的&quot;生成一张高质量总结卡&quot;读起来人人都懂，却没有定义：什么情况下不应该生成；多长算过长；什么数据足以支撑趋势判断；哪些结论必须带时间和来源；失败时应该沉默、降级还是提示。&quot;完成&quot;和&quot;理解&quot;如果没有可观察的下落，都只是漂亮的状态描述。</p>
+<h3>替身与证真机制的对应关系</h3>
+<p>四个替身不是四个孤立的现象，它们各自对应一种把&quot;证真&quot;变成机制的解法：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>正确替身</th>
+<th>案例中的画面</th>
+<th>对应证真机制（详见 §四）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>状态字段替代真实成功</td>
+<td>查询失败仍出&quot;暂无异常&quot;卡</td>
+<td>质量门禁（结构与证据层）</td>
+</tr>
+<tr>
+<td>原始产出替代有效产出</td>
+<td>14 张里只有 5 张可用</td>
+<td>产出分级指标 + 门禁</td>
+</tr>
+<tr>
+<td>名称先验替代真实能力</td>
+<td>hook 拿不到整轮结果</td>
+<td>探针先行</td>
+</tr>
+<tr>
+<td>&quot;做完了&quot;替代可验证完成</td>
+<td>&quot;生成高质量总结卡&quot;无法验收</td>
+<td>可检验完成条件 + 独立验证</td>
+</tr>
+</tbody></table></div>
+<p>这里给的是&quot;最对症的起点&quot;，不是一一映射：一个替身往往需要多个机制叠加才能拦住（&quot;暂无异常&quot;卡既要证据层门禁，也要独立验证），而一个机制也常常同时防住多个替身。识别替身，本质上是在识别系统里哪些信号正在冒充证据——状态码、数量、命名、语气，每一种都是一种外观。</p>
+<p><a id="deep-s3"></a></p>
+<h2>三、为什么“以后仔细一点”解决不了问题</h2>
+<p>发现这些风险后，最自然的反应是：以后多检查一下。这不是可靠的工程方案。</p>
+<p>一方面，模型不会因为上一次被纠正，就永久形成新的行为。没有进入系统提示、项目指令、测试或代码门禁的纠正，换一个会话后很可能重新发生 <code>[经验]</code>。另一方面，人也会忘。系统在大多数时候表现正确，反而会培养自动化偏见：工具越可靠，人越少核对；越少核对，偶发的高置信错误越容易穿过整条链路 <code>[经验]</code>。</p>
+<p>这正是剪刀差的另一半：产出端已经自动化，验证端如果还停留在&quot;人靠警觉&quot;的手工模式，两端的速度失配只会越来越大。可靠性不能依赖每个人在每一次执行中都保持警觉，正确方向是把判断固化成机制：</p>
+<pre><code class="language-text">靠记得检查
+    ↓
+每次自动检查
+    ↓
+检查不通过就无法继续
+</code></pre>
+<p>工程的价值不只在于降低错误概率，还在于让某些错误没有机会静默通过。常规解法之所以失效，是因为它把验证责任放在&quot;人的警觉&quot;这个最不可靠的组件上——而自动化恰恰放大了警觉的稀缺。</p>
+<p><a id="deep-s4"></a></p>
+<h2>四、四种把“证真”变成机制的方法</h2>
+<h3>1. 在集成点上先放探针，再做设计</h3>
+<p>如果一个功能依赖 hook、回调、消息事件或框架生命周期，先写一个不承担业务逻辑的最小探针：</p>
+<pre><code class="language-text">收到哪些字段？
+调用发生在什么时候？
+同一轮会触发几次？
+异常和取消时是否触发？
+能否看到最终结果？
+</code></pre>
+<p>先记录原始载荷和时间顺序，再决定是否适合作为集成点。这里最重要的纪律是：不接受&quot;应该能拿到&quot;，只接受&quot;这段代码传递了这些字段&quot;或&quot;这次运行实际收到这些内容&quot;。案例第一版的整轮返工，理论上用一个半小时的探针就能避免。</p>
+<h3>2. 在产出边界设置质量门禁</h3>
+<p>门禁不是 LLM 专属保险——规则系统、模板系统和统计系统同样可能在错误输入上稳定地产出错误结果。只要同时满足以下三点，就应该考虑门禁：</p>
+<ol>
+<li>结果由系统生成或推导；</li>
+<li>结果会展示给用户，或驱动下游动作；</li>
+<li>输入本身不能天然保证结果有效。</li>
+</ol>
+<p>门禁最好分层：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层级</th>
+<th>检查内容</th>
+<th>适合方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>结构</td>
+<td>schema、必填字段、类型</td>
+<td>代码</td>
+</tr>
+<tr>
+<td>范围</td>
+<td>长度、枚举、时间窗、数值范围</td>
+<td>代码</td>
+</tr>
+<tr>
+<td>证据</td>
+<td>结论能否对应来源，关键数据是否存在</td>
+<td>代码优先，必要时模型判别</td>
+</tr>
+<tr>
+<td>语义</td>
+<td>是否误导、是否过度断言</td>
+<td>模型判别或人工抽检</td>
+</tr>
+<tr>
+<td>业务</td>
+<td>是否值得展示，失败应否降级</td>
+<td>产品规则与代码</td>
+</tr>
+</tbody></table></div>
+<p>这张表给的是&quot;哪类检查该用什么工具&quot;的默认分配，不回答门禁该设在系统哪条边界上。另外要留意：五层是串联关系，低层通过不代表整条链合格——schema 通过只能证明&quot;可以解析&quot;，不能证明&quot;事实正确&quot;。</p>
+<p>反过来，门禁也不是越严越好——过度拦截会把系统变成沉默机器，因此要同时观察误放和误杀。<strong>误杀怎么度量</strong>，两个可操作口径 <code>[推测]</code>（口径设计属本文建议，数值需按业务校准）：</p>
+<ul>
+<li><strong>抽检复核率</strong>：定期抽样被门禁拦截的结果，交人工复核，统计其中&quot;其实该放行&quot;的比例——它直接度量误杀；</li>
+<li><strong>线上缺陷回流率</strong>：统计放过门禁的结果，在下游或生产环节被发现问题的比例——它度量误放。</li>
+</ul>
+<p>两个口径必须一起看：只盯误放，门禁会越收越紧，直到产出被拦光；只盯误杀，门禁形同虚设。健康的门禁是两个率都有数值、都被接受，而不是其中一个趋近于零。</p>
+<p><strong>用模型判别模型产出，算不算循环论证</strong>——这个问题需要正面回答。是风险，但可控，方法是分层限权：模型判别只放在<strong>低风险层</strong>（语义层：是否误导、是否过度断言、格式是否一致），并且模型判别器本身也要定期用人工标注样本校准；<strong>高风险判断</strong>（数据真实性、业务价值、最终放行）由确定性代码规则或固定比例人工抽检兜底。换句话说，模型判别的角色是&quot;缩小需要人工复核的范围&quot;，不是&quot;最终裁决&quot;——它提高抽检的命中率，而抽检保留了人对系统的校准通道。这样处理之后，自指不再是&quot;模型自己证明自己&quot;，而是&quot;模型做初筛、证据和人工做终审&quot;。</p>
+<h3>3. 把完成条件写成可独立检验的清单</h3>
+<p>&quot;标题简洁&quot;无法验收；&quot;标题不超过 32 个字符，且不能通过截断破坏语义&quot;可以验收。一个好的完成条件应该让第三方无需理解作者意图，也能回答&quot;过还是不过&quot;。例如：</p>
+<ul>
+<li>必须运行哪些测试；</li>
+<li>哪些输出字段必须存在；</li>
+<li>哪些负面场景不得产生结果；</li>
+<li>数据时间窗如何判断；</li>
+<li>什么证据需要保留；</li>
+<li>哪些结果必须人工确认。</li>
+</ul>
+<p>让&quot;完成&quot;从一句报告变成一组证据：测试输出、运行截图、trace、实际响应或可重复命令。</p>
+<h3>4. 让验证者拥有独立视角</h3>
+<p>自查的问题不只是态度。创作者已经接受了自己的前提，复查时容易继续沿用同一套解释。更可靠的方式是让验证者从外部证据重新建立判断：</p>
+<ul>
+<li>新会话读取 <code>git diff</code> 和测试结果；</li>
+<li>独立评审者对照原始需求逐条检查；</li>
+<li>模型读取原始记录，而不是作者自己的总结；</li>
+<li>关键高风险结果接受人工抽检。</li>
+</ul>
+<p>重点不是&quot;再问一次&quot;，而是改变验证者看到的信息和所处的位置。注意这与 §四 第 2 小节的分层限权是同一原则的两个应用：门禁侧，模型只做低风险初筛；验证侧，独立视角不继承作者前提。</p>
+<p>四种机制的共同点，是把&quot;信不信&quot;的判断权从生成者手里移交给外部证据——探针移交能力事实，门禁移交规则事实，清单移交验收标准，独立验证移交旁观者视角。这也是它们能组合成链条的原因：每道移交都留下可被下一环消费的产物。</p>
+<p><a id="deep-s5"></a></p>
+<h2>五、一条完整的证据链：五阶段、四道验证闸</h2>
+<p>四种机制不是独立的补丁，它们可以组成一条从需求到生产的证据链。链条有五个阶段，阶段之间有四道验证闸，每道闸消耗前一个阶段的产物、拒绝不合格的继续前进：</p>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;需求&quot;] --&gt;|&quot;闸1&lt;br/&gt;写成可验收条件&lt;br/&gt;和负面用例&quot;| B[&quot;设计&quot;]
+    B --&gt;|&quot;闸2&lt;br/&gt;探针确认集成点&lt;br/&gt;真实能力&quot;| C[&quot;实现&quot;]
+    C --&gt;|&quot;闸3&lt;br/&gt;代码测试、schema&lt;br/&gt;与业务门禁&quot;| D[&quot;交付&quot;]
+    D --&gt;|&quot;闸4&lt;br/&gt;独立验证&lt;br/&gt;实际产物&quot;| E[&quot;生产&quot;]
+    E -.-&gt;|&quot;trace、抽样评估、&lt;br/&gt;失败样本回流&quot;| A
+</code></pre>
+<p>图上最值得注意的是底部那条回流虚线：生产阶段的失败样本不是终点，而是下一轮需求的输入——证据链是闭环，不是流水线。</p>
+<p>每一层都回答不同的问题，也都对应一种&quot;断掉时的典型症状&quot;：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层</th>
+<th>要证明什么</th>
+<th>断掉时的典型症状</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>需求</td>
+<td>团队对&quot;正确&quot;是否有同一个定义？</td>
+<td>验收靠&quot;人人都懂&quot;的形容词，两个实现各按自己的理解做</td>
+</tr>
+<tr>
+<td>设计</td>
+<td>方案依赖的能力是否真的存在？</td>
+<td>集成点&quot;应该能拿到&quot;，第一次真实触发才发现字段缺失</td>
+</tr>
+<tr>
+<td>实现</td>
+<td>代码是否满足确定性约束？</td>
+<td>测试只测 happy path，schema 通过被当成事实正确</td>
+</tr>
+<tr>
+<td>交付</td>
+<td>实际结果是否符合需求，而不只是改了代码？</td>
+<td>作者自证清白，复查沿用同一套前提</td>
+</tr>
+<tr>
+<td>生产</td>
+<td>真实输入分布下是否仍然可靠？</td>
+<td>没有 trace 和失败样本回流，问题只能靠用户投诉发现</td>
+</tr>
+</tbody></table></div>
+<p>这张表是&quot;断在哪里会看到什么&quot;的对照，不是诊断流程——同一症状可能由多层同时断裂引起，修复时要回到具体链路确认，而不是按症状机械对号。判据仍然只有一条：如果某一层只能提供一句&quot;应该没问题&quot;，证据链就在那里断了。</p>
+<p>证据链回答的不是&quot;这次结果对不对&quot;，而是&quot;我凭什么能持续知道对不对&quot;——它把单次验证升级为一条可持续运转的验证流水线。</p>
+<p><a id="deep-s6"></a></p>
+<h2>六、回扣案例：用证据链重放两次翻盘</h2>
+<p>现在回到第一节，把两次翻盘放进证据链逐层定位。</p>
+<p><strong>第一版翻盘断在闸 2（设计层）</strong>：hook 方案没有经过探针验证，直接基于名称先验做设计。如果当时先放一个最小探针，&quot;看不到整轮最终回答&quot;会在半小时内暴露，而不是在一次整体返工后。</p>
+<p><strong>第二版翻盘断在闸 1 和闸 3（需求层 + 实现层）</strong>：需求层，&quot;高质量总结卡&quot;不可验收，负面场景（查询失败、数据不足）从未被写成用例；实现层，没有产出分级指标和门禁，14 张卡全部直接放行，质量筛选被留给了事后人工。</p>
+<p>对比两种路线的成本 <code>[复盘证据]</code>：实际路线是两次整体性返工外加一轮人工筛卡；证据链路线是一个探针、一张分级指标表和一组可验收条件。剪刀差存在，但方向可以选择——要么把成本花在事后返工，要么把成本花在事前闸门；区别在于后者买回的是<strong>可持续的判断能力</strong>，而前者每次都要重新付一遍。</p>
+<p>案例的价值不在证明&quot;会出错&quot;，而在证明错误可以逐层归位：每类替身都对应链条上的一道闸，闸到位，替身就失去了冒充真品的位置。</p>
+<p><a id="deep-s7"></a></p>
+<h2>结语</h2>
+<p>回到开头的立论：似真产出不是 AI 发明的，但 AI 把产出的边际成本压到接近零，而验证成本没有同比例下降——剪刀差张开之后，&quot;做出一个东西&quot;不再构成高质量交付。</p>
+<p>更稀缺的能力转移到判真假这一侧：</p>
+<ul>
+<li>找到似真与真最容易分家的位置；</li>
+<li>把模糊的&quot;好&quot;改造成可执行标准；</li>
+<li>为概率组件设计确定性边界；</li>
+<li>保留能被第三方复核的原始证据；</li>
+<li>让一次事故变成以后每次都会执行的门禁。</li>
+</ul>
+<p>这不是对 AI 更不信任，而是把它当成真正的生产组件：既利用它的生成能力，也承认它的输出需要被验证。</p>
+<p>一句话总结：</p>
+<blockquote>
+<p>AI 让产出变得便宜，所以工程价值越来越集中在判真假；而判真假不能靠每次自觉，必须靠证据和机制。</p>
+</blockquote>
+<h2>参考资料</h2>
+<ul>
+<li><a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Demystifying evals for AI agents — Anthropic</a></li>
+<li><a href="https://github.com/humanlayer/12-factor-agents">12-Factor Agents</a></li>
+<li><a href="https://direct.mit.edu/tacl/article/doi/10.1162/tacl_a_00754/131566/Know-Your-Limits-A-Survey-of-Abstention-in-Large">Know Your Limits: A Survey of Abstention in Large Language Models</a></li>
+<li><a href="https://simonwillison.net/2025/Mar/2/hallucinations-in-code/">Hallucinations in code are the least dangerous form of LLM mistakes — Simon Willison</a></li>
+</ul>
+<hr>
+<h2>证据边界声明</h2>
+<p><strong>这份声明的范围</strong>：适用于正文所有带标注的判断，也适用于未标注但涉及失败模式的描述。</p>
+<ul>
+<li><code>[复盘证据]</code> 来自作者真实项目的匿名化复盘，属单案例经验——它证明该失败模式存在，<strong>不代表</strong>所有 Agent 系统的统计发生率；14→5 是单次批量运行的数字，不是基准测试；</li>
+<li><code>[官方方法]</code> 是厂商或社区公开的工程方法论，属经验性证据而非受控实验——分层 eval、12-Factor Agents 等提供的是做法参考，不是效果保证；</li>
+<li><code>[经验]</code> 是作者实践观察，样本有限，不可外推为普遍规律；</li>
+<li><code>[推测]</code> 是本文提出的判断（目前一处：误杀/误放的两个度量口径），口径设计属建议，具体数值阈值需按业务校准；</li>
+<li>文中对人类时代似真产出的描述（装饰性汇报、自动化偏见等）为常识性观察与作者经验，未引用定量研究。</li>
+</ul>
+<h3>这些来源分别支持什么</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>文中判断</th>
+<th>证据性质</th>
+<th>边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>hook 无法取得整轮结果、14 项中仅 5 项可展示</td>
+<td>匿名化项目复盘</td>
+<td>证明该失败模式存在，不代表行业发生率</td>
+</tr>
+<tr>
+<td>Agent 需要分层 eval 和可观察轨迹</td>
+<td>Anthropic 工程方法</td>
+<td>是方法论，不是效果保证</td>
+</tr>
+<tr>
+<td>长任务应把上下文、动作与控制流显式化</td>
+<td>12-Factor Agents 工程经验</td>
+<td>社区实践，不是受控实验</td>
+</tr>
+<tr>
+<td>模型需要知道何时拒答或降级</td>
+<td>弃答研究综述</td>
+<td>研究结论不能直接替代具体业务阈值</td>
+</tr>
+<tr>
+<td>流畅表达会掩盖事实错误</td>
+<td>公开案例与工程观察</td>
+<td>用于解释风险，不给出定量概率</td>
+</tr>
+</tbody></table></div>
+<h2>Changelog</h2>
+<ul>
+<li><strong>v3（2026-10-27，按 SHOW v3.1 重写）</strong><ul>
+<li>结构：六节次序不动（篇型 B：案例→分类→常规解法失效→机制→证据链→回扣闭环）；删去六处同句式的&quot;本节本质&quot;栏目，把收口句并入该节正文末尾——原写法与本篇 §一/§二/§三/§四/§五/§六 六节完全同构，属模板报幕句批量复制（同 V-002 事故形态）；</li>
+<li>边界：删去两处&quot;这张表不能告诉你什么&quot;引导语，边界内容改写进表后正文；§二 对应关系表中&quot;详见第四节&quot;改为&quot;§四&quot;；</li>
+<li><strong>修正交叉引用错误</strong>：§四 第 4 小节原文写&quot;这与上一节的分层限权是同一原则&quot;，但&quot;上一节&quot;是第 3 小节（可检验清单），分层限权实际在第 2 小节（门禁）。已改为&quot;§四 第 2 小节&quot;。此类错误机器检查查不出，只有逐节复读能发现；</li>
+<li>入口：顶部改为讲解版入口并按 SHOW-P05 给出对应小节号。原 v2 记录的理由&quot;讲解版 html 位于 gitignore 的 <code>阅读/</code> 目录&quot;已过期（当前 <code>.gitignore</code> 只忽略 <code>.DS_Store</code>），本次不再以该理由偏离 P-2；</li>
+<li>未改：全部事实、案例数字（14/5）、引用编号、标注等级与结论口径保持原样；未新增未经核实的数字。</li>
+</ul>
+</li>
+<li><strong>v2（2026-10-16，重写，任务卡 2）</strong><ul>
+<li>似真-1：立论由&quot;AI 时代特有似真产出&quot;改为&quot;似真产出历史延续存在，AI 改变的是产出边际成本趋零与验证成本未降的<strong>比例/速率失衡</strong>&quot;，开篇正面承认问题的人类时代前身与既有工程纪律；</li>
+<li>似真-2：新增第二节末&quot;替身与证真机制的对应关系&quot;表，把四个替身与四种机制显式挂钩，并附&quot;这张表不能告诉你什么&quot;；</li>
+<li>似真-3：第四节门禁小节正面处理&quot;用模型判别模型产出&quot;的自指问题——模型判别限低风险语义层 + 定期人工校准，高风险层由确定性规则与固定比例人工抽检兜底；</li>
+<li>似真-4：门禁小节新增误杀度量思路：抽检复核率（度量误杀）+ 线上缺陷回流率（度量误放），两率并重，标注 <code>[推测]</code>；</li>
+<li>似真-5：删除原第六节&quot;AI 时代工程师的价值正在换位&quot;独立章节，其&quot;稀缺能力清单&quot;压缩并入结语；</li>
+<li>似真-6：第五节新增 mermaid 证据链图（五阶段四道验证闸 + 生产回流），并新增&quot;每层断掉时的典型症状&quot;列；</li>
+<li>结构：按篇型 B 重组（案例→提炼分类→常规解法失效→机制→证据链→回扣案例闭环），六节收敛为引子+六节+结语；开篇新增断言标注约定（[M-7]），案例保留原稿&quot;真实项目复盘匿名化&quot;声明；</li>
+<li><strong>偏离记录</strong>：偏离 [P-2]（md 顶部→html 讲解版入口链接），理由同样板篇：讲解版 html 位于 gitignore 的 <code>阅读/</code> 目录、不推送公开仓库（拍板 D2），在推送的 md 中放相对链接会 404；两层互引改在本地核验流程中完成。（该理由已于 v3 失效）任务卡动作 6 &quot;证据链四层图&quot;按&quot;四道验证闸&quot;落实：原文证据链为五阶段、阶段间四道验证闸，图中四层指四道闸，五阶段与&quot;每层要证明什么&quot;表完整保留（避免 [M-12] 无声丢失）。</li>
+</ul>
+</li>
+<li><strong>v1（原稿）</strong>：初始版本（status: draft）。</li>
+</ul>
+</article></details></main></div>
+<footer class="article-shell article-footer"><a href="../index.html#recommended">← 返回推荐阅读</a><span>铁甲依然在 · 3.1-review · 2026-11-27</span><a href="#article-top">回到顶部 ↑</a></footer>
+<dialog class="figure-dialog" aria-label="放大图示"><button class="figure-close" type="button" aria-label="关闭放大图示">关闭 ×</button><div class="figure-dialog-content"></div></dialog>
+</body></html>

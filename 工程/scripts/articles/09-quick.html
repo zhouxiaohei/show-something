@@ -1,0 +1,34 @@
+<section class="content-section" id="dm-intro"><p class="kicker">先给一句话答案</p><h2>读完代码只是起点：要交付的是带证据与未知项的系统画像</h2>
+<p>接手一个陌生后端，目标是建立一份能指导行动的系统画像：请求从哪里进来，核心业务由哪些组件完成，数据与外部依赖在哪里，目标环境实际运行哪个版本。AI 可以帮助搜索代码、整理线索，但这些线索必须和运行对象对应起来，才能支持对接、改造或接管判断。</p>
+<p class="callout">本文的一句话答案：<strong>读码建立候选结构，沿关键业务路径观察实际行为，再把观察关联到运行实例、构建来源和有效配置；遇到矛盾就回查，最终交付附有证据与未知项的系统画像。</strong></p>
+<p>先声明口径：全文的导出服务为构造案例，流程是综合方法设计，未做量化效率实验。</p><a class="deep" href="?view=deep#overview">查看引子与阅读姿态 ↗</a> <a class="md-source" href="{{MD_URL}}#overview">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-questions"><p class="kicker">背景</p><h2>接手一个服务，先回答四类问题</h2>
+<p>入口在哪里、服务负责什么、哪些工作由其他组件完成；读写哪些数据、依赖哪些服务与基础设施；一次导出从请求到结果怎样完成；目标环境运行什么制品、源码与配置。只整理目录、数据库地址和接口数量不够：导出接口可能只负责创建任务，真正生成文件的是后台 worker——它可能使用另一套启动命令、配置和发布制品。若迁移计划只覆盖 HTTP 服务，接口能收请求，文件也可能永远生成不了。</p>
+<p>贯穿调查的业务链：用户提交导出请求，API 完成鉴权并创建任务；worker 取得任务后读取业务数据、生成文件；用户随后查询状态或下载结果。任务传递方式和文件存放位置暂时都是待核实项。</p><a class="deep" href="?view=deep#s0">查看四类问题表与业务链 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-gaps"><p class="kicker">难点</p><h2>为什么读到的信息经常对不上</h2>
+<p>四个难点：①仓库保存的是实现与默认选择，环境决定哪些实际生效——默认配置连接开发库，部署时却用环境变量选任务库；②接口声明描述能力，业务路径才解释工作——"创建任务成功"只覆盖业务链前半段；③每次观察都带着环境、身份、时点和覆盖范围——健康检查成功只说明该检查覆盖的条件在那一刻满足；④代码、制品与运行实例之间需要另外建立对应——本地分支叫 <code>main</code>，不说明线上服务由它构建，滚动更新期间新旧实例可能共存。</p>
+<p class="callout">四个难点指向同一件事：文件中的声明用来提出解释，业务观察用来核对行为，运行来源用来限定这些解释和观察属于谁。</p><a class="deep" href="?view=deep#s1">查看四个难点的展开案例 ↗</a> <a class="md-source" href="{{MD_URL}}#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-plan"><p class="kicker">总方案</p><h2>先建图，再观察，最后对账</h2>
+<p>三类工作各解决一个问题：<strong>读码</strong>建立候选结构，产物是带出处的候选地图与待核实命题；<strong>受控观察</strong>核对关键事实，围绕影响当前决策的命题进行；<strong>运行溯源</strong>把对象对齐——实例、制品、构建来源、源码提交与有效配置。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜三阶段调查闭环：对账不过关就回查</b></div><div class="diagram-scroll"><img src="配图/09/fig01.svg" alt="明确决策与时点后，经读码、观察、溯源三阶段推进，对账一致则交付系统画像，矛盾则定位差异回到命题清单" loading="lazy" decoding="async"></div><figcaption>箭头表示信息如何推进和修正判断，不要求把溯源全部留到最后；实际执行可以往返。</figcaption></figure>
+<p>贯穿全程的是事实底账：把记录分为声明、观察、推断、未知，每条重要判断记录当前依据。</p>
+<figure><div class="figure-top"><span>底账</span><b>图 02｜四类记录各带限定，一条命题可引用多类记录</b></div><div class="diagram-scroll"><img src="配图/09/fig03.svg" alt="声明、观察、推断、未知四类记录的示例与必须保留的限定，下方是一条记录的书写链" loading="lazy" decoding="async"></div><figcaption>四类描述信息性质，不是从低到高的固定等级；证据位置应指向有权限复查的原始材料。</figcaption></figure><a class="deep" href="?view=deep#s2">查看三类工作、流程图与底账记录表 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-steps"><p class="kicker">七步展开</p><h2>沿一笔导出任务查清系统</h2>
+<p>第一步锁定范围与快照，写清仓库提交、目标环境、观察身份与时间窗口；第二步从构建文件和启动入口建立候选地图，配置要追到加载逻辑与运行来源；第三步把数据源追到有效配置、身份、对象和用途——TCP 成功只支持网络可达；第四步沿业务路径把请求、任务、后台处理和结果关联起来；第五步区分服务调用、任务传递和共享数据访问三种不同的箭头；第六步把行为关联到实例、制品、构建与源码，API 与 worker 分别查；第七步对账，差异解释必须能连接到发生差异的那个环节。</p>
+<figure><div class="figure-top"><span>七步</span><b>图 03｜每步的主要工作与本步产物</b></div><div class="diagram-scroll"><img src="配图/09/fig02.svg" alt="锁定范围、候选地图、数据源、业务路径、组件关系、运行来源、对账交付七步及各自产物" loading="lazy" decoding="async"></div><figcaption>第一份范围说明是后续比较的基准；证据无法对应这些条件时，先补齐对象信息再比较。</figcaption></figure><a class="deep" href="?view=deep#s3">查看七步的构造案例细节 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-case"><p class="kicker">完整案例</p><h2>证据把"一个应用连一个库"改成两条数据线</h2>
+<p>最初的粗略方案是"部署应用、接好数据库、把三个接口接到新入口"。按七步推进后，E1—E5 表明：API 与 worker 是两种执行角色；API 用任务库 T，worker 用业务库 B 并回写 T；任务经消息通道交给 worker；结果经 API 读取交付并按独立参考核对内容；API 制品关联提交 R2，worker 制品关联 R1——不能按本地单一提交概括。</p>
+<figure><div class="figure-top"><span>结构</span><b>图 04｜修订后的导出链与支撑它的五组证据</b></div><div class="diagram-scroll"><img src="配图/09/fig04.svg" alt="用户、导出 API、任务队列、worker、任务库 T、业务库 B、文件存储 F 的关系图，配 E1 到 E5 五组证据" loading="lazy" decoding="async"></div><figcaption>箭头表示已取得证据的关系，不表达吞吐、时延或覆盖率；API 与 worker 同仓库，仍需分别识别。</figcaption></figure>
+<p class="callout">交付结论同时说明系统是什么、查清到哪一步、下一步为什么要补证；生产来源、跨用户权限、大数据量与失败重试尚未覆盖，需要另行验证。</p><a class="deep" href="?view=deep#s4">查看 E1—E5 材料表与交付结论原文 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-stop"><p class="kicker">交付与停止</p><h2>查得够不够，跟着当前决策走</h2>
+<p>停止前把问题改写为："如果这个未知取另一种可能的值，会改变当前决定吗？"会改变，就补证或明确限制决定；不会改变，可以保留未知并停止本轮调查。没有通用的"覆盖多少接口就够了"阈值。交付物要同时回答结构、行为、来源和未知，每条未知最好带"下一步是什么"——这比只写"待确认版本"更容易推动后续工作。稳定事实有维护位置，调查报告保留自己的证据时点。</p><a class="deep" href="?view=deep#s5">查看交付物清单与停止条件表 ↗</a> <a class="md-source" href="{{MD_URL}}#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="dm-boundary"><p class="kicker">证据边界</p><h2>构造案例加公开机制说明，不是实测成绩</h2>
+<p>全文的导出服务、文件名、接口、资源与观察结果均为构造案例，用于展示调查过程；本次没有连接生产数据库、调用内部服务或重跑真实部署调查。配置覆盖、接口字段、数据库可见性、追踪、镜像和构建溯源语义由 12 条公开资料支持；三阶段七步组织、事实底账、差异检查顺序和停止判断属于本文的综合方法，没有量化证明它比其他调查方法更快。</p>
+<p class="closing">调查的价值不在多跑几条命令，而在每个结论都能被复查、能指向下一步。</p><a class="deep" href="?view=deep#s6">查看证据边界与参考资料 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>

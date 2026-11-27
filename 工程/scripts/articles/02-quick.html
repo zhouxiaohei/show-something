@@ -1,0 +1,34 @@
+<section class="content-section" id="ev-gap"><p class="kicker">先给一句话答案</p><h2>"看起来正确"变得廉价，"证明正确"没有</h2>
+<p>先修正一个容易走偏的立论：<strong>似真产出不是 AI 发明的</strong>——装饰性的工作汇报、听起来专业实则空洞的方案、靠口才过关的验收演示，人类时代一直存在；针对它们的工程纪律（测试、评审、验收标准）也早已存在。AI 改变的是<strong>比例与速率</strong>：产出边际成本趋零，验证成本没有同比例下降，两条成本曲线张开剪刀差。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜两条成本曲线的剪刀差</b></div><div class="diagram-scroll"><img src="配图/02/fig01.svg" alt="产出一条结果的成本随时间趋零，验证真实性的成本基本持平，剪刀差张开，工程重心从生产结果移向建立证据链" loading="lazy" decoding="async"></div><figcaption>过去"做出来"本身就是高成本信号；现在"做出来了"不再携带"大概率做对了"的信息量。本文不讨论如何让模型更会写，只讨论如何让错误结果无法只凭外观过关。</figcaption></figure>
+<p class="callout">一句话答案：<strong>AI 让"看起来正确"变得廉价，却没有让"证明正确"变得廉价；于是最危险的失败不再是明显报错，而是成功地产出了一个错误结果——它可能通过 schema 校验、返回 success: true、页面正常展示，直到有人用真实数据、真实链路核对才发现整个结论建立在错误前提上。</strong></p><a class="deep" href="?view=deep#s0">查看引子与可以直接拿走的四样东西 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-case"><p class="kicker">案例样本</p><h2>一个总结卡功能，两次推倒重来</h2>
+<p><strong>第一版</strong>把生成逻辑挂在"工具调用完成"的 hook 上：名字合理、触发稳定，很快"成功出卡"。抓取运行轨迹才发现——这个 hook 只能看到当前工具的结果，看不到整轮任务的最终回答：生成的是"电影演到一半写出的影评"，整体作废。<strong>第二版</strong>移到一轮结束之后：批量运行产出 14 张卡，按时间范围、数据充分性、证据一致性、展示价值筛选，真正适合给用户看的只有 5 张。</p>
+<figure><div class="figure-top"><span>案例</span><b>图 02｜两次翻盘的画面</b></div><div class="diagram-scroll"><img src="配图/02/fig02.svg" alt="第一版 hook 只见当前工具结果整版作废；第二版 14 张卡筛选后只有 5 张可用，其余包括旧数据写成近期变化、明细描述成趋势、查询失败仍出卡、数据不足补结论" loading="lazy" decoding="async"></div><figcaption>14 → 5 是单次批量运行的数字，不是基准测试 [复盘证据]。两次翻盘表面是集成点选错和质量不足，底层是同一个问题：接受了"足够像真的替身"。</figcaption></figure><a class="deep" href="?view=deep#s1">查看案例完整复盘 ↗</a> <a class="md-source" href="{{MD_URL}}#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-standins"><p class="kicker">分类</p><h2>四种"正确替身"：每种都对应一道证真机制</h2>
+<p><strong>似真产出</strong>：结构完整、语气自信、状态看起来成功，但真实性未经验证；在关键节点被当作"真"来接受的那份，就是<strong>正确替身</strong>。四类位置：状态字段替代真实成功（外层 success 只表示流程走完了）；原始产出替代有效产出（14 张 ≠ 14 张可用）；名称和先验替代真实能力（"应该能拿到"是语言推理，能力是经验问题）；"做完了"替代可验证完成。</p>
+<figure><div class="figure-top"><span>四宫格</span><b>图 03｜替身、案例画面与对应证真机制</b></div><div class="diagram-scroll"><img src="配图/02/fig03.svg" alt="四种正确替身各配案例画面与对应证真机制：质量门禁、产出分级指标、探针先行、可检验完成条件加独立验证" loading="lazy" decoding="async"></div><figcaption>对应关系给的是"最对症的起点"，不是一一映射：一个替身往往需要多个机制叠加才能拦住，一个机制也常常同时防住多个替身。</figcaption></figure><a class="deep" href="?view=deep#s2">查看四种替身的定义与对应关系表 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-vigilance"><p class="kicker">为什么常规解法失效</p><h2>"以后仔细一点"不是工程方案</h2>
+<p>发现风险后最自然的反应是"以后多检查一下"——这不可靠。一方面，模型不会因为上一次被纠正就永久形成新行为：没有进入系统提示、项目指令、测试或代码门禁的纠正，换个会话很可能重新发生 [经验]。另一方面，人也会忘：系统大多数时候表现正确，反而培养自动化偏见——工具越可靠，人越少核对，偶发的高置信错误越容易穿过整条链路 [经验]。</p>
+<p class="callout">这是剪刀差的另一半：产出端已经自动化，验证端还停在"人靠警觉"的手工模式，速度失配只会越来越大。正确方向是把判断固化成机制：<strong>靠记得检查 → 每次自动检查 → 检查不通过就无法继续。</strong>工程的价值不止降低错误概率，还在于让某些错误没有机会静默通过。</p><a class="deep" href="?view=deep#s3">查看警觉失效与自动化偏见 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-mechanisms"><p class="kicker">四种机制</p><h2>把"证真"变成机制：探针、门禁、清单、独立验证</h2>
+<p><strong>探针先行</strong>：功能依赖 hook、回调、事件或生命周期时，先写一个不承担业务逻辑的最小探针，记录原始载荷和时间顺序；不接受"应该能拿到"，只接受"这段代码传递了这些字段"——案例第一版的整轮返工，理论上一个半小时的探针就能避免。<strong>可检验清单</strong>：让第三方无需理解作者意图也能回答"过还是不过"。<strong>独立验证</strong>：新会话读 diff 和测试，不继承作者前提。</p>
+<figure><div class="figure-top"><span>门禁</span><b>图 04｜质量门禁：五层串联 + 两率并重 + 分层限权</b></div><div class="diagram-scroll"><img src="配图/02/fig04.svg" alt="门禁触发三条件与结构、范围、证据、语义、业务五层检查；误杀误放两个度量口径；模型判别分层限权，高风险由代码规则与人工抽检兜底" loading="lazy" decoding="async"></div><figcaption>"用模型判别模型产出"是风险但可控：模型判别只放低风险语义层并定期人工校准，高风险判断由确定性规则和固定比例人工抽检兜底——模型做初筛，证据和人工做终审。</figcaption></figure>
+<p class="callout">四种机制的共同点：把"信不信"的判断权从生成者手里移交给外部证据——探针移交能力事实，门禁移交规则事实，清单移交验收标准，独立验证移交旁观者视角。每道移交都留下可被下一环消费的产物，所以它们能组合成链条。</p><a class="deep" href="?view=deep#s4">查看四种机制细节与误杀度量口径 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-chain"><p class="kicker">证据链</p><h2>五阶段、四道闸，闭环不是流水线</h2>
+<p>四种机制可以组成一条从需求到生产的证据链：需求 → 设计 → 实现 → 交付 → 生产，阶段之间是四道验证闸——闸 1 写成可验收条件和负面用例；闸 2 探针确认集成点真实能力；闸 3 代码测试、schema 与业务门禁；闸 4 独立验证实际产物。生产阶段的失败样本不是终点，而是下一轮需求的输入。</p>
+<figure><div class="figure-top"><span>链路</span><b>图 05｜五阶段四道闸 + 回流闭环</b></div><div class="diagram-scroll"><img src="配图/02/fig05.svg" alt="需求设计实现交付生产五阶段，四道验证闸，生产失败样本回流为下一轮需求输入" loading="lazy" decoding="async"></div><figcaption>每层断掉时的症状不同：验收靠形容词、集成点"应该能拿到"、只测 happy path、作者自证清白、问题靠用户投诉发现。同一症状可能由多层同时断裂引起，修复要回到具体链路确认。</figcaption></figure>
+<p class="callout">判据只有一条：<strong>如果某一层只能提供一句"应该没问题"，证据链就在那里断了。</strong>证据链回答的不是"这次结果对不对"，而是"我凭什么能持续知道对不对"。</p><a class="deep" href="?view=deep#s5">查看证据链分层表与断链症状 ↗</a> <a class="md-source" href="{{MD_URL}}#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-replay"><p class="kicker">回扣案例</p><h2>两次翻盘逐层归位</h2>
+<p><strong>第一版断在闸 2（设计层）</strong>：hook 没经过探针验证，直接基于名称先验做设计——先放探针，"看不到整轮最终回答"会在半小时内暴露。<strong>第二版断在闸 1 和闸 3（需求层 + 实现层）</strong>：需求层，"高质量总结卡"不可验收，查询失败、数据不足等负面场景从未写成用例；实现层，没有产出分级指标和门禁，14 张卡全部直接放行。</p>
+<p class="callout">成本对比 [复盘证据]：实际路线 = 两次整体返工 + 一轮人工筛卡；证据链路线 = 一个探针 + 一张分级指标表 + 一组可验收条件。剪刀差存在，但方向可以选择：<strong>要么把成本花在事前闸门，要么花在事后返工——前者买回可持续的判断能力，后者每次都要重新付一遍。</strong></p><a class="deep" href="?view=deep#s6">查看两次翻盘的逐层定位 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ev-closing"><p class="kicker">结语</p><h2>产出变便宜，工程价值集中在判真假</h2>
+<p>更稀缺的能力转移到判真假这一侧：找到似真与真最容易分家的位置；把模糊的"好"改造成可执行标准；为概率组件设计确定性边界；保留能被第三方复核的原始证据；让一次事故变成以后每次都会执行的门禁。</p>
+<p class="closing">一句话总结：<strong>AI 让产出变得便宜，所以工程价值越来越集中在判真假；而判真假不能靠每次自觉，必须靠证据和机制。</strong></p><a class="deep" href="?view=deep#s7">查看结语与证据边界声明 ↗</a> <a class="md-source" href="{{MD_URL}}#s7">Markdown 对应段落</a></section>

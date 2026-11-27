@@ -1,0 +1,43 @@
+<section class="content-section" id="ctx-answer"><p class="kicker">先给一句话答案</p><h2>越聊越浅通常不是变笨，是三个独立机制的叠加</h2>
+<p>同一个编码 Agent，刚开始分析得很深，做着做着却越来越敷衍：重复读取已经看过的文件、修复一个问题又复活几小时前处理过的旧问题、让它"深入复盘"得到的往往是一段更完整的自我解释。最消耗人的信号是：<strong>人开始替 Agent 维护任务记忆</strong>——反复提醒已确认的约束，阻止它复活被否决的方案，再逐项核对它口中的"完成"。</p>
+<figure><div class="figure-top"><span>总览</span><b>图 01｜症状、三个机制与解法</b></div><div class="diagram-scroll"><img src="配图/01/fig01.svg" alt="症状清单经零号变量分诊后指向上下文腐烂、自我纠错盲区、交接成本三个机制，解法是写稳定载体加干净上下文读原始证据" loading="lazy" decoding="async"></div><figcaption>三个机制的症状高度相似，所以顺序不能反：先认症状、再拆机制、后谈解法，拆开才能对症。把一切统称"模型变笨"，只会得到"换更强模型"的泛化建议。</figcaption></figure>
+<p class="callout">一句话答案：<strong>"越聊越浅"通常不是模型突然变笨，而是上下文腐烂、自我纠错盲区、交接成本三个独立机制的叠加；外加一个必须最先排除的零号变量——推理预算或模型配置本身不适配。解法不是把提示词写得更凶，而是管理信息：把仍约束未来的决定写进稳定载体，让干净的上下文直接读取原始证据。</strong></p><a class="deep" href="?view=deep#s0">查看症状清单与失控轨迹原型 ↗</a> <a class="md-source" href="{{MD_URL}}#s0">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-variable"><p class="kicker">零号变量</p><h2>第一轮就浅？先查配置，别急着诊断上下文</h2>
+<p>如果回答从第一轮开始就浅，先别诊断上下文。推理模型有思考预算：格式化、重命名和样板代码用低预算就够；复杂竞态、架构审查、安全检查和跨仓迁移需要更高预算。还要分清：<strong>输出简洁</strong>与<strong>推理深入</strong>是两个维度——让模型少说一点，不应该等价于让它少想一点。</p>
+<figure><div class="figure-top"><span>分诊</span><b>图 02｜零号变量：四步排查顺序与时间轴分诊</b></div><div class="diagram-scroll"><img src="配图/01/fig02.svg" alt="排查顺序四步：档位、配置变化、前几轮是否正常、再谈上下文；前面深后面浅指向上下文问题，第一轮就浅指向配置问题" loading="lazy" decoding="async"></div><figcaption>只有"前面深、后面浅"才更像上下文累积问题。零号变量是时间轴上的分诊台——它把"一直浅"（配置问题）与"后来浅"（本文主题）分开。</figcaption></figure><a class="deep" href="?view=deep#s1">查看零号变量与排查顺序 ↗</a> <a class="md-source" href="{{MD_URL}}#s1">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-rot"><p class="kicker">机制一</p><h2>上下文腐烂：不是信息丢了，是权威版本判断不稳</h2>
+<p>Agent 每次搜索、读文件、跑测试的结果都会进入会话。任务推进后，窗口里同时存在失效的旧方案、重复的文件片段、语义相似的搜索结果、被覆盖的早期要求、报错重试和自我总结——仍然有效的事实被噪声包围。一个候选解释是检索与推理共享注意力资源（本文的 [推测]，附剂量效应验证方式）；研究观察到的是：即使正确答案已在上下文中，周围信息增加也会降低表现。</p>
+<figure><div class="figure-top"><span>机制</span><b>图 03｜有效信息被历史噪声包围</b></div><div class="diagram-scroll"><img src="配图/01/fig03.svg" alt="会话窗口中有效事实被旧方案、重复片段、相似搜索、被覆盖要求、报错重试、自我总结包围，右侧是研究证据与典型症状" loading="lazy" decoding="async"></div><figcaption>Context Rot 与多轮对话研究都是 [模型证据]；对编码任务尤其严重，因为代码搜索返回大量"看起来都相关"的内容——Agent 不是找不到信息，而是难以稳定判断哪份才是最新权威版本。</figcaption></figure>
+<p class="callout">典型症状：重复读取没变化的文件、忘记已明确否决的方案、只响应最新一句而遗漏累计约束、计划修改与总结对不上、时而深时而浅。最后一种"方差变大"是线索不是定论——它也可能来自采样温度或服务端负载波动，结合零号变量的排查顺序使用。</p><a class="deep" href="?view=deep#s2">查看上下文腐烂的机制假设与证据 ↗</a> <a class="md-source" href="{{MD_URL}}#s2">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-blindspot"><p class="kicker">机制二</p><h2>自我纠错盲区：改变身份，而不是增加强调</h2>
+<p>让 Agent 复盘自己刚做的工作听起来很合理——上下文都在，它最了解自己做过什么。但"最了解过程"不等于"最适合证伪过程"：自回归模型继续回答时，前面的判断更像既定前提，而不是需要从零审查的外部对象。Self-Correction Bench 报告了明显的盲区，且任务越复杂越严重；缺少外部反馈时，"再想想""认真检查"不仅常无效，有时还会把原本正确的答案改错。</p>
+<figure><div class="figure-top"><span>解法</span><b>图 04｜两种身份、无效提示与有效做法</b></div><div class="diagram-scroll"><img src="配图/01/fig04.svg" alt="同一份内容作为你刚才的结论是既定前提，作为待审查材料可以从零证伪；有效做法是新开上下文、给 diff 与测试、称这份修改、逐条找反例" loading="lazy" decoding="async"></div><figcaption>要求"更深入"只是让模型在原框架内生成更长、更自洽的解释。有效做法是把产物变成外部证据：新开上下文、提供 diff 与测试输出、称它"这份修改"、逐条寻找反例而不是解释设计意图。</figcaption></figure>
+<p>风险高时换一个模型或独立评审者——价值不在投票，而在让验证者不继承原作者的全部隐含前提。</p><a class="deep" href="?view=deep#s3">查看自我纠错盲区的证据与身份改变法 ↗</a> <a class="md-source" href="{{MD_URL}}#s3">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-handoff"><p class="kicker">机制三</p><h2>交接成本：腐烂得以持续的经济学原因</h2>
+<p>前两个机制都指向同一个动作——换到更干净的上下文，但如果换上下文很贵，腐烂就会持续。代码任务高度紧耦合：一个修改可能同时依赖项目规范、多轮追加的约束、已失败的方案、当前 diff、测试环境，以及只能从历史讨论理解的设计意图。每次人工重写背景太贵，于是大家留在已腐烂的旧上下文里，质量进一步下降。</p>
+<p class="callout">多 Agent 也不会自动解决问题：Anthropic 的经验是并行架构适合可拆成独立分支的研究任务，对需要共享状态的紧耦合任务效果更差、成本显著增加。<strong>并行度解决的是吞吐，未必解决单点深度。</strong></p><a class="deep" href="?view=deep#s4">查看交接成本与多 Agent 边界 ↗</a> <a class="md-source" href="{{MD_URL}}#s4">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-layers"><p class="kicker">解法</p><h2>不按任务切知识，按变化速度分层</h2>
+<p>"新窗口需要知道哪些内容"这个问题几乎答不对——代码任务彼此纠缠。更稳定的问法是换一个切分维度：<strong>这条信息变化得有多快？</strong> 由此得到三层：地基层（技术栈、规范、禁区 → AGENTS.md，自动加载）；决策层（已定方案、已否决路径、设计意图 → NOTES.md / ADR，增量更新）；现场层（diff、测试、日志 → Git 和工具输出，不搬运）。</p>
+<figure><div class="figure-top"><span>分层</span><b>图 05｜三层信息与交接路径：现场层不搬运</b></div><div class="diagram-scroll"><img src="配图/01/fig05.svg" alt="旧会话知识分三层流入新上下文：地基层自动加载，决策层经人确认增量更新，现场层由新上下文直接读取原始证据后进入独立审查" loading="lazy" decoding="async"></div><figcaption>图上最关键的是那条虚线：现场层最容易纠缠、也最容易失真，所以<strong>不让旧 Agent 转述</strong>。真正需要手工维护的只有决策层，尤其是"试过但失败的方案"——这类信息无法从当前代码自动恢复，却持续约束未来选择。</figcaption></figure>
+<p class="callout">什么值得进入持久上下文，判据一句话：<strong>只保留仍然会约束未来推理的信息。</strong>"我读了 20 个文件"不值得保留；"方案 A 因为事务边界不成立而被否决"值得保留。过期笔记会在每次会话中重复污染上下文。</p><a class="deep" href="?view=deep#s5">查看分层表与持久上下文判据 ↗</a> <a class="md-source" href="{{MD_URL}}#s5">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-axes"><p class="kicker">判断框架</p><h2>两条轴：身份轴 × 时效轴，交叉出四种处理方式</h2>
+<p>具体到某一条信息，问两个问题：<strong>身份轴</strong>——它是当前模型自己的产出，还是外部证据？<strong>时效轴</strong>——它仍然约束未来，还是已经完成的过程？交叉得到：外部证据 + 仍约束未来 → 保留或按需读取；外部证据 + 已完成 → 用完清理；模型自产 + 仍约束未来 → 写入文件、经人确认后重新加载；模型自产 + 已完成 → 直接清理。</p>
+<p class="callout">"经人确认"防的是：模型对过程的有损总结在未经人审阅时写入持久层，变成下一轮会话的"权威事实"。最没价值的是"已经完成的模型自述"——占空间、是有损总结、还容易触发自我纠错盲区。一条记录一半仍有约束力、一半已作废时，拆成两条分别处理，不要硬塞进一格。</p><a class="deep" href="?view=deep#s6">查看两轴表与常见做法有效性对照 ↗</a> <a class="md-source" href="{{MD_URL}}#s6">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-review"><p class="kicker">流程</p><h2>证据式复盘：五段输入 + 三条纪律</h2>
+<p>长任务进入复盘阶段时，直接采用五段输入结构：原始目标（用户真正要什么）、仍然有效的约束（只列当前有效规则，注明权威来源）、已否决方案（方案 + 否决原因 + 证据）、当前事实（让新上下文自行读取 git diff、测试和日志）、审查任务（寻找被绕过的要求、被掩盖的失败、未验证的假设、半途而废的工作）。</p>
+<p class="callout">三条纪律：① 不要求旧窗口证明自己正确；② 不只读取作者总结，要读取原始产物；③ 每个"已完成"都必须对应外部证据。交接材料最常见的死法是"我做了什么"式流水账——它把旧会话的噪声原样复制进新会话。<strong>复盘的质量取决于输入的身份（证据还是自述），而不是复盘指令的强度。</strong></p><a class="deep" href="?view=deep#s7">查看复盘输入模板与三条纪律 ↗</a> <a class="md-source" href="{{MD_URL}}#s7">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-table"><p class="kicker">速查</p><h2>症状—原因速查表：先怀疑谁，误判了怎么办</h2>
+<p>使用方法：先按症状定位行，执行"首要动作"；没改善再查"误判时怎么办"。几行示例：从第一轮就浅 → 查推理档位和版本；前几轮好后来浅 → 停止扩写历史，建约束清单，新上下文读当前事实；复盘全是自洽解释 → 改成外部审查任务（diff + 测试 + 找反例）；反复采用已否决方案 → 补记方案与否决理由——没有理由的禁令最难被遵守。</p>
+<p class="callout">最后一行是对本文主推动作的自我设限：<strong>上下文腐烂不能被简化成定时清空会话。</strong>修改很小、约束没变、Agent 仍能准确回放目标与非目标、问题依赖尚未落盘的局部推理、交接成本高于剩余工作——这些情况留在当前会话更划算。真正的切换信号不是 token 数，而是<strong>任务模型是否仍然稳定</strong>：抽查三问——当前目标是什么？哪条路径已被否决？完成需要哪些证据？答错任何一个关键项，就不应继续扩大修改面。</p><a class="deep" href="?view=deep#s8">查看完整速查表与抽查三问 ↗</a> <a class="md-source" href="{{MD_URL}}#s8">Markdown 对应段落</a></section>
+
+<section class="content-section" id="ctx-closing"><p class="kicker">结语</p><h2>别让旧上下文汇报自己；让它交出记录</h2>
+<p>编码 Agent 越聊越浅，不一定是模型突然变差，也不一定能靠更强烈的提示词解决。真正有效的方向是管理信息：减少已经失效的过程，把仍然有效的决定写进稳定载体，让新上下文从原始证据重新建立判断，并把自我复盘改成独立审查。</p>
+<p class="closing">可以把全文压缩成一句工作原则：<strong>别让旧上下文汇报自己做得怎么样；让它交出记录，再让一个干净的上下文读取证据。</strong></p><a class="deep" href="?view=deep#s9">查看结语与证据边界声明 ↗</a> <a class="md-source" href="{{MD_URL}}#s9">Markdown 对应段落</a></section>

@@ -19,10 +19,14 @@
   "documents": [
     {
       "id": "show-07",
-      "version": "2.1-review",
+      "version": "2.2-review",
       "status": "local-review",
       "markdown": "原文/文档明明写了，Agent 为什么还是答错：把知识库变成可测试接口.md",
-      "html": "阅读/讲解-07-文档可测试化.html"
+      "html": "阅读/讲解-07-文档可测试化.html",
+      "markdown_version": "2.2-review",
+      "html_version": "2.2-review",
+      "last_paired_version": "2.2-review",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。"
     },
     {
       "id": "show-08",
@@ -40,20 +44,23 @@
       "status": "local-reviewed",
       "markdown": "原文/读完代码，还不算了解这个系统：陌生后端的事实核验七步法.md",
       "html": "阅读/讲解-09-项目事实核验.html",
-      "markdown_version": "1.1",
-      "html_version": "1.1",
-      "last_paired_version": "1.1",
-      "stage_note": "2026-10-28：MD已由用户确认；两版同为1.1，完成12幅图解、完整深入全文、机械/独立语义/真实浏览器复核；本地交付，未发布。",
-      "version": "1.1"
+      "markdown_version": "1.2-review",
+      "html_version": "1.2-review",
+      "last_paired_version": "1.2-review",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。",
+      "version": "1.2-review"
     },
     {
       "id": "show-10",
-      "version": "0.1-review",
+      "version": "0.2-review",
       "status": "review",
       "markdown": "原文/AI 趋势新闻 2026-11月观察.md",
       "html": "阅读/AI 趋势新闻 2026-11月观察.html",
       "specification": "SHOW v3.3（2026-10-29）",
-      "stage_note": "2026-11-05：MD与7幅图解HTML同版，完成本轮检查；用户已授权提交并推送至origin/main，保留0.1-review版本。"
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。",
+      "markdown_version": "0.2-review",
+      "html_version": "0.2-review",
+      "last_paired_version": "0.2-review"
     },
     {
       "id": "show-11",
@@ -133,6 +140,66 @@
       "last_paired_version": "0.1-review",
       "specification": "SHOW v3.3（2026-10-29）",
       "stage_note": "2026-11-24：初稿 0.1-review。MD 九节加术语表，8 幅配图与图解片段同版；未核对 Agnes 源码，数字按官方自评登记，见文末证据边界声明。"
+    },
+    {
+      "id": "show-01",
+      "version": "3.2-review",
+      "status": "local-review",
+      "markdown": "原文/为什么编码 Agent 越聊越浅：上下文腐烂、自我纠错盲区与交接成本.md",
+      "html": "阅读/讲解-01-越聊越浅.html",
+      "markdown_version": "3.2-review",
+      "html_version": "3.2-review",
+      "last_paired_version": "3.2-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。"
+    },
+    {
+      "id": "show-02",
+      "version": "3.1-review",
+      "status": "local-review",
+      "markdown": "原文/AI 让看起来正确变得廉价：从似真产出到证据化工程.md",
+      "html": "阅读/讲解-02-证据化工程.html",
+      "markdown_version": "3.1-review",
+      "html_version": "3.1-review",
+      "last_paired_version": "3.1-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。"
+    },
+    {
+      "id": "show-04",
+      "version": "3.1-review",
+      "status": "local-review",
+      "markdown": "原文/Agent 系统可靠性：提示词、模型与代码的边界.md",
+      "html": "阅读/讲解-04-提示词与代码边界.html",
+      "markdown_version": "3.1-review",
+      "html_version": "3.1-review",
+      "last_paired_version": "3.1-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。"
+    },
+    {
+      "id": "show-05",
+      "version": "4.1-review",
+      "status": "local-review",
+      "markdown": "原文/为什么最好用的是 Claude Code：分数打平之后，赢在协作可靠性.md",
+      "html": "阅读/讲解-05-为什么最好用的是 Claude Code.html",
+      "markdown_version": "4.1-review",
+      "html_version": "4.1-review",
+      "last_paired_version": "4.1-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。"
+    },
+    {
+      "id": "show-06",
+      "version": "1.4-review",
+      "status": "local-review",
+      "markdown": "原文/为什么和 AI 越聊越乱.md",
+      "html": "阅读/讲解-06-越聊越乱.html",
+      "markdown_version": "1.4-review",
+      "html_version": "1.4-review",
+      "last_paired_version": "1.4-review",
+      "specification": "SHOW v3.3（2026-10-29）",
+      "stage_note": "2026-11-27：讲解版升级到新标准（外置配图+图解片段+双视图）。md 正文未改，仅加导航锚点（overview+sN）；版本随讲解版同步上移。"
     }
   ],
   "markdown_reader": "新增讲解页内置由完整正本生成的深入版，?view=deep#deep-锚点用于浏览器精确定位；保留Markdown源文及显式锚点。",
